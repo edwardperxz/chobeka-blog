@@ -19,3 +19,9 @@ ChobekaBlog es un proyecto de blog panameño para compartir memes, desarrollado 
    ```sh
    conda install anaconda::django
    pip install django-widget-tweaks
+
+5. **Ejecutar el proyecto**
+    Para iniciar el servidor, utiliza Anaconda Prompt, dirígete a la carpeta donde se ubica el repositorio y ejecuta:
+
+    ```sh
+   python manage.py runserver
