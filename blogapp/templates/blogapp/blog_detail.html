@@ -7,7 +7,10 @@
   </article>
 
   <section class="mt-8">
-    <h2 class="text-2xl font-semibold mb-4">Reviews</h2>
+    <h2 class="text-2xl dark:text-white font-semibold mb-4">Reviews</h2> <!--Se agrega el color del texto para el modo oscuro-->
+    {% if user.is_authenticated %}
+      <a href="{% url 'blogapp:add_review' object.pk %}" class="mb-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors">Add Review</a>
+    {% endif %}
     {% for review in object.reviews.all %}
       <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-4 transition-all duration-700 ease-in-out dark:text-white text-gray-900 animate-fade-in">
         <p class="text-blue-700 dark:text-blue-300 font-medium">{{ review.reviewer.username }} - {{ review.rating }}/5 ⭐</p>
@@ -22,6 +25,6 @@
     {% empty %}
       <p class="text-gray-400">No reviews yet. Be the first to add one.</p>
     {% endfor %}
-    <a href="{% url 'blogapp:add_review' object.pk %}" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors">Add Review</a>
+    <a href="{% url 'blogapp:add_review' object.pk %}" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors animate-fade-in">Add Review</a> <!--Se agrega la animacion-->
   </section>
 {% endblock %}
