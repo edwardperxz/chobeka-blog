@@ -1,10 +1,10 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
 from .models import Blog, Review, Comment
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 class BlogListView(ListView):
     model = Blog
