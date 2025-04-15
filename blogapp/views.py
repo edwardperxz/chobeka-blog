@@ -30,7 +30,7 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
 
 
 
-class ReviewCreateView(CreateView, LoginRequiredMixin):
+class ReviewCreateView(LoginRequiredMixin, CreateView):
     model = Review
     fields = ['rating', 'comment']
     template_name = 'blogapp/review_form.html'
