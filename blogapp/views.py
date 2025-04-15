@@ -1,7 +1,10 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
 from .models import Blog, Review, Comment
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 class BlogListView(ListView):
     model = Blog
@@ -27,7 +30,7 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
 
 
 
-class ReviewCreateView(CreateView):
+class ReviewCreateView(LoginRequiredMixin, CreateView):
     model = Review
     fields = ['rating', 'comment']
     template_name = 'blogapp/review_form.html'
@@ -41,7 +44,7 @@ class ReviewCreateView(CreateView):
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.kwargs['pk']})
 
 
-class CommentCreateView(CreateView):
+class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     fields = ['content']
     template_name = 'blogapp/comment_form.html'
@@ -53,3 +56,21 @@ class CommentCreateView(CreateView):
 
     def get_success_url(self):
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.kwargs['blog_pk']})
+
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('blogapp:blog_list')
+        else:
+            messages.error(request, 'Invalid username or password')
+    return render(request, 'blogapp/login.html')
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('blogapp:blog_list')
