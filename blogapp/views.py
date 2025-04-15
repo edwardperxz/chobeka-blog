@@ -44,7 +44,7 @@ class ReviewCreateView(CreateView, LoginRequiredMixin):
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.kwargs['pk']})
 
 
-class CommentCreateView(CreateView, LoginRequiredMixin):
+class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     fields = ['content']
     template_name = 'blogapp/comment_form.html'
