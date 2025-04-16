@@ -1,10 +1,13 @@
-from django.urls import path
-from .views import BlogListView, BlogDetailView, ReviewCreateView, CommentCreateView, BlogCreateView, login_view, logout_view
+from django.contrib.auth import views as auth_views
+from django.urls import path, include
+from .views import BlogListView, BlogDetailView, ReviewCreateView, CommentCreateView, BlogCreateView, login_view, logout_view, sign_up
 
 app_name = 'blogapp'
 
 
 urlpatterns = [
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('signup/', sign_up, name = 'sign_up'),
     path('', BlogListView.as_view(), name='blog_list'),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
