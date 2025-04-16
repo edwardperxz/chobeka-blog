@@ -84,7 +84,7 @@ def sign_up(request):
             messages.success(request, '¡Tu cuenta ha sido creada!')
             return redirect('blogapp:login')
         else:
-            messages.error(request, 'Error! Porfavor corrige los siguientes errores.')
+            messages.error(request, 'Error! Por favor corrige los siguientes errores.')
     else:
         form = UserRegisterForm()
     return render(request, 'blogapp/register.html', {'form':form})
