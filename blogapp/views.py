@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from .forms import UserRegisterForm
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
@@ -74,3 +75,14 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('blogapp:blog_list')
+
+def sign_up(request):
+    if request.method == 'POST':
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request,user)
+            return redirect('blogapp:blog_list')
+    else:
+        form = UserRegisterForm()
+    return render(request, 'blogapp/register.html', {'form':form})
