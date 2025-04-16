@@ -25,6 +25,8 @@
     {% empty %}
       <p class="text-gray-400">No reviews yet. Be the first to add one.</p>
     {% endfor %}
-    <a href="{% url 'blogapp:add_review' object.pk %}" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors animate-fade-in">Add Review</a> <!--Se agrega la animacion-->
+    {% if user.is_authenticated %}
+      <a href="{% url 'blogapp:add_review' object.pk %}" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors animate-fade-in">Add Review</a> <!--Se agrega la animacion-->
+    {% endif %}
   </section>
 {% endblock %}
