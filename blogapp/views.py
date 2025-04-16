@@ -81,8 +81,10 @@ def sign_up(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request,user)
-            return redirect('blogapp:blog_list')
+            messages.success(request, '¡Tu cuenta ha sido creada!')
+            return redirect('blogapp:login')
+        else:
+            messages.error(request, 'Error! Porfavor corrige los siguientes errores.')
     else:
         form = UserRegisterForm()
     return render(request, 'blogapp/register.html', {'form':form})
