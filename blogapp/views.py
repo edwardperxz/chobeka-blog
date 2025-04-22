@@ -25,8 +25,6 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        form.instance.created_at = datetime.now()
-        response = super().form_valid(form)
         return response
 
     def get_success_url(self):
