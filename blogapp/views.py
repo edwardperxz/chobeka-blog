@@ -25,7 +25,9 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return response
+        messages.success(self.request, f'The Blog has been created successfully!')
+
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.object.pk})
