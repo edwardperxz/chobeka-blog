@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from .forms import UserRegisterForm
 from django.contrib import messages
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.urls import reverse_lazy
 from .models import Blog, Review, Comment
 
@@ -32,7 +32,26 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.object.pk})
 
+class BlogUpdateView(LoginRequiredMixin, UpdateView):
+    model = Blog
+    fields = ['title', 'content', 'image']
+    template_name = 'blogapp/blog_form.html'
 
+    def form_valid(self, form):
+        # Check if image was cleared
+        if 'image-clear' in self.request.POST and self.request.POST['image-clear'] == 'on':
+            old_instance = Blog.objects.get(pk=self.object.pk)
+            if old_instance.image:
+                old_instance.image.delete(save=False)
+
+        form.instance.last_updated = datetime.now()
+
+        messages.success(self.request, f'The Blog has been updated successfully!')
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.object.pk})
 
 class ReviewCreateView(LoginRequiredMixin, CreateView):
     model = Review
