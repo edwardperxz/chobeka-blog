@@ -44,6 +44,12 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
             if old_instance.image:
                 old_instance.image.delete(save=False)
 
+        # Check if image was replaced
+        elif 'image' in self.request.FILES:
+            old_instance = Blog.objects.get(pk=self.object.pk)
+            if old_instance.image:
+                old_instance.image.delete(save=False)
+
         form.instance.last_updated = datetime.now()
 
         messages.success(self.request, f'The Blog has been updated successfully!')
