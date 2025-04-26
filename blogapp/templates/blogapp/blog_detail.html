@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
   {% if user.is_authenticated and user == object.author %}
-    <div class="flex justify-start mb-4">
+    <div class="flex justify-start mb-4 space-x-4">
       <a href="{% url 'blogapp:edit_blog' object.pk %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors animate-fade-in">Edit</a>
+      <a href="{% url 'blogapp:delete_blog' object.pk %}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors animate-fade-in" data-toggle="modal" data-target="#deleteConfirmModal">Delete</a>
     </div>
   {% endif %}
   <article class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg transition-all duration-700 ease-in-out dark:text-white text-gray-900 animate-fade-in">
