@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from .forms import UserRegisterForm
 from django.contrib import messages
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import Blog, Review, Comment
 
@@ -58,6 +58,15 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.object.pk})
+
+class BlogDeleteView(LoginRequiredMixin, DeleteView):
+    model = Blog
+    template_name = 'blogapp/blog_confirm_delete.html'
+    success_url = reverse_lazy('blogapp:blog_list')
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, f'The Blog has been deleted successfully!')
+        return super().delete(request, *args, **kwargs)
 
 class ReviewCreateView(LoginRequiredMixin, CreateView):
     model = Review
