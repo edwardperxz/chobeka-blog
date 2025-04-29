@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
 from .models import Blog, Review, Comment
+from django.contrib.messages import get_messages
 
 class BlogListView(ListView):
     model = Blog
@@ -60,6 +61,10 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
 
 def login_view(request):
+    storage = get_messages(request)
+    for message in storage:
+        pass 
+
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -69,6 +74,7 @@ def login_view(request):
             return redirect('blogapp:blog_list')
         else:
             messages.error(request, 'Invalid username or password')
+
     return render(request, 'blogapp/login.html')
 
 
@@ -84,7 +90,31 @@ def sign_up(request):
             messages.success(request, '¡Tu cuenta ha sido creada!')
             return redirect('blogapp:login')
         else:
-            messages.error(request, 'Error! Por favor corrige los siguientes errores.')
+            messages.error(request, 'ERROR! Verifica nuevamente tu información')
     else:
         form = UserRegisterForm()
-    return render(request, 'blogapp/register.html', {'form':form})
+    return render(request, 'blogapp/register.html', {
+        'form':form,
+        'errors': form.errors.get_json_data() if request.method == 'POST' else None
+    })
+
+def facebook_register_view(request):
+    if request.method == 'POST':
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            return redirect('social:begin', backend='facebook') 
+    else:
+        form = UserRegisterForm()
+    return render(request, 'blogapp/register.html', {'form': form})
+
+def social_auth_error(request):
+    error = request.GET.get('error', None)
+    error_description = request.GET.get('error_description', '')
+    
+    if error == 'access_denied' or 'user_denied' in error_description:
+        messages.info(request, 'Has cancelado el inicio de sesión con tu cuenta')
+        return redirect('blogapp:login')
+    
+    messages.error(request, 'Ocurrió un error durante la autenticación. Por favor, intenta nuevamente.')
+    return redirect('blogapp:login')

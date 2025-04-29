@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+  {% load static %}
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blog and Reviews</title>
+  <title>{% block title %}CHOBEKABlog || Reviews{% endblock %}</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'Images/FishChoveaca.ico' %}">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -25,7 +29,8 @@
   html {
     transition: background-color 0.5s ease-in-out;
   }
-    html, body {
+  
+  html, body {
   height: 100%;
   scroll-behavior: smooth;
   transition: background-color 0.5s ease-in-out;
@@ -74,44 +79,7 @@
     </div>
   </main>
 
-  <script>
-    // Persist dark mode setting
-    document.addEventListener('DOMContentLoaded', () => {
-      const prefersDark = localStorage.getItem('theme') === 'dark';
-      const body = document.getElementById('body');
-      const icon = document.getElementById('theme-icon');
-      if (prefersDark) {
-        body.classList.add('dark');
-        if (icon) icon.textContent = '🌙';
-        const label = document.getElementById('theme-label');
-        if (label) label.textContent = 'Modo Oscuro';
-      } else {
-        if (icon) icon.textContent = '🌞';
-        const label = document.getElementById('theme-label');
-        if (label) label.textContent = 'Modo Claro';
-      }
-    });
-
-    function toggleDarkMode() {
-      const body = document.getElementById('body');
-      const icon = document.getElementById('theme-icon');
-      const isDark = body.classList.toggle('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      if (icon) {
-        icon.classList.add('rotate-180');
-        setTimeout(() => {
-          icon.textContent = isDark ? '🌙' : '🌞';
-          const label = document.getElementById('theme-label');
-          if (label) label.style.opacity = 0;
-          setTimeout(() => {
-            label.textContent = isDark ? 'Modo Oscuro' : 'Modo Claro';
-            label.style.opacity = 1;
-          }, 250);
-          icon.classList.remove('rotate-180');
-        }, 250);
-      }
-    }
-
-  </script>
+  <script src="{% static 'js/register_validation.js' %}"></script>
+  <script src="{% static 'js/dark_mode.js' %}"></script>
 </body>
 </html>

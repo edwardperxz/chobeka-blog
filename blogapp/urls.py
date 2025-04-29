@@ -1,6 +1,6 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
-from .views import BlogListView, BlogDetailView, ReviewCreateView, CommentCreateView, BlogCreateView, login_view, logout_view, sign_up
+from .views import BlogListView, BlogDetailView, ReviewCreateView, CommentCreateView, BlogCreateView, login_view, logout_view, sign_up, social_auth_error
 
 app_name = 'blogapp'
 

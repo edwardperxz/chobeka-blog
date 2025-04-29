@@ -16,8 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls.static import static
+from django.conf import settings
+from blogapp.views import social_auth_error
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('blogapp.urls')),  # Conecta las URLs de blogapp
-]
+    path('', include('blogapp.urls')),  
+    path('accounts/', include('allauth.urls')),
+    path('social-auth/', include('social_django.urls', namespace='social')),
+    path('social-auth-error/', social_auth_error, name='social_auth_error'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
