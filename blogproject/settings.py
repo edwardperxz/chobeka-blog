@@ -199,6 +199,4 @@ SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', 'public_profile']
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
 SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {'fields': 'id, name, email'}
 
-SOCIAL_AUTH_LOGIN_ERROR_URL = '/social-auth-error/'
-SOCIAL_AUTH_BACKEND_ERROR_URL = '/social-auth-error/'
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False
