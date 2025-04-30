@@ -62,8 +62,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
 def login_view(request):
     storage = get_messages(request)
-    for message in storage:
-        pass 
+    list(storage)  # Consume messages to clear them from storage
 
     if request.method == 'POST':
         username = request.POST['username']
