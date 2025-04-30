@@ -112,7 +112,7 @@ def social_auth_error(request):
     error = request.GET.get('error', None)
     error_description = request.GET.get('error_description', '')
     
-    if error == 'access_denied' or 'user_denied' in error_description:
+    if (error == 'access_denied') or ('user_denied' in error_description):
         messages.info(request, 'Has cancelado el inicio de sesión con tu cuenta')
         return redirect('blogapp:login')
     
