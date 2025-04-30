@@ -160,7 +160,7 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CSRF_TRUSTED_ORIGINS = [
-    ' https://db2b-190-140-21-62.ngrok-free.app', 
+    'https://db2b-190-140-21-62.ngrok-free.app', 
 ]
 
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True  
