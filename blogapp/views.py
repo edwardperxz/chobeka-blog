@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from .forms import UserRegisterForm
 from django.contrib import messages
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import Blog, Review, Comment
 
@@ -25,12 +25,42 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return response
+        messages.success(self.request, f'The Blog has been created successfully!')
+
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.object.pk})
 
+class BlogUpdateView(LoginRequiredMixin, UpdateView):
+    model = Blog
+    fields = ['title', 'content', 'image']
+    template_name = 'blogapp/blog_form.html'
 
+    def form_valid(self, form):
+        # Check if image was cleared
+        if 'image-clear' in self.request.POST and self.request.POST['image-clear'] == 'on':
+            old_instance = Blog.objects.get(pk=self.object.pk)
+            if old_instance.image:
+                old_instance.image.delete(save=False)
+
+        form.instance.last_updated = datetime.now()
+
+        messages.success(self.request, f'The Blog has been updated successfully!')
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.object.pk})
+
+class BlogDeleteView(LoginRequiredMixin, DeleteView):
+    model = Blog
+    template_name = 'blogapp/blog_confirm_delete.html'
+    success_url = reverse_lazy('blogapp:blog_list')
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, f'The Blog has been deleted successfully!')
+        return super().delete(request, *args, **kwargs)
 
 class ReviewCreateView(LoginRequiredMixin, CreateView):
     model = Review
