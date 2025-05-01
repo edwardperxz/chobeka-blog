@@ -28,15 +28,12 @@ DEBUG = True
 
 SITE_ID = 1
 
-<<<<<<< HEAD
 ALLOWED_HOSTS = [
     '127.0.0.1', 
     'localhost', 
-    'db2b-190-140-21-62.ngrok-free.app'
+    'deb9-201-218-230-34.ngrok-free.app',
 ]
 
-=======
->>>>>>> b61a8fc60e9d38d950e69fb10e0f3390a729539a
 # Application definition
 
 INSTALLED_APPS = [
@@ -72,7 +69,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
-    'blogapp.middleware.SocialAuthExceptionMiddleware',
+    'blogapp.middleware.SocialAuthExceptionMiddleware'
 ]
 
 ROOT_URLCONF = 'blogproject.urls'
@@ -154,28 +151,58 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
-<<<<<<< HEAD
+ACCOUNT_LOGOUT_REDIRECT_URL = '/login/'
 SOCIALACCOUNT_LOGIN_ON_GET = True
-=======
->>>>>>> b61a8fc60e9d38d950e69fb10e0f3390a729539a
+SOCIALACCOUNT_AUTO_SIGNUP = False
 
 # Media files settings
 # https://docs.djangoproject.com/en/5.1/topics/files/#file-upload-handling
 MEDIA_URL = 'media/'
-<<<<<<< HEAD
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://db2b-190-140-21-62.ngrok-free.app', 
+    'https://deb9-201-218-230-34.ngrok-free.app', 
 ]
-
-SOCIAL_AUTH_REDIRECT_IS_HTTPS = True  
-SOCIAL_AUTH_FACEBOOK_API_VERSION = '18.0'  
 
 # Configuración de sesión segura
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Social authentication
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'openid',
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+            'prompt': 'consent select_account', 
+        },
+        'OAUTH_PKCE_ENABLED': True,
+    },
+    'facebook': {
+        'METHOD': 'oauth2',
+        'SCOPE': ['email', 'public_profile'],
+        'AUTH_PARAMS': {
+            'auth_type': 'rerequest',
+            'display': 'popup'
+        },
+        'INIT_PARAMS': {'cookie': True},
+        'FIELDS': ['id', 'email', 'name'],
+    }
+}
+
+SOCIAL_AUTH_FACEBOOK_KEY = "721013707029947"
+SOCIAL_AUTH_FACEBOOK_SECRET = "ca8330961982913578a16ab06fe81d7c"
+
+SOCIALACCOUNT_ADAPTER = 'blogapp.adapters.CustomSocialAccountAdapter'
+
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = True  
+SOCIAL_AUTH_FACEBOOK_API_VERSION = '18.0'  
 
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
@@ -183,29 +210,22 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.auth_allowed',
     'social_core.pipeline.social_auth.social_user',
     'social_core.pipeline.user.get_username',
-    'social_core.pipeline.user.create_user',  
+    'social_core.pipeline.social_auth.associate_by_email',
+    'social_core.pipeline.user.create_user',
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
 )
 
-# Social authentication
+SOCIAL_AUTH_LOGIN_ERROR_URL = '/login/'
+SOCIAL_AUTH_BACKEND_ERROR_URL = '/login/'
+SOCIAL_AUTH_INACTIVE_USER_URL = '/login/'
 
-SOCIAL_AUTH_FACEBOOK_KEY = "721013707029947"
-SOCIAL_AUTH_FACEBOOK_SECRET = "ca8330961982913578a16ab06fe81d7c"
-
-SOCIAL_AUTH_LOGIN_ERROR_URL = '/social-auth-error/'
-SOCIAL_AUTH_BACKEND_ERROR_URL = '/social-auth-error/'
-
-SOCIAL_AUTH_FACEBOOK_AUTH_EXTRA_ARGUMENTS = {'auth_type': 'reauthenticate', 'display': 'popup'}
-SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {'prompt': 'select_account', 'access_type': 'offline'}
-
-SOCIAL_AUTH_FACEBOOK_IGNORE_DEFAULT_SCOPE = True
-SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', 'public_profile']
-SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
-SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {'fields': 'id, name, email'}
+SOCIALACCOUNT_STORE_TOKENS = True
 
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False
-=======
+SOCIAL_AUTH_SANITIZE_REDIRECTS = True
+SOCIALACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
->>>>>>> b61a8fc60e9d38d950e69fb10e0f3390a729539a
