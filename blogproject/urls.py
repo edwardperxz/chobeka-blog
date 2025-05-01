@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+<<<<<<< HEAD
 from blogapp.views import social_auth_error
 
 urlpatterns = [
@@ -27,3 +28,10 @@ urlpatterns = [
     path('social-auth/', include('social_django.urls', namespace='social')),
     path('social-auth-error/', social_auth_error, name='social_auth_error'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+=======
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('blogapp.urls')),  # Conecta las URLs de blogapp
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+>>>>>>> b61a8fc60e9d38d950e69fb10e0f3390a729539a

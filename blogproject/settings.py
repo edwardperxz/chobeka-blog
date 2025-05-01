@@ -28,12 +28,15 @@ DEBUG = True
 
 SITE_ID = 1
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = [
     '127.0.0.1', 
     'localhost', 
     'db2b-190-140-21-62.ngrok-free.app'
 ]
 
+=======
+>>>>>>> b61a8fc60e9d38d950e69fb10e0f3390a729539a
 # Application definition
 
 INSTALLED_APPS = [
@@ -121,7 +124,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -152,11 +154,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
+<<<<<<< HEAD
 SOCIALACCOUNT_LOGIN_ON_GET = True
+=======
+>>>>>>> b61a8fc60e9d38d950e69fb10e0f3390a729539a
 
 # Media files settings
 # https://docs.djangoproject.com/en/5.1/topics/files/#file-upload-handling
 MEDIA_URL = 'media/'
+<<<<<<< HEAD
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CSRF_TRUSTED_ORIGINS = [
@@ -200,3 +206,6 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
 SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {'fields': 'id, name, email'}
 
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+=======
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+>>>>>>> b61a8fc60e9d38d950e69fb10e0f3390a729539a
