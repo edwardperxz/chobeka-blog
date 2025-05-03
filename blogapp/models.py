@@ -5,6 +5,35 @@ import uuid
 
 
 # MODELOS
+class UserProfile(models.Model):
+    PROVINCES = [
+        ('BOC', 'Bocas del Toro'),
+        ('CHI', 'Chiriquí'),
+        ('COC', 'Coclé'),
+        ('COL', 'Colón'),
+        ('DAR', 'Darién'),
+        ('HER', 'Herrera'),
+        ('LOS', 'Los Santos'),
+        ('PAN', 'Panamá'),
+        ('VER', 'Veraguas'),
+        ('PAN_OESTE', 'Panamá Oeste'),
+    ]
+
+    def profile_image_path(instance, filename):
+        ext = filename.split('.')[-1]
+        return f'profiles/user_{instance.user.id}_{uuid.uuid4()}.{ext}'
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    profile_photo = models.ImageField(upload_to=profile_image_path, blank=True, null=True)
+    bio = models.TextField(blank=True, null=True)
+    location = models.CharField(max_length=10, choices=PROVINCES, blank=True, null=True)
+    birth_date = models.DateField(blank=True, null=True)
+    interests = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Profile of {self.user.username}"
 
 class Blog(models.Model):
     def blog_image_path(instance, filename):

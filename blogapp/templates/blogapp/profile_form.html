@@ -1,0 +1,49 @@
+{% extends "blogapp/base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mx-auto px-4 mt-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+            Edit Profile
+        </h1>
+        <form method="POST" enctype="multipart/form-data"
+                    class="space-y-4 transition-all duration-700 ease-in-out animate-fade-in">
+            {% csrf_token %}
+            <div class="space-y-2 transition-all duration-700 ease-in-out">
+                {% for field in form %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">{{ field.label }}</label>
+                        {% if field.name == 'profile_picture' %}
+                            <input type="file" name="{{ field.name }}" id="{{ field.id_for_label }}"
+                                         class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                         accept="image/*">
+                        {% elif field.name == 'birth_date' %}
+                            <input type="date" name="{{ field.name }}" id="{{ field.id_for_label }}"
+                                   value="{{ field.value|date:'Y-m-d' }}"
+                                   class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        {% else %}
+                            {{ field|add_class:"bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+                        {% endif %}
+                        {% if field.help_text %}
+                            <p class="mt-1 text-sm text-blue-400 dark:text-blue-300">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                            <p class="text-red-500 text-sm">{{ field.errors|striptags }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="mt-6 flex space-x-4">
+                <button type="submit" class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600 dark:hover:bg-blue-700 rounded transition-all duration-500 ease-in-out">
+                    Save Changes
+                </button>
+                <a href="{% url 'blogapp:profile' user.pk %}"
+                     class="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded transition-all duration-500 ease-in-out">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
