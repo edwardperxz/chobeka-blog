@@ -14,7 +14,7 @@
                 {% for field in form %}
                     <div>
                         <label for="{{ field.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">{{ field.label }}</label>
-                        {% if field.name == 'profile_picture' %}
+                        {% if field.name == 'profile_photo' %}
                             <input type="file" name="{{ field.name }}" id="{{ field.id_for_label }}"
                                          class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                          accept="image/*">
@@ -22,6 +22,139 @@
                             <input type="date" name="{{ field.name }}" id="{{ field.id_for_label }}"
                                    value="{{ field.value|date:'Y-m-d' }}"
                                    class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         {% elif field.name == 'interests' %}
+                            <div class="space-y-2">
+                                <!-- Hide the textarea but keep it for form submission -->
+                                <textarea name="{{ field.name }}" id="{{ field.id_for_label }}"
+                                          style="display: none;"
+                                          class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">{{ field.value }}</textarea>
+
+                                <div class="flex flex-wrap gap-2 mt-2 interest-tags">
+                                    <!-- Existing interests will be displayed here -->
+                                </div>
+
+                                <button type="button" id="add-interest-btn"
+                                        class="mt-2 px-4 py-1 bg-green-500 hover:bg-green-600 text-white rounded-md text-sm transition-all">
+                                    Agregar Interés
+                                </button>
+
+                                <div id="interest-popup" class="hidden mt-2 p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+                                    <input type="text" id="new-interest" maxlength="50" placeholder="Add a new interest (50 chars max)"
+                                           class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <div class="flex justify-end mt-2 space-x-2">
+                                        <button type="button" id="save-interest-btn"
+                                                class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm">Save</button>
+                                        <button type="button" id="cancel-interest-btn"
+                                                class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md text-sm">Cancel</button>
+                                    </div>
+                                </div>
+
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        const textarea = document.getElementById('{{ field.id_for_label }}');
+                                        const addBtn = document.getElementById('add-interest-btn');
+                                        const popup = document.getElementById('interest-popup');
+                                        const newInterestInput = document.getElementById('new-interest');
+                                        const saveBtn = document.getElementById('save-interest-btn');
+                                        const cancelBtn = document.getElementById('cancel-interest-btn');
+                                        const tagsContainer = document.querySelector('.interest-tags');
+
+                                        // Initialize tags from textarea
+                                        updateTagsFromTextarea();
+
+                                        addBtn.addEventListener('click', function() {
+                                            popup.classList.remove('hidden');
+                                            newInterestInput.focus();
+                                        });
+
+                                        cancelBtn.addEventListener('click', function() {
+                                            popup.classList.add('hidden');
+                                            newInterestInput.value = '';
+                                        });
+
+                                        saveBtn.addEventListener('click', function() {
+                                            const interest = newInterestInput.value.trim();
+                                            if (interest) {
+                                                const interests = parseInterests(textarea.value);
+                                                interests.push(interest);
+                                                // Store as JSON array
+                                                textarea.value = JSON.stringify(interests);
+                                                updateTagsFromTextarea();
+                                                popup.classList.add('hidden');
+                                                newInterestInput.value = '';
+                                            }
+                                        });
+
+                                        newInterestInput.addEventListener('keydown', function(event) {
+                                            if (event.key === 'Enter') {
+                                                event.preventDefault();
+                                                saveBtn.click();
+                                            }
+                                        });
+
+                                        function updateTagsFromTextarea() {
+                                            tagsContainer.innerHTML = '';
+                                            const interests = parseInterests(textarea.value);
+                                            interests.forEach(interest => {
+                                                const tag = document.createElement('div');
+                                                tag.className = 'px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-md text-sm flex items-center';
+                                                tag.innerHTML = `
+                                                    <span>${interest}</span>
+                                                    <button type="button" class="ml-2 text-blue-600 dark:text-blue-300 hover:text-red-500 dark:hover:text-red-400"
+                                                            data-interest="${interest}">✕</button>
+                                                `;
+                                                tagsContainer.appendChild(tag);
+                                            });
+
+                                            // Add event listeners after tags are created
+                                            tagsContainer.querySelectorAll('button').forEach(btn => {
+                                                btn.addEventListener('click', function() {
+                                                    const interestToRemove = this.getAttribute('data-interest');
+                                                    removeInterest(interestToRemove);
+                                                });
+                                            });
+                                        }
+
+                                        function parseInterests(text) {
+                                            if (!text || text.trim() === '') return [];
+
+                                            // Try to parse as JSON array first
+                                            text = text.trim();
+                                            if (text.startsWith('[') && text.endsWith(']')) {
+                                                try {
+                                                    return JSON.parse(text);
+                                                } catch (e) {
+                                                    // If parsing fails, continue with the old method
+                                                }
+                                            }
+
+                                            // Fallback to old method
+                                            const interests = [];
+                                            const matches = text.match(/("([^"]*)"|[^,]+)+(?=\s*,|\s*$)/g);
+                                            if (matches) {
+                                                matches.forEach(match => {
+                                                    // Clean up any quotes and trim whitespace
+                                                    const cleaned = match.trim().replace(/^"|"$/g, '').trim();
+                                                    if (cleaned) interests.push(cleaned);
+                                                });
+                                            }
+                                            return interests;
+                                        }
+
+                                        function removeInterest(interest) {
+                                            const interests = parseInterests(textarea.value);
+                                            const filteredInterests = interests.filter(i => i !== interest);
+                                            // Store as JSON array
+                                            textarea.value = JSON.stringify(filteredInterests);
+                                            updateTagsFromTextarea();
+                                        }
+
+                                        // Ensure the value is stored as a JSON array on page load
+                                        const initialInterests = parseInterests(textarea.value);
+                                        textarea.value = JSON.stringify(initialInterests);
+                                    });
+                                </script>
+                            </div>
                         {% else %}
                             {{ field|add_class:"bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
                         {% endif %}
@@ -38,7 +171,7 @@
                 <button type="submit" class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600 dark:hover:bg-blue-700 rounded transition-all duration-500 ease-in-out">
                     Save Changes
                 </button>
-                <a href="{% url 'blogapp:profile' user.pk %}"
+                <a href="{% url 'blogapp:profile' user.username %}"
                      class="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded transition-all duration-500 ease-in-out">
                     Cancel
                 </a>
