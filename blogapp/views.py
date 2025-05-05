@@ -9,23 +9,76 @@ from django.urls import reverse_lazy
 from .models import Blog, Review, Comment, UserProfile
 from django.contrib.messages import get_messages
 from social_core.exceptions import AuthCanceled, AuthForbidden
+from django.contrib.auth import get_user_model
+from django.contrib.sessions.models import Session
 
+
+def get_location_info(location_code):
+    LOCATION_MAP = {
+        'BOC': {'emoji': '🌊', 'name': 'Bocas del Toro', 'color': 'blue'},
+        'CHI': {'emoji': '🏔️', 'name': 'Chiriquí', 'color': 'green'},
+        'COC': {'emoji': '🌴', 'name': 'Coclé', 'color': 'orange'},
+        'COL': {'emoji': '🏝️', 'name': 'Colón', 'color': 'teal'},
+        'DAR': {'emoji': '🌿', 'name': 'Darién', 'color': 'brown'},
+        'HER': {'emoji': '🌄', 'name': 'Herrera', 'color': 'yellow'},
+        'LOS': {'emoji': '🌾', 'name': 'Los Santos', 'color': 'gold'},
+        'PAN': {'emoji': '🏙️', 'name': 'Panamá', 'color': 'red'},
+        'POE': {'emoji': '🏞️', 'name': 'Panamá Oeste', 'color': 'pink'},
+        'VER': {'emoji': '🌳', 'name': 'Veraguas', 'color': 'purple'},
+    }
+    return LOCATION_MAP.get(location_code)
 
 class ProfileView(LoginRequiredMixin, DetailView):
     model = UserProfile
     template_name = 'blogapp/profile_user.html'
+    context_object_name = 'profile'
 
     def get_object(self, queryset=None):
         try:
-            return self.request.user.profile
-        except UserProfile.DoesNotExist:
-            # Create a profile if it doesn't exist
-            return UserProfile.objects.create(user=self.request.user)
+            username = self.kwargs.get('username')
+            user = get_user_model().objects.get(username=username)
+
+            try:
+                return user.profile
+            except UserProfile.DoesNotExist:
+                if user == self.request.user:
+                    return UserProfile.objects.create(user=user)
+                return None
+        except get_user_model().DoesNotExist:
+            return None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['blogs'] = Blog.objects.filter(author=self.request.user).select_related('author')
+        try:
+            viewed_user = get_user_model().objects.get(username=self.kwargs.get('username'))
+            context['profile_user'] = viewed_user
+            context['blogs'] = Blog.objects.filter(author=viewed_user).select_related('author')
+
+            profile = self.get_object()
+            if profile and profile.interests:
+                context['interests_list'] = profile.interests
+            else:
+                context['interests_list'] = []
+
+            if profile and profile.location:
+                context['location_info'] = get_location_info(profile.location)
+            else:
+                context['location_info'] = get_location_info(None)
+
+        except get_user_model().DoesNotExist:
+            context['profile_user'] = None
+            context['blogs'] = []
+            context['interests_list'] = []
+            context['location_info'] = get_location_info(None)
+
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        # If the user doesn't exist, redirect to blog list with an error
+        if not context.get('profile_user'):
+            messages.error(self.request, "User not found.")
+            return redirect('blogapp:blog_list')
+        return super().render_to_response(context, **response_kwargs)
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = UserProfile
@@ -44,25 +97,45 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('blogapp:profile', kwargs={'pk': self.request.user.profile.pk})
+        return reverse_lazy('blogapp:profile', kwargs={'username': self.request.user.username})
 
-#TODO: fix the delete view to delete the user and profile
 class ProfileDeleteView(LoginRequiredMixin, DeleteView):
     model = UserProfile
     template_name = 'blogapp/profile_confirm_delete.html'
     success_url = reverse_lazy('blogapp:blog_list')
 
-    def get_object(self, *args, **kwargs):
-        # Retrieve by user relationship
-        return self.request.user.profile
+    def get_object(self, queryset=None):
+        try:
+            profile = self.request.user.profile
+            return profile
+        except UserProfile.DoesNotExist:
+            return None
 
-    def delete(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object is None:
+            messages.error(request, "Profile not found.")
+            return redirect('blogapp:blog_list')
+
         user = self.request.user
-        response = super().delete(request, *args, **kwargs)
-        logout(request)  # Log the user out
-        user.delete()  # Delete the user (cascade will delete profile)
+
+        # Delete profile photo if exists
+        if self.object.profile_photo:
+            self.object.profile_photo.delete(save=False)
+
+        # Store session key before user deletion
+        session_key = request.session.session_key
+
+        user.delete()
+
+        # Clear the session
+        if session_key:
+            print(f"Clearing session: {session_key}")
+            Session.objects.filter(session_key=session_key).delete()
+            print("Session cleared")
+
         messages.success(request, 'Your profile has been deleted successfully!')
-        return redirect('blogapp:blog_list')  # Redirect after deletion
+        return redirect('blogapp:blog_list')
 
 class BlogListView(ListView):
     model = Blog
@@ -72,6 +145,26 @@ class BlogListView(ListView):
 
     def get_queryset(self):
         return Blog.objects.select_related('author').prefetch_related('reviews').order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        blogs_with_location = []
+        for blog in context['blogs']:
+            try:
+                location_code = blog.author.profile.location if hasattr(blog.author, 'profile') else None
+                location_info = get_location_info(location_code)
+                blogs_with_location.append({
+                    'blog': blog,
+                    'location_info': location_info
+                })
+            except:
+                blogs_with_location.append({
+                    'blog': blog,
+                    'location_info': get_location_info(None)
+                })
+
+        context['blogs_with_location'] = blogs_with_location
+        return context
 
 
 class BlogDetailView(DetailView):
