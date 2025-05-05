@@ -28,7 +28,6 @@ class UserProfile(models.Model):
     bio = models.TextField(blank=True, null=True)
     location = models.CharField(max_length=10, choices=PROVINCES, blank=True, null=True)
     birth_date = models.DateField(blank=True, null=True)
-    #TODO: store correctly as a JSON field to allow for flexible data structure
     interests = models.JSONField(default=list, blank=True, null=True, help_text="Lista tus intereses como 'parkear', 'comer pio pio', 'escuchar plenas'")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
