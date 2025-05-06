@@ -1,55 +1,342 @@
-from django.views.generic import ListView, DetailView, CreateView
-from django.urls import reverse_lazy
-from .models import Blog, Review, Comment
+from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from .forms import UserRegisterForm
+from django.contrib import messages
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, RedirectView
+from django.urls import reverse_lazy
+from .models import Blog, Review, Comment, UserProfile
+from django.contrib.messages import get_messages
+from social_core.exceptions import AuthCanceled, AuthForbidden
+from django.contrib.auth import get_user_model
+from django.contrib.sessions.models import Session
+
+
+def get_location_info(location_code):
+    LOCATION_MAP = {
+        'BOC': {'emoji': '🌊', 'name': 'Bocas del Toro', 'color': 'lime'},
+        'CHI': {'emoji': '🏔️', 'name': 'Chiriquí', 'color': 'green'},
+        'COC': {'emoji': '🌴', 'name': 'Coclé', 'color': 'amber'},
+        'COL': {'emoji': '🏝️', 'name': 'Colón', 'color': 'indigo'},
+        'DAR': {'emoji': '🌿', 'name': 'Darién', 'color': 'cyan'},
+        'HER': {'emoji': '🌄', 'name': 'Herrera', 'color': 'yellow'},
+        'LOS': {'emoji': '🌾', 'name': 'Los Santos', 'color': 'orange'},
+        'PAN': {'emoji': '🏙️', 'name': 'Panamá', 'color': 'red'},
+        'POE': {'emoji': '🏞️', 'name': 'Panamá Oeste', 'color': 'emerald'},
+        'VER': {'emoji': '🌳', 'name': 'Veraguas', 'color': 'blue'},
+    }
+    return LOCATION_MAP.get(location_code)
+
+class ProfileView(LoginRequiredMixin, DetailView):
+    model = UserProfile
+    template_name = 'blogapp/profile_user.html'
+    context_object_name = 'profile'
+
+    def get_object(self, queryset=None):
+        try:
+            username = self.kwargs.get('username')
+            user = get_user_model().objects.get(username=username)
+
+            try:
+                return user.profile
+            except UserProfile.DoesNotExist:
+                if user == self.request.user:
+                    return UserProfile.objects.create(user=user)
+                return None
+        except get_user_model().DoesNotExist:
+            return None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            viewed_user = get_user_model().objects.get(username=self.kwargs.get('username'))
+            context['profile_user'] = viewed_user
+            context['blogs'] = Blog.objects.filter(author=viewed_user).select_related('author')
+
+            profile = self.get_object()
+            if profile and profile.interests:
+                context['interests_list'] = profile.interests
+            else:
+                context['interests_list'] = []
+
+            if profile and profile.location:
+                context['location_info'] = get_location_info(profile.location)
+            else:
+                context['location_info'] = get_location_info(None)
+
+        except get_user_model().DoesNotExist:
+            context['profile_user'] = None
+            context['blogs'] = []
+            context['interests_list'] = []
+            context['location_info'] = get_location_info(None)
+
+        return context
+
+    def render_to_response(self, context, **response_kwargs):
+        # If the user doesn't exist, redirect to blog list with an error
+        if not context.get('profile_user'):
+            messages.error(self.request, "User not found.")
+            return redirect('blogapp:blog_list')
+        return super().render_to_response(context, **response_kwargs)
+
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+    model = UserProfile
+    fields = ['profile_photo', 'bio', 'location', 'birth_date', 'interests']
+    template_name = 'blogapp/profile_form.html'
+
+    def get_object(self, queryset=None):
+        try:
+            return self.request.user.profile
+        except UserProfile.DoesNotExist:
+            # Create a profile if it doesn't exist
+            return UserProfile.objects.create(user=self.request.user)
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Your profile has been updated successfully!')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('blogapp:profile', kwargs={'username': self.request.user.username})
+
+class ProfileDeleteView(LoginRequiredMixin, DeleteView):
+    model = UserProfile
+    template_name = 'blogapp/profile_confirm_delete.html'
+    success_url = reverse_lazy('blogapp:blog_list')
+
+    def get_object(self, queryset=None):
+        try:
+            profile = self.request.user.profile
+            return profile
+        except UserProfile.DoesNotExist:
+            return None
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object is None:
+            messages.error(request, "Profile not found.")
+            return redirect('blogapp:blog_list')
+
+        user = self.request.user
+
+        # Delete profile photo if exists
+        if self.object.profile_photo:
+            self.object.profile_photo.delete(save=False)
+
+        # Store session key before user deletion
+        session_key = request.session.session_key
+
+        user.delete()
+
+        # Clear the session
+        if session_key:
+            print(f"Clearing session: {session_key}")
+            Session.objects.filter(session_key=session_key).delete()
+            print("Session cleared")
+
+        messages.success(request, 'Your profile has been deleted successfully!')
+        return redirect('blogapp:blog_list')
 
 class BlogListView(ListView):
     model = Blog
     template_name = 'blogapp/blog_list.html'
+    context_object_name = 'blogs'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Blog.objects.select_related('author').prefetch_related('reviews').order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        blogs_with_location = []
+        for blog in context['blogs']:
+            try:
+                location_code = blog.author.profile.location if hasattr(blog.author, 'profile') else None
+                location_info = get_location_info(location_code)
+                blogs_with_location.append({
+                    'blog': blog,
+                    'location_info': location_info
+                })
+            except:
+                blogs_with_location.append({
+                    'blog': blog,
+                    'location_info': get_location_info(None)
+                })
+
+        context['blogs_with_location'] = blogs_with_location
+        return context
 
 
 class BlogDetailView(DetailView):
     model = Blog
     template_name = 'blogapp/blog_detail.html'
+    context_object_name = 'blog'
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('author').prefetch_related('reviews__comments')
 
 
 class BlogCreateView(LoginRequiredMixin, CreateView):
     model = Blog
-    fields = ['title', 'content']
-    template_name = 'blog_form.html'
+    fields = ['title', 'content', 'image']
+    template_name = 'blogapp/blog_form.html'
 
     def form_valid(self, form):
         form.instance.author = self.request.user
+        messages.success(self.request, 'The Blog has been created successfully!')
         return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.object.pk})
 
 
+class BlogUpdateView(LoginRequiredMixin, UpdateView):
+    model = Blog
+    fields = ['title', 'content', 'image']
+    template_name = 'blogapp/blog_form.html'
 
-class ReviewCreateView(CreateView):
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.author != self.request.user:
+            messages.error(request, "You don't have permission to edit this blog.")
+            return redirect('blogapp:blog_detail', pk=obj.pk)
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        # Handle image deletion/replacement
+        if 'image-clear' in self.request.POST and self.request.POST['image-clear'] == 'on':
+            if self.object.image:
+                self.object.image.delete(save=False)
+        elif 'image' in self.request.FILES and self.object.image:
+            self.object.image.delete(save=False)
+
+        form.instance.last_updated = datetime.now()
+        messages.success(self.request, 'The Blog has been updated successfully!')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.object.pk})
+
+
+class BlogDeleteView(LoginRequiredMixin, DeleteView):
+    model = Blog
+    template_name = 'blogapp/blog_confirm_delete.html'
+    success_url = reverse_lazy('blogapp:blog_list')
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.author != self.request.user:
+            messages.error(request, "You don't have permission to delete this blog.")
+            return redirect('blogapp:blog_detail', pk=obj.pk)
+        return super().dispatch(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        blog = self.get_object()
+        # Delete associated image file if exists
+        if blog.image:
+            blog.image.delete(save=False)
+        messages.success(request, 'The Blog has been deleted successfully!')
+        return super().delete(request, *args, **kwargs)
+
+
+class ReviewCreateView(LoginRequiredMixin, CreateView):
     model = Review
     fields = ['rating', 'comment']
     template_name = 'blogapp/review_form.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['blog'] = Blog.objects.get(pk=self.kwargs['pk'])
+        return context
+
     def form_valid(self, form):
         form.instance.reviewer = self.request.user
         form.instance.blog_id = self.kwargs['pk']
+        messages.success(self.request, 'Your review has been posted successfully!')
         return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.kwargs['pk']})
 
 
-class CommentCreateView(CreateView):
+class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     fields = ['content']
     template_name = 'blogapp/comment_form.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['review'] = Review.objects.get(pk=self.kwargs['review_pk'])
+        return context
+
     def form_valid(self, form):
         form.instance.commenter = self.request.user
         form.instance.review_id = self.kwargs['review_pk']
+        messages.success(self.request, 'Your comment has been posted successfully!')
         return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.kwargs['blog_pk']})
+
+
+class LoginView(FormView):
+    template_name = 'blogapp/login.html'
+    success_url = reverse_lazy('blogapp:blog_list')
+
+    def form_valid(self, form):
+        username = form.cleaned_data.get('username', '')
+        password = form.cleaned_data.get('password', '')
+        user = authenticate(self.request, username=username, password=password)
+        if user is not None:
+            login(self.request, user)
+            next_url = self.request.GET.get('next', self.get_success_url())
+            return redirect(next_url)
+
+        messages.error(self.request, 'Invalid username or password')
+        return self.form_invalid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('blogapp:blog_list')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form(self):
+        # Return a basic form without a form class
+        if self.request.method == 'POST':
+            return {'username': self.request.POST.get('username', ''), 
+                   'password': self.request.POST.get('password', '')}
+        return {}
+
+
+class LogoutView(RedirectView):
+    url = reverse_lazy('blogapp:blog_list')
+    
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        messages.success(request, 'You have been logged out successfully')
+        return super().get(request, *args, **kwargs)
+
+
+class SignUpView(FormView):
+    template_name = 'blogapp/register.html'
+    form_class = UserRegisterForm
+    success_url = reverse_lazy('blogapp:login')
+    
+    def form_valid(self, form):
+        user = form.save()
+        messages.success(self.request, 'Your account has been created successfully!')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, 'Please correct the errors below')
+        return super().form_invalid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['errors'] = self.get_form().errors.get_json_data() if self.request.method == 'POST' else None
+        return context
+        
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('blogapp:blog_list')
+        return super().dispatch(request, *args, **kwargs)

@@ -21,9 +21,16 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+<<<<<<< HEAD
     path('', include('blogapp.urls')),  # Conecta las URLs de blogapp
     path('accounts/', include('allauth.urls')),
     path('social-auth/', include('social_django.urls', namespace='social')),
     path('accounts/google/login/callback/', include('allauth.socialaccount.urls')),
     path("ckeditor5/", include('django_ckeditor_5.urls')),
+=======
+    path('', include('blogapp.urls')),  
+    path('accounts/', include('allauth.urls')),
+    path('social-auth/', include('social_django.urls', namespace='social')),
+    path('accounts/google/login/callback/', include('allauth.socialaccount.urls')),
+>>>>>>> a52bc2bf39d0c71b63cd345d1f5b91f9dd472681
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

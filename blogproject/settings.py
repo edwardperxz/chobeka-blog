@@ -26,11 +26,20 @@ SECRET_KEY = 'django-insecure-ukz72g)*267@$nvdk**+6#+a*nyzh_1t3o2=@wxtpga$cew)2^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = [
     '127.0.0.1', 
     'localhost', 
 ]
+=======
+SITE_ID = 1
+>>>>>>> a52bc2bf39d0c71b63cd345d1f5b91f9dd472681
 
+ALLOWED_HOSTS = [
+    '127.0.0.1', 
+    'localhost', 
+    'deb9-201-218-230-34.ngrok-free.app',
+]
 
 # Application definition
 
@@ -49,7 +58,10 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'social_django',
+<<<<<<< HEAD
     'django_ckeditor_5',
+=======
+>>>>>>> a52bc2bf39d0c71b63cd345d1f5b91f9dd472681
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -68,6 +80,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
+<<<<<<< HEAD
+=======
+    'blogapp.middleware.SocialAuthExceptionMiddleware'
+>>>>>>> a52bc2bf39d0c71b63cd345d1f5b91f9dd472681
 ]
 
 ROOT_URLCONF = 'blogproject.urls'
@@ -83,13 +99,13 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
             ],
         },
     },
 ]
 
 WSGI_APPLICATION = 'blogproject.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -100,7 +116,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -120,7 +135,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -137,6 +151,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -225,6 +243,7 @@ SOCIALACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+<<<<<<< HEAD
 
 # CkEditor configuration
 customColorPalette = [
@@ -323,3 +342,5 @@ CKEDITOR_5_CONFIGS = {
         }
     }
 }
+=======
+>>>>>>> a52bc2bf39d0c71b63cd345d1f5b91f9dd472681

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+<<<<<<< HEAD
 <<<<<<< Updated upstream
   <h1 class="text-3xl font-bold mb-6 text-center text-gray-900 dark:text-white">All Blogs</h1>
   <div class="grid gap-6">
@@ -14,6 +15,8 @@
       <p class="text-gray-500 dark:text-gray-400 text-center">No blogs have been posted yet.</p>
     {% endfor %}
 =======
+=======
+>>>>>>> a52bc2bf39d0c71b63cd345d1f5b91f9dd472681
   <div class="max-w-[1440px] mx-auto px-6 lg:px-12 space-y-6">
     <!-- Main Content -->
     <main class="space-y-6">
@@ -61,7 +64,11 @@
           <h2 class="text-xl font-semibold mb-2">
             <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="text-blue-400 hover:text-blue-300">{{ blog.title }}</a>
           </h2>
+<<<<<<< HEAD
           <p class="text-gray-700 dark:text-gray-300 line-clamp-3 mb-4">{{ blog.content|truncatewords:30|safe }}</p>
+=======
+          <p class="text-gray-700 dark:text-gray-300 line-clamp-3 mb-4">{{ blog.content|truncatewords:30 }}</p>
+>>>>>>> a52bc2bf39d0c71b63cd345d1f5b91f9dd472681
           {% if blog.image %}
             <div class="mb-4">
               <div class="relative w-full max-w-4xl mx-auto bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
@@ -78,6 +85,9 @@
         <p class="text-gray-500 dark:text-gray-400 text-center">No blogs have been posted yet.</p>
       {% endfor %}
     </main>
+<<<<<<< HEAD
 >>>>>>> Stashed changes
+=======
+>>>>>>> a52bc2bf39d0c71b63cd345d1f5b91f9dd472681
   </div>
 {% endblock %}
