@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,10 @@ SECRET_KEY = 'django-insecure-ukz72g)*267@$nvdk**+6#+a*nyzh_1t3o2=@wxtpga$cew)2^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1', 
+    'localhost', 
+]
 
 
 # Application definition
@@ -39,9 +43,23 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'blogapp',
     'widget_tweaks',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'social_django',
+    'django_ckeditor_5',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend', 
+    'allauth.account.auth_backends.AuthenticationBackend', 
+    'social_core.backends.facebook.FacebookOAuth2',
 ]
 
 MIDDLEWARE = [
+    'allauth.account.middleware.AccountMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -49,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'blogproject.urls'
@@ -123,3 +142,184 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Login and Logout redirects
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/login/'
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_AUTO_SIGNUP = False
+
+# Media files settings
+# https://docs.djangoproject.com/en/5.1/topics/files/#file-upload-handling
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://deb9-201-218-230-34.ngrok-free.app', 
+]
+
+# Configuración de sesión segura
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Social authentication
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'openid',
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+            'prompt': 'consent select_account', 
+        },
+        'OAUTH_PKCE_ENABLED': True,
+    },
+    'facebook': {
+        'METHOD': 'oauth2',
+        'SCOPE': ['email', 'public_profile'],
+        'AUTH_PARAMS': {
+            'auth_type': 'rerequest',
+            'display': 'popup'
+        },
+        'INIT_PARAMS': {'cookie': True},
+        'FIELDS': ['id', 'email', 'name'],
+    }
+}
+
+SOCIAL_AUTH_FACEBOOK_KEY = "721013707029947"
+SOCIAL_AUTH_FACEBOOK_SECRET = "ca8330961982913578a16ab06fe81d7c"
+
+SOCIALACCOUNT_ADAPTER = 'blogapp.adapters.CustomSocialAccountAdapter'
+
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = True  
+SOCIAL_AUTH_FACEBOOK_API_VERSION = '18.0'  
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.social_auth.associate_by_email',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+)
+
+SOCIAL_AUTH_LOGIN_ERROR_URL = '/login/'
+SOCIAL_AUTH_BACKEND_ERROR_URL = '/login/'
+SOCIAL_AUTH_INACTIVE_USER_URL = '/login/'
+
+SOCIALACCOUNT_STORE_TOKENS = True
+
+SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+SOCIAL_AUTH_SANITIZE_REDIRECTS = True
+SOCIALACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# CkEditor configuration
+customColorPalette = [
+    {
+        'color': 'hsl(4, 90%, 58%)',
+        'label': 'Red'
+    },
+    {
+        'color': 'hsl(340, 82%, 52%)',
+        'label': 'Pink'
+    },
+    {
+        'color': 'hsl(291, 64%, 42%)',
+        'label': 'Purple'
+    },
+    {
+        'color': 'hsl(262, 52%, 47%)',
+        'label': 'Deep Purple'
+    },
+    {
+        'color': 'hsl(231, 48%, 48%)',
+        'label': 'Indigo'
+    },
+    {
+        'color': 'hsl(207, 90%, 54%)',
+        'label': 'Blue'
+    },
+]
+
+CKEDITOR_5_CUSTOM_CSS = 'path_to.css' # optional
+CKEDITOR_5_FILE_STORAGE = "path_to_storage.CustomStorage" # optional
+CKEDITOR_5_CONFIGS = {
+'default': {
+    'toolbar': {
+        'items': [
+            'heading', '|', 'bold', 'italic', 'link','bulletedList', 'numberedList', 'blockQuote', 'imageUpload', 
+        ],
+    }
+},
+
+'extends': {
+    'blockToolbar': [
+        'paragraph', 'heading1', 'heading2', 'heading3',
+        '|',
+        'bulletedList', 'numberedList',
+        '|',
+        'blockQuote',
+    ],
+    'toolbar': {
+        'items': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
+                    'code','subscript', 'superscript', 'highlight', '|', 'codeBlock', 'sourceEditing', 'insertImage',
+                'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', 'imageUpload', '|',
+                'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
+                'insertTable',
+                ],
+        'shouldNotGroupWhenFull': True
+    },
+    'image': {
+        'toolbar': ['imageTextAlternative', '|', 'imageStyle:alignLeft',
+                    'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side',  '|'],
+        'styles': [
+            'full',
+            'side',
+            'alignLeft',
+            'alignRight',
+            'alignCenter',
+        ]
+    },
+    'table': {
+        'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
+        'tableProperties', 'tableCellProperties' ],
+        'tableProperties': {
+            'borderColors': customColorPalette,
+            'backgroundColors': customColorPalette
+        },
+        'tableCellProperties': {
+            'borderColors': customColorPalette,
+            'backgroundColors': customColorPalette
+        }
+    },
+    'heading' : {
+        'options': [
+            { 'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph' },
+            { 'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1' },
+            { 'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2' },
+            { 'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3' }
+        ]
+    }
+},
+
+'list': {
+    'properties': {
+            'styles': 'true',
+            'startIndex': 'true',
+            'reversed': 'true',
+        }
+    }
+}
