@@ -8,7 +8,11 @@
   {% endif %}
   <article class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg transition-all duration-700 ease-in-out dark:text-white text-gray-900 animate-fade-in">
     <h1 class="text-3xl font-bold mb-2">{{ object.title }}</h1>
+<<<<<<< HEAD
+    <p class="text-gray-700 dark:text-gray-300 mb-4">{{ object.content|safe }}</p>
+=======
     <p class="text-gray-700 dark:text-gray-300 mb-4">{{ object.content }}</p>
+>>>>>>> a52bc2bf39d0c71b63cd345d1f5b91f9dd472681
     {% if object.image %}
       <!-- Contenedor para la imagen -->
       <div class="relative w-full max-w-4xl mx-auto bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
@@ -26,11 +30,11 @@
     {% for review in object.reviews.all %}
       <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-4 transition-all duration-700 ease-in-out dark:text-white text-gray-900 animate-fade-in">
         <p class="text-blue-700 dark:text-blue-300 font-medium">{{ review.reviewer.username }} - {{ review.rating }}/5 ⭐</p>
-        <p class="text-gray-700 dark:text-gray-300">{{ review.comment }}</p>
+        <p class="text-gray-700 dark:text-gray-300">{{ review.comment|safe }}</p>
         <a href="{% url 'blogapp:add_comment' blog_pk=object.pk review_pk=review.pk %}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 mt-2 inline-block">Add Comment</a>
         <ul class="mt-2 list-disc ml-6 text-gray-600 dark:text-gray-400">
           {% for comment in review.comments.all %}
-            <li><span class="font-semibold text-gray-900 dark:text-white">{{ comment.commenter.username }}</span>: {{ comment.content }}</li>
+            <li><span class="font-semibold text-gray-900 dark:text-white">{{ comment.commenter.username }}</span>: {{ comment.content|safe }}</li>
           {% endfor %}
         </ul>
       </div>
