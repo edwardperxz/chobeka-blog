@@ -21,5 +21,8 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('blogapp.urls')),  # Conecta las URLs de blogapp
+    path('', include('blogapp.urls')),  
+    path('accounts/', include('allauth.urls')),
+    path('social-auth/', include('social_django.urls', namespace='social')),
+    path('accounts/google/login/callback/', include('allauth.socialaccount.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

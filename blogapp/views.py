@@ -4,9 +4,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from .forms import UserRegisterForm
 from django.contrib import messages
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import Blog, Review, Comment
+from django.contrib.messages import get_messages
+from social_core.exceptions import AuthCanceled, AuthForbidden
 
 class BlogListView(ListView):
     model = Blog
@@ -25,12 +27,48 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return response
+        messages.success(self.request, f'The Blog has been created successfully!')
+
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.object.pk})
 
+class BlogUpdateView(LoginRequiredMixin, UpdateView):
+    model = Blog
+    fields = ['title', 'content', 'image']
+    template_name = 'blogapp/blog_form.html'
 
+    def form_valid(self, form):
+        # Check if image was cleared
+        if 'image-clear' in self.request.POST and self.request.POST['image-clear'] == 'on':
+            old_instance = Blog.objects.get(pk=self.object.pk)
+            if old_instance.image:
+                old_instance.image.delete(save=False)
+
+        # Check if image was replaced
+        elif 'image' in self.request.FILES:
+            old_instance = Blog.objects.get(pk=self.object.pk)
+            if old_instance.image:
+                old_instance.image.delete(save=False)
+
+        form.instance.last_updated = datetime.now()
+
+        messages.success(self.request, f'The Blog has been updated successfully!')
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.object.pk})
+
+class BlogDeleteView(LoginRequiredMixin, DeleteView):
+    model = Blog
+    template_name = 'blogapp/blog_confirm_delete.html'
+    success_url = reverse_lazy('blogapp:blog_list')
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, f'The Blog has been deleted successfully!')
+        return super().delete(request, *args, **kwargs)
 
 class ReviewCreateView(LoginRequiredMixin, CreateView):
     model = Review
@@ -61,6 +99,9 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
 
 def login_view(request):
+    storage = get_messages(request)
+    list(storage)  # Consume messages to clear them from storage
+
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -68,8 +109,9 @@ def login_view(request):
         if user is not None:
             login(request, user)
             return redirect('blogapp:blog_list')
-        else:
-            messages.error(request, 'Invalid username or password')
+        
+        messages.error(request, 'Usuario o contraseña inválidos')
+
     return render(request, 'blogapp/login.html')
 
 
@@ -85,7 +127,10 @@ def sign_up(request):
             messages.success(request, '¡Tu cuenta ha sido creada!')
             return redirect('blogapp:login')
         else:
-            messages.error(request, 'Error! Por favor corrige los siguientes errores.')
+            messages.error(request, 'ERROR! Verifica nuevamente tu información')
     else:
         form = UserRegisterForm()
-    return render(request, 'blogapp/register.html', {'form':form})
+    return render(request, 'blogapp/register.html', {
+        'form':form,
+        'errors': form.errors.get_json_data() if request.method == 'POST' else None
+    })

@@ -1,10 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
+  {% if user.is_authenticated and user == object.author %}
+    <div class="flex justify-start mb-4 space-x-4">
+      <a href="{% url 'blogapp:edit_blog' object.pk %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors animate-fade-in">Edit</a>
+      <a href="{% url 'blogapp:delete_blog' object.pk %}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors animate-fade-in" data-toggle="modal" data-target="#deleteConfirmModal">Delete</a>
+    </div>
+  {% endif %}
   <article class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg transition-all duration-700 ease-in-out dark:text-white text-gray-900 animate-fade-in">
     <h1 class="text-3xl font-bold mb-2">{{ object.title }}</h1>
     <p class="text-gray-700 dark:text-gray-300 mb-4">{{ object.content }}</p>
     {% if object.image %}
-      <img src="{{ object.image.url }}" alt="{{ object.title }}" class="w-full h-auto rounded-lg mb-4 transition-all duration-700 ease-in-out">
+      <!-- Contenedor para la imagen -->
+      <div class="relative w-full max-w-4xl mx-auto bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
+        <!-- Fondo difuminado dinámico -->
+        <div class="absolute inset-0 bg-cover bg-center blur-md" style="background-image: url('{{ object.image.url }}');"></div>
+        <!-- Imagen centrada -->
+        <img src="{{ object.image.url }}" alt="{{ object.title }}" class="relative z-10 w-full h-auto max-h-[56.25vw] object-contain md:max-h-[40vw] lg:max-h-[30vw]">
+      </div>
     {% endif %}
     <p class="text-sm text-gray-600 dark:text-gray-500">By {{ object.author.username }} - {{ object.created_at }}</p>
   </article>
