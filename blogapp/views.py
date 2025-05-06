@@ -15,16 +15,16 @@ from django.contrib.sessions.models import Session
 
 def get_location_info(location_code):
     LOCATION_MAP = {
-        'BOC': {'emoji': '🌊', 'name': 'Bocas del Toro', 'color': 'blue'},
+        'BOC': {'emoji': '🌊', 'name': 'Bocas del Toro', 'color': 'lime'},
         'CHI': {'emoji': '🏔️', 'name': 'Chiriquí', 'color': 'green'},
-        'COC': {'emoji': '🌴', 'name': 'Coclé', 'color': 'orange'},
-        'COL': {'emoji': '🏝️', 'name': 'Colón', 'color': 'teal'},
-        'DAR': {'emoji': '🌿', 'name': 'Darién', 'color': 'brown'},
+        'COC': {'emoji': '🌴', 'name': 'Coclé', 'color': 'amber'},
+        'COL': {'emoji': '🏝️', 'name': 'Colón', 'color': 'indigo'},
+        'DAR': {'emoji': '🌿', 'name': 'Darién', 'color': 'cyan'},
         'HER': {'emoji': '🌄', 'name': 'Herrera', 'color': 'yellow'},
-        'LOS': {'emoji': '🌾', 'name': 'Los Santos', 'color': 'gold'},
+        'LOS': {'emoji': '🌾', 'name': 'Los Santos', 'color': 'orange'},
         'PAN': {'emoji': '🏙️', 'name': 'Panamá', 'color': 'red'},
-        'POE': {'emoji': '🏞️', 'name': 'Panamá Oeste', 'color': 'pink'},
-        'VER': {'emoji': '🌳', 'name': 'Veraguas', 'color': 'purple'},
+        'POE': {'emoji': '🏞️', 'name': 'Panamá Oeste', 'color': 'emerald'},
+        'VER': {'emoji': '🌳', 'name': 'Veraguas', 'color': 'blue'},
     }
     return LOCATION_MAP.get(location_code)
 

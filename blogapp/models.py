@@ -16,7 +16,7 @@ class UserProfile(models.Model):
         ('LOS', 'Los Santos'),
         ('PAN', 'Panamá'),
         ('VER', 'Veraguas'),
-        ('PAN_OESTE', 'Panamá Oeste'),
+        ('POE', 'Panamá Oeste'),
     ]
 
     def profile_image_path(instance, filename):
