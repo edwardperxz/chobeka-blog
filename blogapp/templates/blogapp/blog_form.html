@@ -122,21 +122,27 @@
 
                   // Try to parse as JSON array
                   if (text.startsWith('[') && text.endsWith(']')) {
-                  try {
-                    tags = JSON.parse(text);
-                  } catch (e) {
-                    tags = text.match(/("([^"]*)"|[^,]+)+(?=\s*,|\s*$)/g) || [];
-                    tags = tags.map(tag => tag.trim().replace(/^"|"$/g, '').trim()).filter(Boolean);
-                  }
+                    tags = parseJSON(text);
                   } else {
-                  tags = text.match(/("([^"]*)"|[^,]+)+(?=\s*,|\s*$)/g) || [];
-                  tags = tags.map(tag => tag.trim().replace(/^"|"$/g, '').trim()).filter(Boolean);
+                    tags = parseTagsFromText(text);
                   }
 
                   // Ensure all tags have a hashtag prefix
                   return tags.map(tag => tag.startsWith('#') ? tag : '#' + tag);
                 }
 
+                function parseJSON(text) {
+                  try {
+                    return JSON.parse(text);
+                  } catch (e) {
+                    return parseTagsFromText(text);
+                  }
+                }
+
+                function parseTagsFromText(text) {
+                  const tags = text.match(/("([^"]*)"|[^,]+)+(?=\s*,|\s*$)/g) || [];
+                  return tags.map(tag => tag.trim().replace(/^"|"$/g, '').trim()).filter(Boolean);
+                }
                 function removetag(tag) {
                   const tags = parsetags(textarea.value);
                   const filteredtags = tags.filter(i => i !== tag);
