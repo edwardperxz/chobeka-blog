@@ -4,26 +4,26 @@
 {% block content %}
     <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
         {% if user == profile_user %}
-            Your Profile
+            Tu Perfil
         {% else %}
-            {{ profile_user.username }}'s Profile
+            Perfil de {{ profile_user.username }}
         {% endif %}
     </h1>
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
         <div class="flex items-center mb-4">
             {% if profile_user.profile.profile_photo %}
-                <img src="{{ profile_user.profile.profile_photo.url }}" alt="Profile Picture" class="w-16 h-16 rounded-full mr-4 cursor-pointer"
+                <img src="{{ profile_user.profile.profile_photo.url }}" alt="Foto de Perfil" class="w-16 h-16 rounded-full mr-4 cursor-pointer"
                      onclick="openImageModal(this.src)">
             {% else %}
-                <img src="/static/Images/default-avatar.jpg" alt="Default Profile Picture" class="w-16 h-16 rounded-full mr-4 cursor-pointer"
+                <img src="/static/Images/default-avatar.jpg" alt="Foto de Perfil Predeterminada" class="w-16 h-16 rounded-full mr-4 cursor-pointer"
                      onclick="openImageModal(this.src)">
             {% endif %}
 
-            <!-- Modal for larger image view -->
+            <!-- Modal para ver imagen en grande -->
             <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden" onclick="closeImageModal()">
                 <div class="max-w-screen-md max-h-screen-md p-2">
-                    <img id="modalImage" src="" alt="Large profile picture" class="max-h-[80vh] max-w-full rounded shadow-lg">
+                    <img id="modalImage" src="" alt="Imagen de perfil ampliada" class="max-h-[80vh] max-w-full rounded shadow-lg">
                 </div>
             </div>
 
@@ -38,25 +38,25 @@
 
         {% if profile_user.profile.bio %}
             <div class="mb-4">
-                <h3 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">Bio</h3>
+                <h3 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">Biografía</h3>
                 <p class="text-gray-600 dark:text-gray-400">{{ profile_user.profile.bio }}</p>
             </div>
         {% endif %}
 
-    {% if profile_user.profile.location %}
-    <div class="mb-4">
-        <h3 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">Provincia</h3>
-        {% if location_info %}
-            <div class="inline-block px-3 py-1.5 rounded-full
-                    bg-{{ location_info.color }}-100
-                    text-{{ location_info.color }}-800
-                    dark:bg-{{ location_info.color }}-900
-                    dark:text-{{ location_info.color }}-300">
-                {{ location_info.emoji }} {{ location_info.name }}
+        {% if profile_user.profile.location %}
+            <div class="mb-4">
+                <h3 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">Provincia</h3>
+                {% if location_info %}
+                    <div class="inline-block px-3 py-1.5 rounded-full
+                            bg-{{ location_info.color }}-100
+                            text-{{ location_info.color }}-800
+                            dark:bg-{{ location_info.color }}-900
+                            dark:text-{{ location_info.color }}-300">
+                        {{ location_info.emoji }} {{ location_info.name }}
+                    </div>
+                {% endif %}
             </div>
         {% endif %}
-    </div>
-    {% endif %}
 
         {% if profile_user.profile.birth_date %}
             <div class="mb-4">
@@ -67,29 +67,29 @@
 
         {% if interests_list %}
             <div class="mb-4">
-            <h3 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">Intereses</h3>
-            <div class="flex flex-wrap gap-2">
-                {% for interest in interests_list %}
-                <span class="px-3 py-1 bg-purple-100 text-purple-800 text-sm font-medium rounded-full dark:bg-purple-900 dark:text-purple-300">
-                    {{ interest }}
-                </span>
-                {% endfor %}
-            </div>
+                <h3 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">Intereses</h3>
+                <div class="flex flex-wrap gap-2">
+                    {% for interest in interests_list %}
+                        <span class="px-3 py-1 bg-purple-100 text-purple-800 text-sm font-medium rounded-full dark:bg-purple-900 dark:text-purple-300">
+                            {{ interest }}
+                        </span>
+                    {% endfor %}
+                </div>
             </div>
         {% endif %}
 
         {% if user == profile_user %}
             <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-                <a href="{% url 'blogapp:edit_profile' user.username %}" class="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300">Edita tu flow</a>
+                <a href="{% url 'blogapp:edit_profile' user.username %}" class="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300">Editar perfil</a>
             </div>
 
             <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-                <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2">¿Quieres desaparecer del mapa webin?</h3>
-                <a href="{% url 'blogapp:delete_profile' user.username %}" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Borra tu perfil y chao peskao</a>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2">¿Quieres eliminar tu cuenta?</h3>
+                <a href="{% url 'blogapp:delete_profile' user.username %}" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Eliminar perfil</a>
             </div>
 
             <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-                <a href="{% url 'blogapp:add_blog' %}" class="text-orange-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-300">Takilla tu meme</a>
+                <a href="{% url 'blogapp:add_blog' %}" class="text-orange-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-300">Crear un blog</a>
             </div>
 
             <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
@@ -98,13 +98,13 @@
         {% endif %}
     </div>
 
-    <!-- User's Blog Posts Section -->
+    <!-- Sección de Blogs del Usuario -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             {% if user == profile_user %}
-                Your Blogs
+                Tus Blogs
             {% else %}
-                {{ profile_user.username }}'s Blogs
+                Blogs de {{ profile_user.username }}
             {% endif %}
         </h2>
 
@@ -117,7 +117,7 @@
                                 {{ blog.title }}
                             </a>
                         </h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Published on {{ blog.created_at|date:"F j, Y" }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Publicado el {{ blog.created_at|date:"j F, Y" }}</p>
                         <p class="text-gray-600 dark:text-gray-300 mt-2">{{ blog.content|truncatewords:20 }}</p>
                     </div>
                 {% endfor %}
@@ -125,9 +125,9 @@
         {% else %}
             <p class="text-gray-600 dark:text-gray-400">
                 {% if user == profile_user %}
-                    You haven't created any blogs yet.
+                    Aún no has creado ningún blog.
                 {% else %}
-                    {{ profile_user.username }} hasn't created any blogs yet.
+                    {{ profile_user.username }} aún no ha creado ningún blog.
                 {% endif %}
             </p>
         {% endif %}
