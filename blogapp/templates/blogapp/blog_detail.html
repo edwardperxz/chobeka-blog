@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
-  {% if user.is_authenticated and user == object.author %}
-    <div class="flex justify-start mb-4 space-x-4">
-      <a href="{% url 'blogapp:edit_blog' object.pk %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors animate-fade-in">Editar Blog</a>
-      <a href="{% url 'blogapp:delete_blog' object.pk %}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors animate-fade-in" data-toggle="modal" data-target="#deleteConfirmModal">Mandar Pa' lante</a>
-    </div>
-  {% endif %}
   <article class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg transition-all duration-700 ease-in-out dark:text-white text-gray-900 animate-fade-in">
+    <p class="text-gray-500 dark:text-gray-400 text-xs">Published on {{ object.created_at|date:"F j, Y" }}</p>
     <h1 class="text-3xl font-bold mb-2">{{ object.title }}</h1>
+    {% if blog_tags %}
+    <div class="mb-4">
+        {% for tag in blog_tags %}
+        <span class="bg-slate-100 text-slate-800 text-sm font-medium mr-2 px-2 py-1 rounded dark:bg-slate-800 dark:text-slate-300">{{ tag }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
     <p class="text-gray-700 dark:text-gray-300 mb-4">{{ object.content|safe }}</p>
     {% if object.image %}
       <!-- Contenedor para la imagen -->
@@ -18,16 +20,24 @@
         <img src="{{ object.image.url }}" alt="{{ object.title }}" class="relative z-10 w-full h-auto max-h-[56.25vw] object-contain md:max-h-[40vw] lg:max-h-[30vw]">
       </div>
     {% endif %}
-    <p class="text-sm text-gray-600 dark:text-gray-500">By {{ object.author.username }} - {{ object.created_at }}</p>
+    <p class="text-sm text-gray-600 dark:text-gray-500">Por {{ object.author.username }} - {{ object.created_at }}</p>
   </article>
 
+  {% if user.is_authenticated and user == object.author %}
+    <!-- Botones de Editar y Eliminar -->
+    <div class="flex justify-start mt-4 mb-6 space-x-4">
+      <a href="{% url 'blogapp:edit_blog' object.pk %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors animate-fade-in">Editar</a>
+      <a href="{% url 'blogapp:delete_blog' object.pk %}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors animate-fade-in" data-toggle="modal" data-target="#deleteConfirmModal">Eliminar</a>
+    </div>
+  {% endif %}
+
   <section class="mt-8">
-    <h2 class="text-2xl dark:text-white font-semibold mb-4">Revius'</h2> <!--Se agrega el color del texto para el modo oscuro-->
+    <h2 class="text-2xl dark:text-white font-semibold mb-4">Revius'</h2>
     {% for review in object.reviews.all %}
       <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-4 transition-all duration-700 ease-in-out dark:text-white text-gray-900 animate-fade-in">
         <p class="text-blue-700 dark:text-blue-300 font-medium">{{ review.reviewer.username }} - {{ review.rating }}/5 ⭐</p>
         <p class="text-gray-700 dark:text-gray-300">{{ review.comment|safe }}</p>
-        <a href="{% url 'blogapp:add_comment' blog_pk=object.pk review_pk=review.pk %}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 mt-2 inline-block">Add Comment</a>
+        <a href="{% url 'blogapp:add_comment' blog_pk=object.pk review_pk=review.pk %}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 mt-2 inline-block">Agregar Comentario</a>
         <ul class="mt-2 list-disc ml-6 text-gray-600 dark:text-gray-400">
           {% for comment in review.comments.all %}
             <li><span class="font-semibold text-gray-900 dark:text-white">{{ comment.commenter.username }}</span>: {{ comment.content|safe }}</li>
@@ -37,8 +47,9 @@
     {% empty %}
       <p class="text-gray-400">Aqui no hay nada mo'. *Sonido de grillo*</p>
     {% endfor %}
-    {% if user.is_authenticated %}
-      <a href="{% url 'blogapp:add_review' object.pk %}" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors animate-fade-in">Add Review</a> <!--Se agrega la animacion-->
+    {% if user.is_authenticated and user != object.author %}
+      <!-- Solo los usuarios que no son el autor pueden agregar una reseña -->
+      <a href="{% url 'blogapp:add_review' object.pk %}" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors animate-fade-in">Agregar Reseña</a>
     {% endif %}
   </section>
 {% endblock %}

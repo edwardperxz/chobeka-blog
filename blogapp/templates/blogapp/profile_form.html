@@ -5,7 +5,7 @@
 <div class="container mx-auto px-4 mt-8">
     <div class="max-w-2xl mx-auto">
         <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
-            Edit Profile
+            Editar Perfil
         </h1>
         <form method="POST" enctype="multipart/form-data"
                     class="space-y-4 transition-all duration-700 ease-in-out animate-fade-in">
@@ -24,13 +24,13 @@
                                    class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                          {% elif field.name == 'interests' %}
                             <div class="space-y-2">
-                                <!-- Hide the textarea but keep it for form submission -->
+                                <!-- Ocultar el textarea pero mantenerlo para el envío del formulario -->
                                 <textarea name="{{ field.name }}" id="{{ field.id_for_label }}"
                                           style="display: none;"
                                           class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">{{ field.value }}</textarea>
 
                                 <div class="flex flex-wrap gap-2 mt-2 interest-tags">
-                                    <!-- Existing interests will be displayed here -->
+                                    <!-- Los intereses existentes se mostrarán aquí -->
                                 </div>
 
                                 <button type="button" id="add-interest-btn"
@@ -39,13 +39,13 @@
                                 </button>
 
                                 <div id="interest-popup" class="hidden mt-2 p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 shadow-md">
-                                    <input type="text" id="new-interest" maxlength="50" placeholder="Add a new interest (50 chars max)"
+                                    <input type="text" id="new-interest" maxlength="50" placeholder="Agregar un nuevo interés (máx. 50 caracteres)"
                                            class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <div class="flex justify-end mt-2 space-x-2">
                                         <button type="button" id="save-interest-btn"
-                                                class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm">Save</button>
+                                                class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm">Guardar</button>
                                         <button type="button" id="cancel-interest-btn"
-                                                class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md text-sm">Cancel</button>
+                                                class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md text-sm">Cancelar</button>
                                     </div>
                                 </div>
 
@@ -59,7 +59,7 @@
                                         const cancelBtn = document.getElementById('cancel-interest-btn');
                                         const tagsContainer = document.querySelector('.interest-tags');
 
-                                        // Initialize tags from textarea
+                                        // Inicializar etiquetas desde el textarea
                                         updateTagsFromTextarea();
 
                                         addBtn.addEventListener('click', function() {
@@ -77,7 +77,7 @@
                                             if (interest) {
                                                 const interests = parseInterests(textarea.value);
                                                 interests.push(interest);
-                                                // Store as JSON array
+                                                // Guardar como un array JSON
                                                 textarea.value = JSON.stringify(interests);
                                                 updateTagsFromTextarea();
                                                 popup.classList.add('hidden');
@@ -106,7 +106,7 @@
                                                 tagsContainer.appendChild(tag);
                                             });
 
-                                            // Add event listeners after tags are created
+                                            // Agregar eventos después de crear las etiquetas
                                             tagsContainer.querySelectorAll('button').forEach(btn => {
                                                 btn.addEventListener('click', function() {
                                                     const interestToRemove = this.getAttribute('data-interest');
@@ -118,22 +118,22 @@
                                         function parseInterests(text) {
                                             if (!text || text.trim() === '') return [];
 
-                                            // Try to parse as JSON array first
+                                            // Intentar analizar como un array JSON primero
                                             text = text.trim();
                                             if (text.startsWith('[') && text.endsWith(']')) {
                                                 try {
                                                     return JSON.parse(text);
                                                 } catch (e) {
-                                                    // If parsing fails, continue with the old method
+                                                    // Si falla el análisis, continuar con el método antiguo
                                                 }
                                             }
 
-                                            // Fallback to old method
+                                            // Método alternativo
                                             const interests = [];
                                             const matches = text.match(/("([^"]*)"|[^,]+)+(?=\s*,|\s*$)/g);
                                             if (matches) {
                                                 matches.forEach(match => {
-                                                    // Clean up any quotes and trim whitespace
+                                                    // Limpiar comillas y espacios
                                                     const cleaned = match.trim().replace(/^"|"$/g, '').trim();
                                                     if (cleaned) interests.push(cleaned);
                                                 });
@@ -144,12 +144,12 @@
                                         function removeInterest(interest) {
                                             const interests = parseInterests(textarea.value);
                                             const filteredInterests = interests.filter(i => i !== interest);
-                                            // Store as JSON array
+                                            // Guardar como un array JSON
                                             textarea.value = JSON.stringify(filteredInterests);
                                             updateTagsFromTextarea();
                                         }
 
-                                        // Ensure the value is stored as a JSON array on page load
+                                        // Asegurarse de que el valor se guarde como un array JSON al cargar la página
                                         const initialInterests = parseInterests(textarea.value);
                                         textarea.value = JSON.stringify(initialInterests);
                                     });
@@ -169,11 +169,11 @@
             </div>
             <div class="mt-6 flex space-x-4">
                 <button type="submit" class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600 dark:hover:bg-blue-700 rounded transition-all duration-500 ease-in-out">
-                    Save Changes
+                    Guardar Cambios
                 </button>
                 <a href="{% url 'blogapp:profile' user.username %}"
                      class="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded transition-all duration-500 ease-in-out">
-                    Cancel
+                    Cancelar
                 </a>
             </div>
         </form>
