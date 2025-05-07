@@ -74,9 +74,9 @@ class ProfileView(LoginRequiredMixin, DetailView):
         return context
 
     def render_to_response(self, context, **response_kwargs):
-        # If the user doesn't exist, redirect to blog list with an error
+        # Si el usuario no existe, redirigir a la lista de blogs con un error
         if not context.get('profile_user'):
-            messages.error(self.request, "User not found.")
+            messages.error(self.request, "Usuario no encontrado.")
             return redirect('blogapp:blog_list')
         return super().render_to_response(context, **response_kwargs)
 
@@ -93,7 +93,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
             return UserProfile.objects.create(user=self.request.user)
 
     def form_valid(self, form):
-        messages.success(self.request, 'Your profile has been updated successfully!')
+        messages.success(self.request, '¡Tu perfil ha sido actualizado exitosamente!')
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -134,7 +134,7 @@ class ProfileDeleteView(LoginRequiredMixin, DeleteView):
             Session.objects.filter(session_key=session_key).delete()
             print("Session cleared")
 
-        messages.success(request, 'Your profile has been deleted successfully!')
+        messages.success(request, '¡Tu perfil ha sido eliminado exitosamente!')
         return redirect('blogapp:blog_list')
 
 class BlogListView(ListView):
@@ -183,7 +183,7 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        messages.success(self.request, 'The Blog has been created successfully!')
+        messages.success(self.request, '¡El blog ha sido creado exitosamente!')
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -198,7 +198,7 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
         if obj.author != self.request.user:
-            messages.error(request, "You don't have permission to edit this blog.")
+            messages.error(request, "No tienes permiso para editar este blog.")
             return redirect('blogapp:blog_detail', pk=obj.pk)
         return super().dispatch(request, *args, **kwargs)
 
@@ -211,7 +211,7 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
             self.object.image.delete(save=False)
 
         form.instance.last_updated = datetime.now()
-        messages.success(self.request, 'The Blog has been updated successfully!')
+        messages.success(self.request, '¡El blog ha sido actualizado exitosamente!')
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -226,7 +226,7 @@ class BlogDeleteView(LoginRequiredMixin, DeleteView):
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
         if obj.author != self.request.user:
-            messages.error(request, "You don't have permission to delete this blog.")
+            messages.error(request, "No tienes permiso para eliminar este blog.")
             return redirect('blogapp:blog_detail', pk=obj.pk)
         return super().dispatch(request, *args, **kwargs)
 
@@ -235,7 +235,7 @@ class BlogDeleteView(LoginRequiredMixin, DeleteView):
         # Delete associated image file if exists
         if blog.image:
             blog.image.delete(save=False)
-        messages.success(request, 'The Blog has been deleted successfully!')
+        messages.success(request, '¡El blog ha sido eliminado exitosamente!')
         return super().delete(request, *args, **kwargs)
 
 
@@ -250,9 +250,15 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
+        blog = Blog.objects.get(pk=self.kwargs['pk'])
+        # Verificar si el usuario ya dejó una reseña para este blog
+        if Review.objects.filter(blog=blog, reviewer=self.request.user).exists():
+            messages.error(self.request, 'Ya has dejado una reseña para este blog.')
+            return redirect('blogapp:blog_detail', pk=blog.pk)
+
         form.instance.reviewer = self.request.user
-        form.instance.blog_id = self.kwargs['pk']
-        messages.success(self.request, 'Your review has been posted successfully!')
+        form.instance.blog = blog
+        messages.success(self.request, '¡Tu reseña ha sido publicada exitosamente!')
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -272,7 +278,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.commenter = self.request.user
         form.instance.review_id = self.kwargs['review_pk']
-        messages.success(self.request, 'Your comment has been posted successfully!')
+        messages.success(self.request, '¡Tu comentario ha sido publicado exitosamente!')
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -292,7 +298,7 @@ class LoginView(FormView):
             next_url = self.request.GET.get('next', self.get_success_url())
             return redirect(next_url)
 
-        messages.error(self.request, 'Invalid username or password')
+        messages.error(self.request, 'Usuario o contraseña inválidos.')
         return self.form_invalid(form)
 
     def dispatch(self, request, *args, **kwargs):
@@ -313,7 +319,7 @@ class LogoutView(RedirectView):
     
     def get(self, request, *args, **kwargs):
         logout(request)
-        messages.success(request, 'You have been logged out successfully')
+        messages.success(request, 'Has cerrado sesión exitosamente.')
         return super().get(request, *args, **kwargs)
 
 
@@ -324,11 +330,11 @@ class SignUpView(FormView):
     
     def form_valid(self, form):
         user = form.save()
-        messages.success(self.request, 'Your account has been created successfully!')
+        messages.success(self.request, '¡Tu cuenta ha sido creada exitosamente!')
         return super().form_valid(form)
     
     def form_invalid(self, form):
-        messages.error(self.request, 'Please correct the errors below')
+        messages.error(self.request, 'Por favor corrige los errores a continuación.')
         return super().form_invalid(form)
     
     def get_context_data(self, **kwargs):
