@@ -16,6 +16,138 @@
           <label for="{{ field.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">{{ field.label }}</label>
           {% if field.name == 'image' %}
             <input type="file" name="{{ field.name }}" id="{{ field.id_for_label }}" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" accept="image/*, video/*">
+          {% elif field.name == 'tags' %}
+          <div class="space-y-2">
+            <!-- Hide the textarea but keep it for form submission -->
+            <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" style="display: none;"
+              class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">{{ field.value }}</textarea>
+
+            <div class="flex flex-wrap gap-2 mt-2 interest-tags">
+              <!-- Existing interests will be displayed here -->
+            </div>
+
+            <button type="button" id="add-interest-btn" class="mt-2 px-4 py-1 bg-green-500 hover:bg-green-600 text-white rounded-md text-sm transition-all">
+              Agregar Tag
+            </button>
+
+            <div id="tag-popup"
+              class="hidden mt-2 p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+              <input type="text" id="new-tag" maxlength="50" placeholder="Añade un nuevo tag (50 chars max)"
+                class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div class="flex justify-end mt-2 space-x-2">
+                <button type="button" id="save-tag-btn"
+                  class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm">Save</button>
+                <button type="button" id="cancel-tag-btn"
+                  class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md text-sm">Cancel</button>
+              </div>
+            </div>
+
+            <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                const textarea = document.getElementById('{{ field.id_for_label }}');
+                const addBtn = document.getElementById('add-interest-btn');
+                const popup = document.getElementById('tag-popup');
+                const newtagInput = document.getElementById('new-tag');
+                const saveBtn = document.getElementById('save-tag-btn');
+                const cancelBtn = document.getElementById('cancel-tag-btn');
+                const tagsContainer = document.querySelector('.interest-tags');
+
+                // Initialize tags from textarea
+                updateTagsFromTextarea();
+
+                addBtn.addEventListener('click', function () {
+                  popup.classList.remove('hidden');
+                  newtagInput.focus();
+                });
+
+                cancelBtn.addEventListener('click', function () {
+                  popup.classList.add('hidden');
+                  newtagInput.value = '';
+                });
+
+                saveBtn.addEventListener('click', function () {
+                  let tag = newtagInput.value.trim();
+                  if (tag) {
+                  // Ensure the tag has a hashtag prefix
+                  tag = tag.startsWith('#') ? tag : '#' + tag;
+
+                  const tags = parsetags(textarea.value);
+                  tags.push(tag);
+                  // Store as JSON array
+                  textarea.value = JSON.stringify(tags);
+                  updateTagsFromTextarea();
+                  popup.classList.add('hidden');
+                  newtagInput.value = '';
+                  }
+                });
+
+                newtagInput.addEventListener('keydown', function (event) {
+                  if (event.key === 'Enter') {
+                  event.preventDefault();
+                  saveBtn.click();
+                  }
+                });
+
+                function updateTagsFromTextarea() {
+                  tagsContainer.innerHTML = '';
+                  const tags = parsetags(textarea.value);
+                  tags.forEach(tagName => {
+                  const tagElement = document.createElement('div');
+                  tagElement.className = 'px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-md text-sm flex items-center';
+                  tagElement.innerHTML = `
+                    <span>${tagName}</span>
+                    <button type="button" class="ml-2 text-blue-600 dark:text-blue-300 hover:text-red-500 dark:hover:text-red-400"
+                        data-tag="${tagName}">✕</button>
+                    `;
+                  tagsContainer.appendChild(tagElement);
+                  });
+
+                  // Add event listeners after tags are created
+                  tagsContainer.querySelectorAll('button').forEach(btn => {
+                  btn.addEventListener('click', function () {
+                    const tagToRemove = this.getAttribute('data-tag');
+                    removetag(tagToRemove);
+                  });
+                  });
+                }
+
+                function parsetags(text) {
+                  if (!text || text.trim() === '') return [];
+
+                  text = text.trim();
+                  let tags = [];
+
+                  // Try to parse as JSON array
+                  if (text.startsWith('[') && text.endsWith(']')) {
+                  try {
+                    tags = JSON.parse(text);
+                  } catch (e) {
+                    tags = text.match(/("([^"]*)"|[^,]+)+(?=\s*,|\s*$)/g) || [];
+                    tags = tags.map(tag => tag.trim().replace(/^"|"$/g, '').trim()).filter(Boolean);
+                  }
+                  } else {
+                  tags = text.match(/("([^"]*)"|[^,]+)+(?=\s*,|\s*$)/g) || [];
+                  tags = tags.map(tag => tag.trim().replace(/^"|"$/g, '').trim()).filter(Boolean);
+                  }
+
+                  // Ensure all tags have a hashtag prefix
+                  return tags.map(tag => tag.startsWith('#') ? tag : '#' + tag);
+                }
+
+                function removetag(tag) {
+                  const tags = parsetags(textarea.value);
+                  const filteredtags = tags.filter(i => i !== tag);
+                  // Store as JSON array
+                  textarea.value = JSON.stringify(filteredtags);
+                  updateTagsFromTextarea();
+                }
+
+                // Ensure the value is stored as a JSON array on page load
+                const initialtags = parsetags(textarea.value);
+                textarea.value = JSON.stringify(initialtags);
+                });
+            </script>
+          </div>
           {% else %}
             {{ field|add_class:"bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
           {% endif %}
