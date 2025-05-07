@@ -11,6 +11,7 @@ from django.contrib.messages import get_messages
 from social_core.exceptions import AuthCanceled, AuthForbidden
 from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
+from django import forms
 
 
 def get_location_info(location_code):
@@ -285,13 +286,31 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.kwargs['blog_pk']})
 
 
+class LoginForm(forms.Form):
+    username = forms.CharField(
+        label="Usuario",
+        max_length=150,
+        widget=forms.TextInput(attrs={
+            'class': 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'placeholder': 'Usuario'
+        })
+    )
+    password = forms.CharField(
+        label="Contraseña",
+        widget=forms.PasswordInput(attrs={
+            'class': 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'placeholder': 'Contraseña'
+        })
+    )
+
 class LoginView(FormView):
     template_name = 'blogapp/login.html'
+    form_class = LoginForm
     success_url = reverse_lazy('blogapp:blog_list')
 
     def form_valid(self, form):
-        username = form.cleaned_data.get('username', '')
-        password = form.cleaned_data.get('password', '')
+        username = form.cleaned_data.get("username", "")
+        password = form.cleaned_data.get("password", "")
         user = authenticate(self.request, username=username, password=password)
         if user is not None:
             login(self.request, user)
@@ -305,13 +324,6 @@ class LoginView(FormView):
         if request.user.is_authenticated:
             return redirect('blogapp:blog_list')
         return super().dispatch(request, *args, **kwargs)
-
-    def get_form(self):
-        # Return a basic form without a form class
-        if self.request.method == 'POST':
-            return {'username': self.request.POST.get('username', ''), 
-                   'password': self.request.POST.get('password', '')}
-        return {}
 
 
 class LogoutView(RedirectView):
