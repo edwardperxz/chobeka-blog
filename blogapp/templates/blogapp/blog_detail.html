@@ -1,7 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
   <article class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg transition-all duration-700 ease-in-out dark:text-white text-gray-900 animate-fade-in">
+    <p class="text-gray-500 dark:text-gray-400 text-xs">Published on {{ object.created_at|date:"F j, Y" }}</p>
     <h1 class="text-3xl font-bold mb-2">{{ object.title }}</h1>
+    {% if blog_tags %}
+    <div class="mb-4">
+        {% for tag in blog_tags %}
+        <span class="bg-slate-100 text-slate-800 text-sm font-medium mr-2 px-2 py-1 rounded dark:bg-slate-800 dark:text-slate-300">{{ tag }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
     <p class="text-gray-700 dark:text-gray-300 mb-4">{{ object.content|safe }}</p>
     {% if object.image %}
       <!-- Contenedor para la imagen -->

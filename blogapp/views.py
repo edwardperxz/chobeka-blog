@@ -149,22 +149,35 @@ class BlogListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        blogs_with_location = []
+        blogs_list = []
+        all_tags = set()
+
         for blog in context['blogs']:
+            blog_tags = []
+
             try:
+                if blog.tags:
+                    blog_tags = blog.tags if isinstance(blog.tags, list) else []
+                    all_tags.update(blog_tags)
+
                 location_code = blog.author.profile.location if hasattr(blog.author, 'profile') else None
                 location_info = get_location_info(location_code)
-                blogs_with_location.append({
+
+                blogs_list.append({
                     'blog': blog,
-                    'location_info': location_info
+                    'location_info': location_info,
+                    'blog_tags': blog_tags
                 })
             except:
-                blogs_with_location.append({
+                blogs_list.append({
                     'blog': blog,
-                    'location_info': get_location_info(None)
+                    'location_info': get_location_info(None),
+                    'blog_tags': blog_tags
                 })
 
-        context['blogs_with_location'] = blogs_with_location
+        context['blogs_list'] = blogs_list
+        context['tags_collection'] = sorted(list(all_tags))
+
         return context
 
 
@@ -176,10 +189,24 @@ class BlogDetailView(DetailView):
     def get_queryset(self):
         return super().get_queryset().select_related('author').prefetch_related('reviews__comments')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        blog = self.get_object()
+        blog_tags = []
+
+        if blog.tags:
+            blog_tags = blog.tags if isinstance(blog.tags, list) else []
+
+        context['blog_tags'] = blog_tags
+        context['location_info'] = get_location_info(
+            blog.author.profile.location if hasattr(blog.author, 'profile') else None
+        )
+        return context
+
 
 class BlogCreateView(LoginRequiredMixin, CreateView):
     model = Blog
-    fields = ['title', 'content', 'image']
+    fields = ['title', 'content', 'image', 'tags']
     template_name = 'blogapp/blog_form.html'
 
     def form_valid(self, form):
@@ -193,7 +220,7 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
 
 class BlogUpdateView(LoginRequiredMixin, UpdateView):
     model = Blog
-    fields = ['title', 'content', 'image']
+    fields = ['title', 'content', 'image', 'tags']
     template_name = 'blogapp/blog_form.html'
 
     def dispatch(self, request, *args, **kwargs):
