@@ -32,7 +32,7 @@
   {% endif %}
 
   <section class="mt-8">
-    <h2 class="text-2xl dark:text-white font-semibold mb-4">Reseñas</h2>
+    <h2 class="text-2xl dark:text-white font-semibold mb-4">Revius'</h2>
     {% for review in object.reviews.all %}
       <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-4 transition-all duration-700 ease-in-out dark:text-white text-gray-900 animate-fade-in">
         <p class="text-blue-700 dark:text-blue-300 font-medium">{{ review.reviewer.username }} - {{ review.rating }}/5 ⭐</p>
@@ -45,7 +45,7 @@
         </ul>
       </div>
     {% empty %}
-      <p class="text-gray-400">Aún no hay reseñas. Sé el primero en agregar una.</p>
+      <p class="text-gray-400">Aqui no hay nada mo'. *Sonido de grillo*</p>
     {% endfor %}
     {% if user.is_authenticated and user != object.author %}
       <!-- Solo los usuarios que no son el autor pueden agregar una reseña -->
