@@ -9,6 +9,7 @@
   <article class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg transition-all duration-700 ease-in-out dark:text-white text-gray-900 animate-fade-in">
     <h1 class="text-3xl font-bold mb-2">{{ object.title }}</h1>
     <p class="text-gray-700 dark:text-gray-300 mb-4">{{ object.content|safe }}</p>
+    <p class="text-gray-700 dark:text-gray-300 mb-4">{{ object.content }}</p>
     {% if object.image %}
       <!-- Contenedor para la imagen -->
       <div class="relative w-full max-w-4xl mx-auto bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
