@@ -26,14 +26,11 @@ SECRET_KEY = 'django-insecure-ukz72g)*267@$nvdk**+6#+a*nyzh_1t3o2=@wxtpga$cew)2^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-<<<<<<< HEAD
 ALLOWED_HOSTS = [
     '127.0.0.1', 
     'localhost', 
 ]
-=======
 SITE_ID = 1
->>>>>>> a52bc2bf39d0c71b63cd345d1f5b91f9dd472681
 
 ALLOWED_HOSTS = [
     '127.0.0.1', 
@@ -58,10 +55,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'social_django',
-<<<<<<< HEAD
     'django_ckeditor_5',
-=======
->>>>>>> a52bc2bf39d0c71b63cd345d1f5b91f9dd472681
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -80,10 +74,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
-<<<<<<< HEAD
-=======
     'blogapp.middleware.SocialAuthExceptionMiddleware'
->>>>>>> a52bc2bf39d0c71b63cd345d1f5b91f9dd472681
 ]
 
 ROOT_URLCONF = 'blogproject.urls'
@@ -243,7 +234,6 @@ SOCIALACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-<<<<<<< HEAD
 
 # CkEditor configuration
 customColorPalette = [
@@ -342,5 +332,3 @@ CKEDITOR_5_CONFIGS = {
         }
     }
 }
-=======
->>>>>>> a52bc2bf39d0c71b63cd345d1f5b91f9dd472681
