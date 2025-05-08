@@ -278,13 +278,6 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        # Handle image deletion/replacement
-        if 'image-clear' in self.request.POST and self.request.POST['image-clear'] == 'on':
-            if self.object.image:
-                self.object.image.delete(save=False)
-        elif 'image' in self.request.FILES and self.object.image:
-            self.object.image.delete(save=False)
-
         form.instance.last_updated = datetime.now()
         messages.success(self.request, '¡El blog ha sido actualizado exitosamente!')
         return super().form_valid(form)
