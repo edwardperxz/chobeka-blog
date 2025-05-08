@@ -101,7 +101,7 @@
         <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="Logo" class="h-10 w-150">
       </a>
       <div class="flex items-center space-x-4">
-        <button onclick="toggleDarkMode()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-gray-200 to-gray-400 dark:from-primary_dark-200 dark:to-primary_dark-400 hover:scale-105 transition-all duration-300">
+        <button onclick="toggleDarkMode()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 text-gray-900 dark:text-white hover:scale-105 transition-all duration-300 shadow-lg">
           <span id="theme-icon" class="transition-transform duration-500 transform"></span>
         </button>
 
@@ -138,11 +138,10 @@
         <!-- Imagen centrada -->
         <img src="{{ object.image.url }}" alt="{{ object.title }}" class="relative z-10 w-full h-auto max-h-[56.25vw] object-contain md:max-h-[40vw] lg:max-h-[30vw]">
       </div>
-      
-    {% endblock %}
+      {% endblock %}
     </div>
     {% if messages %}
-    <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-4 items-center">
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-4">
       {% for message in messages %}
       <div class="toast bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 rounded-lg shadow-xl border-l-4
       {% if message.tags == 'success' %}border-green-500{% elif message.tags == 'error' %}border-red-500
