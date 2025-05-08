@@ -263,8 +263,10 @@ customColorPalette = [
     },
 ]
 
-CKEDITOR_5_CUSTOM_CSS = 'path_to.css' # optional
-CKEDITOR_5_FILE_STORAGE = "path_to_storage.CustomStorage" # optional
+# CKEDITOR_5_CUSTOM_CSS = 'path_to.css'
+CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+CKEDITOR_5_UPLOAD_PATH = "uploads/ckeditor5/"
+
 CKEDITOR_5_CONFIGS = {
 'default': {
     'toolbar': {
