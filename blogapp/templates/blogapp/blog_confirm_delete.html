@@ -1,17 +1,19 @@
 {% extends 'blogapp/blog_detail.html' %}
+{% load static %}
 {% block content %}
+<!-- todo: add all block titles to the top of the file -->
 {{ block.super }}  <!-- This displays the parent template's content -->
 
 <div id="deleteConfirmModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50" tabindex="-1" role="dialog">
     <div class="relative mx-auto p-4 w-full max-w-md">
-        <div class="bg-white rounded-lg shadow-lg">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
             <div class="flex items-center justify-between p-4 border-b">
-                <h5 class="text-lg font-medium">Confirm Deletion</h5>
-                <button type="button" class="text-gray-500 hover:text-gray-700" id="closeModal">
+                <h5 class="text-lg font-medium text-black dark:text-white">Confirm Deletion</h5>
+                <button type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white" id="closeModal">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="p-4">
+            <div class="p-4 text-black dark:text-white">
                 <p class="mb-2">Are you sure you want to delete "{{ object.title }}"?</p>
                 <p>This action cannot be undone.</p>
             </div>
@@ -26,18 +28,5 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Show modal on page load
-        document.getElementById('deleteConfirmModal').classList.remove('hidden');
-        // Handle close button
-        document.getElementById('closeModal').addEventListener('click', function() {
-            window.history.back();
-        });
-        // Handle cancel button to redirect back
-        document.getElementById('cancelButton').addEventListener('click', function() {
-            window.history.back();
-        });
-    });
-</script>
+<script src="{% static 'js/delete_modal.js' %}"></script>
 {% endblock %}
