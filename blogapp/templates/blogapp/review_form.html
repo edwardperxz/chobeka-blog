@@ -12,10 +12,67 @@
         <div>
           <label for="{{ field.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">{{ field.label }}</label>
           {% if field.name == 'rating' %}
-            <input type="number" name="{{ field.name }}" id="{{ field.id_for_label }}" 
-                   min="1" max="5" step="1" 
-                   class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                   oninput="validateRating(this)" onkeypress="restrictInput(event)" required>
+            <p class="text-xs text-gray-600 dark:text-gray-400" id="rating-instructions">Haz clic en las estrellas para calificar</p>
+            <div class="flex flex-col space-y-2">
+              <div class="star-rating flex space-x-3 items-center" role="radiogroup" aria-labelledby="rating-instructions">
+              {% for i in "12345" %}
+                <button
+                type="button"
+                class="star-btn md:text-4xl text-2xl focus:outline-none transition-all duration-200 hover:transform hover:scale-110"
+                data-value="{{ i }}"
+                role="radio"
+                aria-checked="false"
+                aria-label="Calificación de {{ i }} estrellas"
+                tabindex="0">
+                  <span class="star" aria-hidden="true">☆</span>
+                </button>
+              {% endfor %}
+              <input type="hidden" name="{{ field.name }}" id="{{ field.id_for_label }}" value="0" required aria-hidden="true">
+              </div>
+              <div class="mb-8 text-sm font-medium text-gray-700 dark:text-gray-300">
+              Tu calificación: <span id="{{ field.name }}-value" class="font-bold text-yellow-500" aria-live="polite">0</span>
+              </div>
+            </div>
+
+            <script>
+              document.addEventListener('DOMContentLoaded', function() {
+                const stars = document.querySelectorAll('.star-btn');
+                const ratingInput = document.getElementById('{{ field.id_for_label }}');
+                const ratingValue = document.getElementById('{{ field.name }}-value');
+
+                // Update star display
+                function upsateStarsDisplay(activeValue) {
+                  stars.forEach(star => {
+                    const starValue = star.getAttribute('data-value');
+                    const selectedStar = star.querySelector('.star');
+                    const isActive = starValue <= activeValue;
+                    selectedStar.textContent = isActive ? '★' : '☆';
+                    selectedStar.classList.toggle('text-yellow-400', isActive);
+                  });
+                }
+
+                upsateStarsDisplay(ratingInput.value);
+
+                // Hover effects
+                stars.forEach(star => {
+                  star.addEventListener('mouseover', function() {
+                    upsateStarsDisplay(this.getAttribute('data-value'));
+                  });
+
+                  star.addEventListener('mouseout', function() {
+                    upsateStarsDisplay(ratingInput.value);
+                  });
+
+                  star.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+                    ratingInput.value = value;
+                    ratingValue.textContent = value;
+                    upsateStarsDisplay(value);
+                  });
+                });
+              });
+            </script>
+
           {% else %}
             {{ field|add_class:"bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
           {% endif %}
@@ -31,26 +88,4 @@
     </div>
   </form>
 
-  <script>
-    // Validación para el campo de calificación
-    function validateRating(input) {
-      const value = parseInt(input.value, 10);
-      if (isNaN(value) || value < 1 || value > 5) {
-        input.value = input.value.slice(0, -1); // Elimina el último carácter si no es válido
-      }
-    }
-
-    // Restringir caracteres permitidos en el campo de calificación
-    function restrictInput(event) {
-      const char = String.fromCharCode(event.which);
-      if (!/[1-5]/.test(char)) {
-        event.preventDefault(); // Bloquea caracteres no permitidos
-      }
-    }
-
-    // Evitar pegar valores no válidos
-    document.getElementById('id_rating').addEventListener('paste', function (e) {
-      e.preventDefault();
-    });
-  </script>
 {% endblock %}
