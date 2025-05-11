@@ -47,12 +47,17 @@
             <div class="mb-4">
                 <h3 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">Provincia</h3>
                 {% if location_info %}
-                    <div class="inline-block px-3 py-1.5 rounded-full
+                    <div class="flex items-center">
+                        <div class="inline-flex items-center px-3 py-1.5 rounded-full
                             bg-{{ location_info.color }}-100
                             text-{{ location_info.color }}-800
                             dark:bg-{{ location_info.color }}-900
                             dark:text-{{ location_info.color }}-300">
-                        {{ location_info.emoji }} {{ location_info.name }}
+                            <img src="/static/flags/{{ location_info.flag_url }}_flag.svg"
+                                alt="{{ location_info.name }} province flag"
+                                class="h-4 w-auto mr-1.5 inline">
+                            <span>{{ location_info.name }}</span>
+                        </div>
                     </div>
                 {% endif %}
             </div>
