@@ -18,16 +18,16 @@ from django.db.models import Avg, Count
 
 def get_location_info(location_code):
     LOCATION_MAP = {
-        'BOC': {'emoji': '🌊', 'name': 'Bocas del Toro', 'color': 'lime'},
-        'CHI': {'emoji': '🏔️', 'name': 'Chiriquí', 'color': 'green'},
-        'COC': {'emoji': '🌴', 'name': 'Coclé', 'color': 'amber'},
-        'COL': {'emoji': '🏝️', 'name': 'Colón', 'color': 'indigo'},
-        'DAR': {'emoji': '🌿', 'name': 'Darién', 'color': 'cyan'},
-        'HER': {'emoji': '🌄', 'name': 'Herrera', 'color': 'yellow'},
-        'LOS': {'emoji': '🌾', 'name': 'Los Santos', 'color': 'orange'},
-        'PAN': {'emoji': '🏙️', 'name': 'Panamá', 'color': 'red'},
-        'POE': {'emoji': '🏞️', 'name': 'Panamá Oeste', 'color': 'emerald'},
-        'VER': {'emoji': '🌳', 'name': 'Veraguas', 'color': 'blue'},
+        'BOC': {'flag_url': 'Bocas_del_Toro', 'name': 'Bocas del Toro', 'color': 'lime'},
+        'CHI': {'flag_url': 'Chiriqui', 'name': 'Chiriquí', 'color': 'green'},
+        'COC': {'flag_url': 'Cocle', 'name': 'Coclé', 'color': 'amber'},
+        'COL': {'flag_url': 'Colon', 'name': 'Colón', 'color': 'indigo'},
+        'DAR': {'flag_url': 'Darien', 'name': 'Darién', 'color': 'cyan'},
+        'HER': {'flag_url': 'Herrera', 'name': 'Herrera', 'color': 'yellow'},
+        'LOS': {'flag_url': 'Los_Santos', 'name': 'Los Santos', 'color': 'orange'},
+        'PAN': {'flag_url': 'Panama', 'name': 'Panamá', 'color': 'red'},
+        'POE': {'flag_url': 'Panama_Oeste', 'name': 'Panamá Oeste', 'color': 'emerald'},
+        'VER': {'flag_url': 'Veraguas', 'name': 'Veraguas', 'color': 'blue'},
     }
     return LOCATION_MAP.get(location_code)
 

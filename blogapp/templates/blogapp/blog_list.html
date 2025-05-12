@@ -22,13 +22,17 @@
               <span class="text-red dark:text-blue-500">• {{ blog.created_at|date:"M d, Y" }}</span>
               {% for blog_content in blogs_list %}
                 {% if blog_content.blog.id == blog.id and blog_content.location_info %}
-                  <div class="inline-block px-3 py-1.5 rounded-full
-                        bg-{{ blog_content.location_info.color }}-100
-                        text-{{ blog_content.location_info.color }}-800
-                        dark:bg-{{ blog_content.location_info.color }}-900
-                        dark:text-{{ blog_content.location_info.color }}-300">
-                    {{ blog_content.location_info.emoji }} {{ blog_content.location_info.name }}
-                  </div>
+                    <div class="inline-block px-3 py-1.5 rounded-full
+                      bg-{{ blog_content.location_info.color }}-100
+                      text-{{ blog_content.location_info.color }}-800
+                      dark:bg-{{ blog_content.location_info.color }}-900
+                      dark:text-{{ blog_content.location_info.color }}-300
+                      flex items-center">
+                      <img src="static/flags/{{ blog_content.location_info.flag_url }}_flag.svg"
+                        alt="{{ blog_content.location_info.name }} province flag"
+                        class="h-4 w-auto mr-1.5">
+                      <span>{{ blog_content.location_info.name }}</span>
+                    </div>
                 {% endif %}
               {% endfor %}
             </div>
