@@ -71,3 +71,9 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.commenter.username}"
+    
+class BlogStats(Blog):
+    class Meta:
+        proxy = True
+        verbose_name = "Estadísticas del Blog"
+        verbose_name_plural = "Estadísticas del Blog"
