@@ -54,25 +54,75 @@ class ProfileView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         try:
             viewed_user = get_user_model().objects.get(username=self.kwargs.get('username'))
-            context['profile_user'] = viewed_user
-            context['blogs'] = Blog.objects.filter(author=viewed_user).select_related('author')
-
             profile = self.get_object()
-            if profile and profile.interests:
-                context['interests_list'] = profile.interests
-            else:
-                context['interests_list'] = []
 
-            if profile and profile.location:
-                context['location_info'] = get_location_info(profile.location)
+            # Basic user info
+            context['profile_user'] = viewed_user
+
+            # Profile info
+            context['interests_list'] = profile.interests if profile and profile.interests else []
+            context['location_info'] = get_location_info(profile.location if profile else None)
+
+            # Blogs by the user
+            user_blogs = Blog.objects.filter(author=viewed_user).select_related('author')
+            context['blogs'] = user_blogs
+            context['blogs_count'] = user_blogs.count()
+
+            # Blog ratings
+            blog_ids = [blog.id for blog in user_blogs]
+            ratings = Review.objects.filter(blog_id__in=blog_ids).values('blog_id').annotate(
+                avg_rating=Avg('rating'),
+                review_count=Count('id')
+            )
+
+            # Calculate average rating for user's blogs
+            if ratings:
+                valid_ratings = [item['avg_rating'] for item in ratings if item['avg_rating']]
+                average_rating = sum(valid_ratings) / len(valid_ratings) if valid_ratings else 0
+                context['average_rating'] = round(average_rating, 1) if average_rating else 0
             else:
-                context['location_info'] = get_location_info(None)
+                context['average_rating'] = 0
+
+            # Reviews by the user
+            user_reviews = Review.objects.filter(reviewer=viewed_user)
+            context['reviews_list'] = user_reviews
+            context['reviews_count'] = user_reviews.count()
+            context['reviewed_blogs'] = [review.blog for review in user_reviews]
+
+            # Average rating given by user in reviews
+            if user_reviews:
+                avg_review_rating = sum(review.rating for review in user_reviews) / user_reviews.count()
+                context['average_review_rating'] = round(avg_review_rating, 1) if avg_review_rating else 0
+            else:
+                context['average_review_rating'] = 0
+
+            # Comments by the user
+            user_comments = Comment.objects.filter(commenter=viewed_user)
+            context['comments_list'] = user_comments
+            context['comments_count'] = user_comments.count()
+            context['commented_blogs'] = [comment.review.blog for comment in user_comments]
+
+            # Tags used by the user
+            all_tags = set()
+            for blog in user_blogs:
+                if blog.tags:
+                    blog_tags = blog.tags if isinstance(blog.tags, list) else []
+                    all_tags.update(blog_tags)
+            context['tags_collection'] = sorted(list(all_tags))
+            context['tags_count'] = len(context['tags_collection'])
 
         except get_user_model().DoesNotExist:
             context['profile_user'] = None
             context['blogs'] = []
             context['interests_list'] = []
             context['location_info'] = get_location_info(None)
+            context['blogs_count'] = 0
+            context['reviews_count'] = 0
+            context['comments_count'] = 0
+            context['average_rating'] = 0
+            context['average_review_rating'] = 0
+            context['tags_collection'] = []
+            context['tags_count'] = 0
 
         return context
 
