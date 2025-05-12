@@ -38,8 +38,9 @@
     }
   </script>
 
-  <link rel="icon" type="image/x-icon" href="{% static 'Images/FishChoveaca.ico' %}">
+  <link rel="icon" type="image/x-icon" href="{% static 'Images/chubekyn.ico' %}">
   <link rel="stylesheet" href="{% static 'style.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
   <script>
@@ -47,11 +48,15 @@
       darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+          sans: ['Roboto', 'sans-serif'], // Roboto como fuente predeterminada
+        },
           colors: {
             primary_dark:{
               DEFAULT: '#101C41',
+              100: '#3A4B80',
               200: '#263666',
-              400: '#0B1633',
+              600: '#263666',
             },
             secondary_dark: '#0B1633',
             red:{
@@ -94,14 +99,14 @@
   }
 </style>
 </head>
-<body id="body" class="flex flex-col min-h-screen bg-white dark:bg-secondary_dark text-gray-900 dark:text-white font-sans transition-all duration-700 ease-in-out">
-  <nav class="bg-white dark:bg-secondary_dark shadow-md py-4 px-6 transition-colors">
-    <div class="max-w-6xl mx-auto flex justify-between items-center">
-      <a href="{% url 'blogapp:blog_list' %}" class="text-gray-900 dark:text-white text-2xl font-semibold tracking-wider transition-colors">
-        <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="Logo" class="h-10 w-150">
-      </a>
-      <div class="flex items-center space-x-4">
-        <button onclick="toggleDarkMode()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-gray-200 to-gray-400 dark:from-primary_dark-200 dark:to-primary_dark-400 hover:scale-105 transition-all duration-300">
+<body id="body" class="flex flex-col min-h-screen bg-gray-800 dark:bg-secondary_dark text-gray-900 dark:text-white transition-colors">
+  <nav class="bg-primary_dark-200 dark:bg-secondary_dark shadow-md py-4 px-4 md:px-20 fixed top-0 left-0 right-0 z-50 transition-colors">
+  <div class="max-w-8xl mx-auto flex justify-between items-center">
+    <a href="{% url 'blogapp:blog_list' %}" class="text-2xl font-semibold">
+      <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="Logo" class="h-10 w-auto">
+    </a>
+    <div class="flex items-center space-x-4">
+        <button onclick="toggleDarkMode()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary_dark dark:bg-primary_dark-600 hover:scale-105 transition-all duration-300">
           <span id="theme-icon" class="transition-transform duration-500 transform"></span>
         </button>
 
@@ -114,18 +119,10 @@
               </a>
             {% endif %}
             <a href="{% url 'blogapp:profile' user.username %}" class="transition-all duration-500 ease-in-out">
-              <!-- Icono para modo claro -->
-              <img src="{% static 'Images/gg_profile_blue.svg' %}" alt="Mi Chantin" class="w-9 h-9 rounded-full block dark:hidden">
-              
-              <!-- Icono para modo oscuro -->
-              <img src="{% static 'Images/gg_profile.svg' %}" alt="Mi Chantin dark" class="w-9 h-9 rounded-full hidden dark:block">
-            </a>
+              <img src="{% static 'Images/gg_profile.svg' %}" alt="Mi Chantin" class="w-9 h-9 rounded-full block">
             
             <a href="{% url 'blogapp:logout' %}" class="dark:hover:transition-all duration-500 ease-in-out">
-              <!-- Icono para modo claro -->
-              <img src="{% static 'Images/logout_blue.svg' %}" alt="Logout" class="w-9 h-9 rounded-full block dark:hidden">
-              <!-- Icono para modo oscuro -->
-              <img src="{% static 'Images/logout.svg' %}" alt="Logout dark" class="w-9 h-9 rounded-full hidden dark:block">
+              <img src="{% static 'Images/logout.svg' %}" alt="Logout" class="w-9 h-9 rounded-full block">
             </a>
           {% else %}
             <a href="{% url 'blogapp:login' %}" class="bg-green-600 hover:bg-green-500 text-white dark:bg-green-700 dark:hover:bg-green-600 font-medium py-2 px-4 rounded hover:scale-105 transition-all duration-500 ease-in-out">Acceder</a>
@@ -134,10 +131,38 @@
       </div>
     </div>
   </nav>
-  <main class="flex-grow w-full bg-white dark:bg-primary_dark transition-all duration-700 ease-in-out">
+
+
+<!-- Sidebar Left -->
+  <div class="w-72 fixed left-0 top-16 h-[calc(100%-4rem)] bg-primary_dark-100 text-white dark:bg-primary_dark overflow-y-auto transition-colors px-8 border-gray-500 border-r border-secondary_dark dark:border-gray-500">
+      <div class="p-4">
+        <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
+          <a href="{% url 'blogapp:add_blog' %}" class="flex justify-center items-center bg-red hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Takilla tu meme</a>
+          {% if user.is_staff %}
+          <a href="{% url 'admin:index' %}" class="mt-2 flex justify-center items-center bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Chakalde</a>
+          {% endif %}
+        <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
+        <ul class="space-y-2">
+          <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Últimos</a></li>
+          <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Top</a></li>
+          <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Más Comentados</a></li>
+          <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Aleatorios</a></li>
+          <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'blogapp:profile' user.username %}" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Mi Chantin</a></li>
+          {% else %}
+            <li><a href="{% url 'blogapp:login' %}" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Iniciar Sesión</a></li>
+          {% endif %}
+          <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Mis Subidas</a></li>
+        </ul>
+      </div>
+    </div>
+
+
+  <main class="flex-grow w-full bg-primary_dark-100 dark:bg-primary_dark transition-colors mt-16">
     <div class="max-w-4xl mx-auto px-4 py-8">
       {% block content %}
-      <div class="relative w-full max-w-4xl mx-auto bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
+      <div class="relative w-full max-w-4xl mx-auto bg-gray-600 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
         <!-- Fondo difuminado dinámico -->
         <div class="absolute inset-0 bg-cover bg-center blur-md" style="background-image: url('{{ object.image.url }}');"></div>
         <!-- Imagen centrada -->
@@ -148,9 +173,8 @@
     {% if messages %}
     <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-4">
       {% for message in messages %}
-      <div class="toast bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 rounded-lg shadow-xl border-l-4
-      {% if message.tags == 'success' %}border-green-500{% elif message.tags == 'error' %}border-red-500
-      {% elif message.tags == 'warning' %}border-yellow-500{% else %}border-blue-500{% endif %}
+      <div class="toast bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 rounded-lg shadow-xl border-l-4 
+      {% if message.tags == 'success' %}border-green-500{% elif message.tags == 'error' %}border-red-500{% elif message.tags == 'warning' %}border-yellow-500{% else %}border-blue-500{% endif %}
       transform transition-all duration-500 ease-in-out opacity-0 translate-x-full" role="alert">
       <div class="flex items-center">
       <div class="flex-shrink-0">
@@ -187,8 +211,24 @@
 
     {% endif %}
   </main>
+
+
+
+  <!-- Sidebar Right-->
+    <div class="w-72 fixed right-0 top-16 h-[calc(100%-4rem)] bg-primary_dark-100 text-primary_dark dark:text-white dark:bg-primary_dark overflow-y-auto transition-colors border-gray-500 px-8 border-l border-secondary_dark dark:border-gray-500">
+      <div class="p-4">
+        <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
+        <h2 class="text-xl text-white mb-6">Tags Recomendados</h2>
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm">#Tecnología</span>
+          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm">#Diseño</span>
+          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm">#Programación</span>
+        </div>
+      </div>
+    </div>
+
+
   <script src="{% static 'js/register_validation.js' %}"></script>
-  <!-- <script src="{% static 'js/dark_mode.js' %}"></script> -->
   <script src="{% static 'js/toaster.js' %}"></script>
 </body>
 </html>

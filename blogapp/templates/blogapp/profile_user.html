@@ -2,9 +2,16 @@
 {% load static %}
 {% load widget_tweaks %}
 {% block content %}
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-0 mb-8 overflow-hidden">
-        <!-- Banner section with blurred background -->
-        <div class="relative h-32 bg-gradient-to-r from-indigo-500 to-purple-600">
+    <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+        {% if user == profile_user %}
+            Tu Perfil
+        {% else %}
+            Perfil de {{ profile_user.username }}
+        {% endif %}
+    </h1>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+        <div class="flex items-center mb-4">
             {% if profile_user.profile.profile_photo %}
                 <img src="{{ profile_user.profile.profile_photo.url }}" alt="Banner"
                     class="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm pointer-events-none select-none" />
