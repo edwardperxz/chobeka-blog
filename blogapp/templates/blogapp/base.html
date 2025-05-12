@@ -132,6 +132,9 @@
       <div class="p-4">
         <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
           <a href="{% url 'blogapp:add_blog' %}" class="flex justify-center items-center bg-red hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Takilla tu meme</a>
+          {% if user.is_staff %}
+          <a href="{% url 'admin:index' %}" class="mt-2 flex justify-center items-center bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Chakalde</a>
+          {% endif %}
         <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
         <ul class="space-y-2">
           <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Últimos</a></li>
@@ -139,14 +142,18 @@
           <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Más Comentados</a></li>
           <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Aleatorios</a></li>
           <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
-          <li><a href="{% url 'blogapp:profile' user.username %}" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Mi Chantin</a></li>
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'blogapp:profile' user.username %}" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Mi Chantin</a></li>
+          {% else %}
+            <li><a href="{% url 'blogapp:login' %}" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Iniciar Sesión</a></li>
+          {% endif %}
           <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Mis Subidas</a></li>
         </ul>
       </div>
     </div>
 
 
-  <main class="flex-grow w-full bg-primary_dark-100 dark:bg-primary_dark transition-colors">
+  <main class="flex-grow w-full bg-primary_dark-100 dark:bg-primary_dark transition-colors mt-16">
     <div class="max-w-4xl mx-auto px-4 py-8">
       {% block content %}
       <div class="relative w-full max-w-4xl mx-auto bg-gray-600 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
@@ -160,9 +167,8 @@
     {% if messages %}
     <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-4">
       {% for message in messages %}
-      <div class="toast bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 rounded-lg shadow-xl border-l-4">
-      {% if message.tags == 'success' %}border-green-500{% elif message.tags == 'error' %}border-red-500
-      {% elif message.tags == 'warning' %}border-yellow-500{% else %}border-blue-500{% endif %}
+      <div class="toast bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 rounded-lg shadow-xl border-l-4 
+      {% if message.tags == 'success' %}border-green-500{% elif message.tags == 'error' %}border-red-500{% elif message.tags == 'warning' %}border-yellow-500{% else %}border-blue-500{% endif %}
       transform transition-all duration-500 ease-in-out opacity-0 translate-x-full" role="alert">
       <div class="flex items-center">
       <div class="flex-shrink-0">
