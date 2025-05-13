@@ -1,12 +1,8 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
-<<<<<<< HEAD
 from .views import BlogListView, BlogDetailView, ReviewCreateView, CommentCreateView, BlogCreateView, BlogUpdateView, BlogDeleteView, LoginView, LogoutView, SignUpView, ProfileView, ProfileUpdateView, ProfileDeleteView
 from .views import LoginView
 from .views import RegisterView
-=======
-from .views import BlogListView, BlogDetailView, ReviewCreateView, CommentCreateView, BlogCreateView, BlogUpdateView, BlogDeleteView, LoginView, LogoutView, SignUpView, ProfileView, ProfileUpdateView, ProfileDeleteView, add_comment
->>>>>>> e69df3888501ae27da6795f1d5c7cf50c4610eb0
 
 app_name = 'blogapp'
 
@@ -25,11 +21,7 @@ urlpatterns = [
     path('blog/<int:pk>/delete/', BlogDeleteView.as_view(), name='delete_blog'),
     path('blog/<int:pk>/', BlogDetailView.as_view(), name='blog_detail'),
     path('blog/<int:pk>/review/', ReviewCreateView.as_view(), name='add_review'),
-<<<<<<< HEAD
     path('blog/<int:blog_pk>/review/<int:review_pk>/comment/', CommentCreateView.as_view(), name='add_comment'),
     path('login_modal', LoginView.as_view(), name='login_modal'),
     path('register_modal', RegisterView.as_view(), name='register_modal'),
-=======
-    path('blog/<int:blog_pk>/review/<int:review_pk>/comment/', add_comment, name='add_comment'),
->>>>>>> e69df3888501ae27da6795f1d5c7cf50c4610eb0
 ]

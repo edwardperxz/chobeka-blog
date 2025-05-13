@@ -456,7 +456,6 @@ class SignUpView(FormView):
             return redirect('blogapp:blog_list')
         return super().dispatch(request, *args, **kwargs)
 
-<<<<<<< HEAD
         # modal login view
 class LoginView(FormView):
     template_name = 'blogapp/login_modal.html'
@@ -509,21 +508,3 @@ class RegisterView(FormView):
             messages.info(request, 'Debes cerrar sesión para registrar una nueva cuenta.')
             return redirect('blogapp:blog_list')
         return super().dispatch(request, *args, **kwargs)
-=======
-
-@login_required
-def add_comment(request, blog_pk, review_pk):
-    review = get_object_or_404(Review, pk=review_pk, blog__pk=blog_pk)
-    if request.method == 'POST':
-        content = request.POST.get('content', '').strip()
-        if content:
-            Comment.objects.create(
-                review=review,
-                commenter=request.user,
-                content=content
-            )
-            messages.success(request, '¡Tu comentario ha sido publicado exitosamente!')
-        else:
-            messages.error(request, 'El comentario no puede estar vacío.')
-    return redirect('blogapp:blog_detail', pk=blog_pk)
->>>>>>> e69df3888501ae27da6795f1d5c7cf50c4610eb0
