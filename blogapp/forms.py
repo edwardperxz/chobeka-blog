@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+from .models import Comment
 
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(
@@ -71,3 +72,14 @@ class UserRegisterForm(UserCreationForm):
                 code='password_mismatch',
             )
         return password2
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+
+    def clean_content(self):
+        content = self.cleaned_data.get('content')
+        if not content or content.strip() == "":
+            raise forms.ValidationError("El comentario no puede estar vacío.")
+        return content
