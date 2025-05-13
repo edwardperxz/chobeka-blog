@@ -73,15 +73,60 @@
   {% endif %}
 
   <section class="mt-8">
-    <h2 class="text-2xl dark:text-white font-semibold mb-4">Revius'</h2>
+    <h2 class="text-2xl text-white font-semibold mb-4">Revius'</h2>
     {% for review in object.reviews.all %}
       <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-4 transition-all duration-700 ease-in-out dark:text-white text-gray-900 animate-fade-in">
         <p class="text-blue-700 dark:text-blue-300 font-medium">{{ review.reviewer.username }} - {{ review.rating }}/5 ⭐</p>
         <p class="text-gray-700 dark:text-gray-300">{{ review.comment|safe }}</p>
-        <a href="{% url 'blogapp:add_comment' blog_pk=object.pk review_pk=review.pk %}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 mt-2 inline-block">Agregar Comentario</a>
+
+        {% if user.is_authenticated %}
+          <!-- Botón para mostrar el formulario -->
+          <button
+            class="toggle-comment-form text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 mt-2 inline-block"
+            data-review-id="{{ review.id }}"
+          >
+            Agregar comentario
+          </button>
+
+          <!-- Contenedor para el formulario de comentarios -->
+          <div id="comment-form-{{ review.id }}" class="hidden mt-4">
+            <form
+              method="post"
+              action="{% url 'blogapp:add_comment' blog_pk=object.pk review_pk=review.pk %}"
+              class="space-y-4"
+            >
+              {% csrf_token %}
+              <textarea
+                name="content"
+                rows="3"
+                class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                placeholder="Escribe tu comentario aquí..."
+              ></textarea>
+              <div class="flex gap-2">
+                <button
+                  type="submit"
+                  class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
+                >
+                  Manda esa vaina
+                </button>
+                <button
+                  type="button"
+                  class="cancel-comment px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white"
+                  data-review-id="{{ review.id }}"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        {% else %}
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Inicia sesión para agregar un comentario.</p>
+        {% endif %}
+
+        <!-- Lista de comentarios -->
         <ul class="mt-2 list-disc ml-6 text-gray-600 dark:text-gray-400">
           {% for comment in review.comments.all %}
-            <li><span class="font-semibold text-gray-900 dark:text-white">{{ comment.commenter.username }}</span>: {{ comment.content|safe }}</li>
+            <li><span class="font-semibold text-gray-900 dark:text-white">{{ comment.commenter.username }}</span>:{{ comment.content|safe }}</li>
           {% endfor %}
         </ul>
       </div>

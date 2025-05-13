@@ -64,13 +64,16 @@ class Review(models.Model):
 
 
 class Comment(models.Model):
-    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='comments')
+    review = models.ForeignKey('Review', on_delete=models.CASCADE, related_name='comments')
     commenter = models.ForeignKey(User, on_delete=models.CASCADE)
-    content = CKEditor5Field(null='true', blank='true', config_name='extends')
+    content = models.TextField(blank=False, help_text="El contenido del comentario no puede estar vacío.")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Comment by {self.commenter.username}"
+
+    class Meta:
+        ordering = ['-created_at']  # Ordenar comentarios por fecha de creación (más recientes primero)
     
 class BlogStats(Blog):
     class Meta:

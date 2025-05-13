@@ -1,7 +1,8 @@
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, RedirectView
@@ -475,3 +476,20 @@ class SignUpView(FormView):
         if request.user.is_authenticated:
             return redirect('blogapp:blog_list')
         return super().dispatch(request, *args, **kwargs)
+
+
+@login_required
+def add_comment(request, blog_pk, review_pk):
+    review = get_object_or_404(Review, pk=review_pk, blog__pk=blog_pk)
+    if request.method == 'POST':
+        content = request.POST.get('content', '').strip()
+        if content:
+            Comment.objects.create(
+                review=review,
+                commenter=request.user,
+                content=content
+            )
+            messages.success(request, '¡Tu comentario ha sido publicado exitosamente!')
+        else:
+            messages.error(request, 'El comentario no puede estar vacío.')
+    return redirect('blogapp:blog_detail', pk=blog_pk)

@@ -1,6 +1,6 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
-from .views import BlogListView, BlogDetailView, ReviewCreateView, CommentCreateView, BlogCreateView, BlogUpdateView, BlogDeleteView, LoginView, LogoutView, SignUpView, ProfileView, ProfileUpdateView, ProfileDeleteView
+from .views import BlogListView, BlogDetailView, ReviewCreateView, CommentCreateView, BlogCreateView, BlogUpdateView, BlogDeleteView, LoginView, LogoutView, SignUpView, ProfileView, ProfileUpdateView, ProfileDeleteView, add_comment
 
 app_name = 'blogapp'
 
@@ -19,5 +19,5 @@ urlpatterns = [
     path('blog/<int:pk>/delete/', BlogDeleteView.as_view(), name='delete_blog'),
     path('blog/<int:pk>/', BlogDetailView.as_view(), name='blog_detail'),
     path('blog/<int:pk>/review/', ReviewCreateView.as_view(), name='add_review'),
-    path('blog/<int:blog_pk>/review/<int:review_pk>/comment/', CommentCreateView.as_view(), name='add_comment'),
+    path('blog/<int:blog_pk>/review/<int:review_pk>/comment/', add_comment, name='add_comment'),
 ]
