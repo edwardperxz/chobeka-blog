@@ -13,6 +13,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
 from django import forms
 from django.db.models import Avg, Count
+from django.contrib.auth.forms import UserCreationForm
 
 
 
@@ -420,28 +421,6 @@ class LoginForm(forms.Form):
         })
     )
 
-class LoginView(FormView):
-    template_name = 'blogapp/login.html'
-    form_class = LoginForm
-    success_url = reverse_lazy('blogapp:blog_list')
-
-    def form_valid(self, form):
-        username = form.cleaned_data.get("username", "")
-        password = form.cleaned_data.get("password", "")
-        user = authenticate(self.request, username=username, password=password)
-        if user is not None:
-            login(self.request, user)
-            next_url = self.request.GET.get('next', self.get_success_url())
-            return redirect(next_url)
-
-        messages.error(self.request, 'Usuario o contraseña inválidos.')
-        return self.form_invalid(form)
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('blogapp:blog_list')
-        return super().dispatch(request, *args, **kwargs)
-
 
 class LogoutView(RedirectView):
     url = reverse_lazy('blogapp:blog_list')
@@ -473,5 +452,58 @@ class SignUpView(FormView):
         
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
+            return redirect('blogapp:blog_list')
+        return super().dispatch(request, *args, **kwargs)
+
+        # modal login view
+class LoginView(FormView):
+    template_name = 'blogapp/login_modal.html'
+    form_class = LoginForm
+    success_url = reverse_lazy('blogapp:blog_list')
+
+    def form_valid(self, form):
+        username = form.cleaned_data.get("username", "")
+        password = form.cleaned_data.get("password", "")
+        user = authenticate(self.request, username=username, password=password)
+        if user is not None:
+            login(self.request, user)
+            next_url = self.request.GET.get('next', self.get_success_url())
+            return redirect(next_url)
+
+        messages.error(self.request, 'Usuario o contraseña inválidos.')
+        return self.form_invalid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('blogapp:blog_list')
+        return super().dispatch(request, *args, **kwargs)
+    
+ # modal resgiter view
+class RegisterView(FormView):
+    """
+    Modal registration view with improved validation
+    """
+    template_name = 'blogapp/register_modal.html'
+    form_class = UserCreationForm
+    success_url = reverse_lazy('blogapp:login')
+
+    def form_valid(self, form):
+        user = form.save()
+        messages.success(
+            self.request,
+            '¡Registro exitoso! Por favor inicia sesión con tus nuevas credenciales.'
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            'Por favor corrige los errores en el formulario.'
+        )
+        return super().form_invalid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            messages.info(request, 'Debes cerrar sesión para registrar una nueva cuenta.')
             return redirect('blogapp:blog_list')
         return super().dispatch(request, *args, **kwargs)

@@ -109,35 +109,36 @@
         <button onclick="toggleDarkMode()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary_dark dark:bg-primary_dark-600 hover:scale-105 transition-all duration-300">
           <span id="theme-icon" class="transition-transform duration-500 transform"></span>
         </button>
-
-        {% if not request.path == '/login/' %}
-            {% if user.is_authenticated %}
-            <a href="{% url 'blogapp:add_blog' %}" class="bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Takilla tu meme</a>
-            {% if user.is_staff %}
-              <a href="{% url 'admin:index' %}" class="bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">
-                Chakalde
-              </a>
-            {% endif %}
-            <a href="{% url 'blogapp:profile' user.username %}" class="transition-all duration-500 ease-in-out">
-              <img src="{% static 'Images/gg_profile.svg' %}" alt="Mi Chantin" class="w-9 h-9 rounded-full block">
-            
-            <a href="{% url 'blogapp:logout' %}" class="dark:hover:transition-all duration-500 ease-in-out">
-              <img src="{% static 'Images/logout.svg' %}" alt="Logout" class="w-9 h-9 rounded-full block">
-            </a>
-          {% else %}
-            <a href="{% url 'blogapp:login' %}" class="bg-green-600 hover:bg-green-500 text-white dark:bg-green-700 dark:hover:bg-green-600 font-medium py-2 px-4 rounded hover:scale-105 transition-all duration-500 ease-in-out">Acceder</a>
-          {% endif %}
-        {% endif %}
-      </div>
-    </div>
-  </nav>
+    {% if user.is_authenticated %}
+      <a href="{% url 'blogapp:profile' user.username %}" class="transition-all duration-500 ease-in-out">
+        <img src="{% static 'Images/gg_profile.svg' %}" alt="Mi Chantin" class="w-9 h-9 rounded-full block">
+      </a>
+      
+      <a href="{% url 'blogapp:logout' %}" class="dark:hover:transition-all duration-500 ease-in-out">
+        <img src="{% static 'Images/logout.svg' %}" alt="Logout" class="w-9 h-9 rounded-full block">
+      </a>
+    {% else %}
+      <button onclick="openModal('{% url 'blogapp:login_modal' %}')"
+        class="bg-green-600 hover:bg-green-500 text-white dark:bg-green-700 dark:hover:bg-green-600 font-medium py-2 px-4 rounded hover:scale-105 transition-all duration-500 ease-in-out">
+        Acceder
+      </button>
+    {% endif %}
+  </div>
+</nav>
 
 
 <!-- Sidebar Left -->
   <div class="w-72 fixed left-0 top-16 h-[calc(100%-4rem)] bg-primary_dark-100 text-white dark:bg-primary_dark overflow-y-auto transition-colors px-8 border-gray-500 border-r border-secondary_dark dark:border-gray-500">
       <div class="p-4">
         <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
-          <a href="{% url 'blogapp:add_blog' %}" class="flex justify-center items-center bg-red hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Takilla tu meme</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'blogapp:add_blog' %}" class="flex items-center justify-center bg-red hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Takilla tu meme</a>
+        {% else %}
+        <button onclick="openModal('{% url 'blogapp:login_modal' %}')"
+        class="flex justify-center w-full bg-green-600 hover:bg-green-800 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">
+        Acceder
+        </button>
+        {% endif %}
         <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
         <ul class="space-y-2">
           <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Últimos</a></li>
@@ -145,8 +146,13 @@
           <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Más Comentados</a></li>
           <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Aleatorios</a></li>
           <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
-          <li><a href="{% url 'blogapp:profile' user.username %}" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Mi Chantin</a></li>
-          <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Mis Subidas</a></li>
+          {% if user.is_authenticated %}
+            <li>
+              <a href="{% url 'blogapp:profile' user.username %}" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">
+                Mi Chantin
+              </a>
+            </li>
+          {% endif %}
         </ul>
       </div>
     </div>
@@ -166,7 +172,7 @@
     {% if messages %}
     <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-4">
       {% for message in messages %}
-      <div class="toast bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 rounded-lg shadow-xl border-l-4">
+      <div class="toast bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 rounded-lg shadow-xl border-l-4"
       {% if message.tags == 'success' %}border-green-500{% elif message.tags == 'error' %}border-red-500
       {% elif message.tags == 'warning' %}border-yellow-500{% else %}border-blue-500{% endif %}
       transform transition-all duration-500 ease-in-out opacity-0 translate-x-full" role="alert">
@@ -207,7 +213,6 @@
   </main>
 
 
-
   <!-- Sidebar Right-->
     <div class="w-72 fixed right-0 top-16 h-[calc(100%-4rem)] bg-primary_dark-100 text-primary_dark dark:text-white dark:bg-primary_dark overflow-y-auto transition-colors border-gray-500 px-8 border-l border-secondary_dark dark:border-gray-500">
       <div class="p-4">
@@ -221,8 +226,41 @@
       </div>
     </div>
 
-
+    
   <script src="{% static 'js/register_validation.js' %}"></script>
   <script src="{% static 'js/toaster.js' %}"></script>
+  <!-- Modal Login -->
+<!-- Modal container -->
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden justify-center items-center">
+  <div id="modal-content" class="bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md relative">
+    <!-- Aquí se carga el contenido dinámico -->
+  </div>
+</div>
+
+<script>
+// Function to open modal
+function openModal(url) {
+  fetch(url)
+  .then(response => response.text())
+  .then(html => {
+    document.getElementById('modal-content').innerHTML = html;
+    document.getElementById('modal').classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+  });
+}
+
+// Function to close modal
+function closeModal() {
+  document.getElementById('modal').classList.add('hidden');
+  document.getElementById('modal-content').innerHTML = '';
+}
+
+// Close with ESC key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && !document.getElementById('modal').classList.contains('hidden')) {
+    closeModal();
+  }
+});
+</script>
 </body>
 </html>
