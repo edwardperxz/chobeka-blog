@@ -149,7 +149,7 @@
           <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Aleatorios</a></li>
           <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
           {% if user.is_authenticated %}
-            <li><a href="{% url 'blogapp:profile' user.username %}" class="text-secondary_dark block p-2 hover:bg-gray-200 rounded hover:dark:bg-red dark:text-white">Mi Chantin</a></li>
+            <li><a href="{% url 'blogapp:profile' user.username %}" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">Mi Chantin</a></li>
           {% endif %}
           <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Mis Subidas</a></li>
         </ul>
