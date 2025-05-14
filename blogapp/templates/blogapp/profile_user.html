@@ -1,331 +1,361 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load widget_tweaks %}
+
 {% block content %}
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-0 mb-8 overflow-hidden">
-        <!-- Banner section with blurred background -->
-        <div class="relative h-32 bg-gradient-to-r from-indigo-500 to-purple-600">
-            {% if profile_user.profile.profile_photo %}
-                <img src="{{ profile_user.profile.profile_photo.url }}" alt="Banner"
-                    class="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm pointer-events-none select-none" />
-            {% endif %}
-            <div class="absolute top-2 right-2 flex gap-2">
-                {% if user == profile_user %}
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-purple-600 text-white">
-                        👤 Tu Perfil
-                    </span>
-                {% endif %}
-                {% if profile_user.is_staff %}
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
-                        🌟 Admin
-                    </span>
-                {% endif %}
-                {% if profile_user.profile.location and location_info %}
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium
-                        bg-{{ location_info.color }}-100
-                        text-{{ location_info.color }}-800
-                        dark:bg-{{ location_info.color }}-900
-                        dark:text-{{ location_info.color }}-300">
-                        <img src="/static/flags/{{ location_info.flag_url }}_flag.svg"
-                            alt="{{ location_info.name }} province flag"
-                            class="h-4 w-auto mr-2 inline">
-                        {{ location_info.name }}
-                    </span>
-                {% endif %}
-            </div>
+<div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-0 mb-8 overflow-hidden">
+  <!-- Banner section -->
+  <div class="relative h-32 bg-gradient-to-r from-primary_dark-300 to-primary_dark-600">
+    {% if profile_user.profile.profile_photo %}
+    <img src="{{ profile_user.profile.profile_photo.url }}" alt="Banner"
+         class="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm pointer-events-none select-none" />
+    {% endif %}
+    
+    <div class="absolute top-2 right-2 flex gap-2">
+      {% if user == profile_user %}
+      <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-primary_dark-600 text-white">
+        <span class="material-icons mr-1">person</span> Tu Perfil
+      </span>
+      {% endif %}
+      
+      {% if profile_user.is_staff %}
+      <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+        <span class="material-icons mr-1">star</span> Admin
+      </span>
+      {% endif %}
+      
+      {% if profile_user.profile.location and location_info %}
+      <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium
+                 bg-{{ location_info.color }}-100
+                 text-{{ location_info.color }}-800
+                 dark:bg-{{ location_info.color }}-900
+                 dark:text-{{ location_info.color }}-300">
+        <img src="/static/flags/{{ location_info.flag_url }}_flag.svg"
+             alt="{{ location_info.name }} province flag"
+             class="h-4 w-auto mr-2 inline">
+        {{ location_info.name }}
+      </span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Profile section -->
+  <div class="relative px-8 pb-8 -mt-16">
+    <div class="flex justify-center">
+      <div class="relative group">
+        {% if profile_user.profile.profile_photo %}
+        <img src="{{ profile_user.profile.profile_photo.url }}" alt="Foto de Perfil"
+             class="w-32 h-32 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-xl cursor-pointer transition-transform duration-300 group-hover:scale-105 group-hover:ring-4 group-hover:ring-primary_dark-300"
+             onclick="openImageModal(this.src)">
+        {% else %}
+        <img src="/static/Images/default-avatar.jpg" alt="Foto de Perfil Predeterminada"
+             class="w-32 h-32 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-xl cursor-pointer transition-transform duration-300 group-hover:scale-105 group-hover:ring-4 group-hover:ring-primary_dark-300"
+             onclick="openImageModal(this.src)">
+        {% endif %}
+        
+        {% if user == profile_user %}
+        <a href="{% url 'blogapp:edit_profile' user.username %}"
+           class="absolute bottom-0 right-0 bg-primary_dark-600 hover:bg-primary_dark-300 text-white p-2 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110">
+          <span class="material-icons">edit</span>
+        </a>
+        {% endif %}
+
+        <!-- Image Modal -->
+        <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden" onclick="closeImageModal()">
+          <div class="max-w-screen-md max-h-screen-md p-2">
+            <img id="modalImage" src="" alt="Imagen de perfil ampliada" class="max-h-[80vh] max-w-full rounded shadow-lg">
+          </div>
         </div>
-
-        <!-- Profile section -->
-        <div class="relative px-8 pb-8 -mt-16">
-            <div class="flex justify-center">
-                <div class="relative group">
-                    {% if profile_user.profile.profile_photo %}
-                    <img src="{{ profile_user.profile.profile_photo.url }}" alt="Foto de Perfil"
-                    class="w-32 h-32 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-xl cursor-pointer transition-transform duration-300 group-hover:scale-105 group-hover:ring-4 group-hover:ring-purple-400"
-                    onclick="openImageModal(this.src)">
-                    {% else %}
-                    <img src="/static/Images/default-avatar.jpg" alt="Foto de Perfil Predeterminada"
-                    class="w-32 h-32 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-xl cursor-pointer transition-transform duration-300 group-hover:scale-105 group-hover:ring-4 group-hover:ring-purple-400"
-                    onclick="openImageModal(this.src)">
-                    {% endif %}
-                    {% if user == profile_user %}
-                    <a href="{% url 'blogapp:edit_profile' user.username %}"
-                    class="absolute bottom-0 right-0 bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110">✏️</a>
-                    {% endif %}
-
-                    <!-- Modal para ver imagen en grande -->
-                    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden" onclick="closeImageModal()">
-                        <div class="max-w-screen-md max-h-screen-md p-2">
-                            <img id="modalImage" src="" alt="Imagen de perfil ampliada" class="max-h-[80vh] max-w-full rounded shadow-lg">
-                        </div>
-                    </div>
-
-                    <script src="{% static 'js/profile_image_modal.js' %}"></script>
-
-                </div>
-            </div>
-
-            {% if user == profile_user %}
-            <div class="absolute top-2 right-2 flex space-x-2">
-                <a href="#" class="bg-white dark:bg-gray-700 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-all" title="Configuración">⚙️</a>
-                <a href="{% url 'blogapp:add_blog' %}" class="bg-white dark:bg-gray-700 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-all" title="Crear un blog">📝</a>
-                <a href="{% url 'blogapp:edit_profile' user.username %}" class="bg-white dark:bg-gray-700 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-all" title="Editar perfil">✏️</a>
-                <a href="{% url 'blogapp:logout' %}" class="bg-white dark:bg-gray-700 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-all" title="Cerrar sesión">🚪</a>
-            </div>
-            {% endif %}
-
-            <div class="text-center mt-4 mb-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
-                    {{ profile_user.username }}
-                </h2>
-            </div>
-
-            <div class="bg-white dark:bg-gray-700 rounded-xl p-4 mb-4 shadow-inner">
-                <p class="text-gray-600 dark:text-gray-300 text-sm mb-2">
-                    Miembro desde {{ profile_user.date_joined|date:"d M, Y" }}
-                </p>
-                {% if profile_user.profile.bio %}
-                <div class="mb-2">
-                        <h4 class="text-md font-medium text-gray-700 dark:text-gray-400 mb-1">Biografía</h4>
-                        <p class="text-gray-600 dark:text-gray-300">{{ profile_user.profile.bio }}</p>
-                    </div>
-                {% endif %}
-                {% if profile_user.profile.birth_date %}
-                    <div class="mb-2">
-                        <h4 class="text-md font-medium text-gray-700 dark:text-gray-400 mb-1">Fecha de nacimiento</h4>
-                        <p class="text-gray-600 dark:text-gray-300">{{ profile_user.profile.birth_date|date:"j F" }}</p>
-                    </div>
-                {% endif %}
-                {% if interests_list %}
-                    <div class="mb-2">
-                        <h4 class="text-md font-medium text-gray-700 dark:text-gray-400 mb-1">Intereses</h4>
-                        <div class="flex flex-wrap gap-2">
-                            {% for interest in interests_list %}
-                                <span class="px-3 py-1 bg-purple-100 text-purple-800 text-sm font-medium rounded-full dark:bg-purple-900 dark:text-purple-300">
-                                    {{ interest }}
-                                </span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endif %}
-            </div>
-            <!-- Stats Grid with icons -->
-            <div class="grid grid-cols-3 gap-4 mb-4">
-                <div class="flex flex-col items-center p-4 bg-white dark:bg-gray-700 rounded-lg shadow hover:shadow-lg transition-all duration-300">
-                    <span class="text-3xl mb-1">📝</span>
-                    <span class="block text-xl font-bold text-purple-600 dark:text-purple-300">{{ blogs_count }}</span>
-                    <span class="text-xs uppercase font-semibold tracking-wider text-gray-600 dark:text-gray-300">Posts</span>
-                </div>
-                <div class="flex flex-col items-center p-4 bg-white dark:bg-gray-700 rounded-lg shadow hover:shadow-lg transition-all duration-300">
-                    <span class="text-3xl mb-1">⭐</span>
-                    <span class="block text-xl font-bold text-blue-600 dark:text-blue-300">{{ reviews_count }}</span>
-                    <span class="text-xs uppercase font-semibold tracking-wider text-gray-600 dark:text-gray-300">Reseñas</span>
-                </div>
-                <div class="flex flex-col items-center p-4 bg-white dark:bg-gray-700 rounded-lg shadow hover:shadow-lg transition-all duration-300">
-                    <span class="text-3xl mb-1">💬</span>
-                    <span class="block text-xl font-bold text-indigo-600 dark:text-indigo-300">{{ comments_count }}</span>
-                    <span class="text-xs uppercase font-semibold tracking-wider text-gray-600 dark:text-gray-300">Comentarios</span>
-                </div>
-                <div class="flex flex-col items-center p-4 bg-white dark:bg-gray-700 rounded-lg shadow hover:shadow-lg transition-all duration-300">
-                    <span class="text-3xl mb-1">🏆</span>
-                    <span class="block text-xl font-bold text-yellow-600 dark:text-yellow-300">{{ average_rating }}</span>
-                    <span class="text-xs uppercase font-semibold tracking-wider text-gray-600 dark:text-gray-300">Puntuación recibida</span>
-                </div>
-                <div class="flex flex-col items-center p-4 bg-white dark:bg-gray-700 rounded-lg shadow hover:shadow-lg transition-all duration-300">
-                    <span class="text-3xl mb-1">🎯</span>
-                    <span class="block text-xl font-bold text-yellow-600 dark:text-yellow-300">{{ average_review_rating }}</span>
-                    <span class="text-xs uppercase font-semibold tracking-wider text-gray-600 dark:text-gray-300">Puntuación otorgada</span>
-                </div>
-                <div class="flex flex-col items-center p-4 bg-white dark:bg-gray-700 rounded-lg shadow hover:shadow-lg transition-all duration-300">
-                    <span class="text-3xl mb-1">🏷️</span>
-                    <span class="block text-xl font-bold text-green-600 dark:text-green-300">{{ tags_count }}</span>
-                    <span class="text-xs uppercase font-semibold tracking-wider text-gray-600 dark:text-gray-300">Tags creados</span>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
 
-    <!-- Carousel Menu and Content -->
-    <div class="mb-8">
-        <!-- Menu Tabs -->
-        <div class="mb-6 w-full flex justify-center">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 flex justify-between w-full">
-                <button id="blogs-tab" class="py-2 px-4 rounded-md font-medium text-md flex-1 mx-1 focus:outline-none transition-all bg-purple-600 text-white hover:bg-purple-700">
-                    <span class="flex items-center justify-center">
-                        Blogs
-                    </span>
-                </button>
-                <button id="reviews-tab" class="py-2 px-4 rounded-md font-medium text-md flex-1 mx-1 focus:outline-none transition-all text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <span class="flex items-center justify-center">
-                        Reseñas
-                    </span>
-                </button>
-                <button id="comments-tab" class="py-2 px-4 rounded-md font-medium text-md flex-1 mx-1 focus:outline-none transition-all text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <span class="flex items-center justify-center">
-                        Comentarios
-                    </span>
-                </button>
-            </div>
-        </div>
+    {% if user == profile_user %}
+    <div class="absolute top-2 right-2 flex space-x-4 transition-colors">
+      <a href="#" class="bg-white dark:bg-gray-700 p-2 rounded-full hover:bg-gray-400 dark:hover:bg-secondary_dark transition-colors" title="Configuración">
+        <span class="material-icons">settings</span>
+      </a>
+      <a href="{% url 'blogapp:add_blog' %}" class="bg-white dark:bg-gray-700 p-2 rounded-full hover:bg-gray-400 dark:hover:bg-secondary_dark transition-colors" title="Crear un blog">
+        <span class="material-icons">post_add</span>
+      </a>
+      <a href="{% url 'blogapp:edit_profile' user.username %}" class="bg-white dark:bg-gray-700 p-2 rounded-full hover:bg-gray-400 dark:hover:bg-secondary_dark transition-colors" title="Editar perfil">
+        <span class="material-icons">edit</span>
+      </a>
+      <a href="{% url 'blogapp:logout' %}" class="bg-white dark:bg-gray-700 p-2 rounded-full hover:bg-gray-400 dark:hover:bg-secondary_dark transition-colors" title="Cerrar sesión">
+        <span class="material-icons">logout</span>
+      </a>
+    </div>
+    {% endif %}
 
-        <!-- Content Sections -->
-        <div id="blogs-content" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                {% if user == profile_user %}
-                    Tus Blogs
-                {% else %}
-                    Blogs de {{ profile_user.username }}
-                {% endif %}
-            </h2>
-
-            {% if profile_user.blog_set.exists %}
-            <div class="space-y-4">
-                {% for blog in profile_user.blog_set.all %}
-                    <div class="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0 last:pb-0">
-                        <h3 class="text-lg font-medium text-gray-800 dark:text-white">
-                            <a href="{% url 'blogapp:blog_detail' blog.id %}" class="hover:text-purple-600 dark:hover:text-purple-400">
-                                {{ blog.title }}
-                            </a>
-                        </h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Publicado el {{ blog.created_at|date:"j F, Y" }}</p>
-                        <p class="text-gray-600 dark:text-gray-300 mt-2">{{ blog.content|truncatewords:20|safe }}</p>
-                    </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="text-gray-600 dark:text-gray-400">
-                {% if user == profile_user %}
-                    Aún no has creado ningún blog.
-                {% else %}
-                    {{ profile_user.username }} aún no ha creado ningún blog.
-                {% endif %}
-            </p>
-            {% endif %}
-        </div>
-
-        <div id="reviews-content" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hidden">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                {% if user == profile_user %}
-                    Tus Reseñas
-                {% else %}
-                    Reseñas de {{ profile_user.username }}
-                {% endif %}
-            </h2>
-
-            {% if profile_user.review_set.exists %}
-            <div class="space-y-4">
-                {% for review in reviews_list %}
-                    <div class="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0 last:pb-0 rounded-lg transition-all duration-200">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="text-lg font-medium text-gray-800 dark:text-white">
-                                <a href="{% url 'blogapp:blog_detail' review.blog.id %}" class="hover:text-purple-600 dark:hover:text-purple-400">
-                                    {{ review.blog.title }}
-                                </a>
-                            </h3>
-                            <div class="flex items-center">
-                                <div class="flex text-yellow-400">
-                                    {% for i in "12345" %}
-                                        {% if forloop.counter <= review.rating %}
-                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.799-2.034c-.784-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                            </svg>
-                                        {% else %}
-                                            <svg class="w-5 h-5 text-gray-300 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.799-2.034c-.784-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                            </svg>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                        {% if review.comment %}
-                            <div class="italic text-sm text-gray-600 dark:text-gray-300 mb-2">{{ review.comment|safe }}</div>
-                        {% endif %}
-                        <p class="text-gray-600 dark:text-gray-300 mt-2">{{ review.content|truncatewords:20 }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Publicado el {{ review.created_at|date:"j F, Y" }}</p>
-                    </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="text-gray-600 dark:text-gray-400">
-                {% if user == profile_user %}
-                    Aún no has creado ninguna reseña.
-                {% else %}
-                    {{ profile_user.username }} aún no ha creado ninguna reseña.
-                {% endif %}
-            </p>
-            {% endif %}
-        </div>
-
-        <div id="comments-content" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hidden">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                {% if user == profile_user %}
-                    Tus Comentarios
-                {% else %}
-                    Comentarios de {{ profile_user.username }}
-                {% endif %}
-            </h2>
-
-            {% if profile_user.comment_set.exists %}
-            <div class="space-y-4">
-                {% for comment in profile_user.comment_set.all %}
-                    <div class="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0 last:pb-0">
-                        <h3 class="text-lg font-medium text-gray-800 dark:text-white">
-                            <a href="{% url 'blogapp:blog_detail' comment.review.blog.id %}" class="hover:text-purple-600 dark:hover:text-purple-400">
-                                {{ comment.review.comment|truncatewords:10|safe }}
-                            </a>
-                        </h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Publicado el {{ comment.created_at|date:"j F, Y H:i" }}</p>
-                        <p class="text-gray-600 dark:text-gray-300 mt-2">{{ comment.content|truncatewords:20 }}</p>
-                    </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="text-gray-600 dark:text-gray-400">
-                {% if user == profile_user %}
-                    Aún no has creado ningún comentario.
-                {% else %}
-                    {{ profile_user.username }} aún no ha creado ningún comentario.
-                {% endif %}
-            </p>
-            {% endif %}
-        </div>
+    <div class="text-center mt-4 mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
+        {{ profile_user.username }}
+      </h2>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabs = ['blogs', 'reviews', 'comments'];
-            tabs.forEach(tab => {
-                const tabButton = document.getElementById(`${tab}-tab`);
-                if (tabButton) {
-                    tabButton.addEventListener('click', function() {
-                        // Hide all content sections
-                        tabs.forEach(t => {
-                            const contentElement = document.getElementById(`${t}-content`);
-                            const tabElement = document.getElementById(`${t}-tab`);
+    <!-- Profile Info Card -->
+    <div class="bg-gray-200 dark:bg-gray-700 rounded-xl p-4 mb-4 shadow-inner">
+      <p class="text-gray-600 dark:text-gray-300 text-sm mb-2">
+        <span class="material-icons mr-1">calendar_today</span>
+        Miembro desde {{ profile_user.date_joined|date:"d M, Y" }}
+      </p>
+      
+      {% if profile_user.profile.bio %}
+      <div class="mb-2">
+        <h4 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center">
+          <span class="material-icons mr-1">info</span> Biografía
+        </h4>
+        <p class="text-gray-600 dark:text-gray-300">{{ profile_user.profile.bio }}</p>
+      </div>
+      {% endif %}
+      
+      {% if profile_user.profile.birth_date %}
+      <div class="mb-2">
+        <h4 class="text-md font-medium text-gray-700 dark:text-gray-400 mb-1 flex items-center">
+          <span class="material-icons mr-1">cake</span> Fecha de nacimiento
+        </h4>
+        <p class="text-gray-600 dark:text-gray-300">{{ profile_user.profile.birth_date|date:"j F" }}</p>
+      </div>
+      {% endif %}
+      
+      {% if interests_list %}
+      <div class="mb-2">
+        <h4 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center">
+          <span class="material-icons mr-1">interests</span> Intereses
+        </h4>
+        <div class="flex flex-wrap gap-2">
+          {% for interest in interests_list %}
+          <span class="px-3 py-1 bg-primary_dark-100 text-primary_dark-600 dark:text-secondary_dark text-sm font-medium rounded-full dark:bg-primary_dark-900 dark:text-primary_dark-300">
+            {{ interest }}
+          </span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
 
-                            if (contentElement) {
-                                contentElement.classList.add('hidden');
-                            }
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-3 gap-4 mb-4">
+      <div class="flex flex-col items-center p-4 bg-gray-200 dark:bg-gray-700 rounded-lg shadow hover:shadow-lg transition-colors">
+        <span class="material-icons text-3xl mb-1 text-primary_dark-300">article</span>
+        <span class="block text-xl font-bold text-primary_dark-300">{{ blogs_count }}</span>
+        <span class="text-xs uppercase font-semibold tracking-wider text-gray-600 dark:text-gray-300">Posts</span>
+      </div>
+      
+      <div class="flex flex-col items-center p-4 bg-gray-200 dark:bg-gray-700 rounded-lg shadow hover:shadow-lg transition-colors">
+        <span class="material-icons text-3xl mb-1 text-primary_dark-300">star</span>
+        <span class="block text-xl font-bold text-primary_dark-300">{{ reviews_count }}</span>
+        <span class="text-xs uppercase font-semibold tracking-wider text-gray-600 dark:text-gray-300">Reseñas</span>
+      </div>
+      
+      <div class="flex flex-col items-center p-4 bg-gray-200 dark:bg-gray-700 rounded-lg shadow hover:shadow-lg transition-colors">
+        <span class="material-icons text-3xl mb-1 text-primary_dark-300">comment</span>
+        <span class="block text-xl font-bold text-primary_dark-300">{{ comments_count }}</span>
+        <span class="text-xs uppercase font-semibold tracking-wider text-gray-600 dark:text-gray-300">Comentarios</span>
+      </div>
+      
+      <div class="flex flex-col items-center p-4 bg-gray-200 dark:bg-gray-700 rounded-lg shadow hover:shadow-lg transition-colors">
+        <span class="material-icons text-3xl mb-1 text-primary_dark-300">emoji_events</span>
+        <span class="block text-xl font-bold text-primary_dark-300">{{ average_rating }}</span>
+        <span class="text-xs uppercase font-semibold tracking-wider text-gray-600 dark:text-gray-300">Puntuación recibida</span>
+      </div>
+      
+      <div class="flex flex-col items-center p-4 bg-gray-200 dark:bg-gray-700 rounded-lg shadow hover:shadow-lg transition-colors">
+        <span class="material-icons text-3xl mb-1 text-primary_dark-300">grade</span>
+        <span class="block text-xl font-bold text-primary_dark-300">{{ average_review_rating }}</span>
+        <span class="text-xs uppercase font-semibold tracking-wider text-gray-600 dark:text-gray-300">Puntuación otorgada</span>
+      </div>
+      
+      <div class="flex flex-col items-center p-4 bg-gray-200 dark:bg-gray-700 rounded-lg shadow hover:shadow-lg transition-colors">
+        <span class="material-icons text-3xl mb-1 text-primary_dark-300">tag</span>
+        <span class="block text-xl font-bold text-primary_dark-300">{{ tags_count }}</span>
+        <span class="text-xs uppercase font-semibold tracking-wider text-gray-600 dark:text-gray-300">Tags creados</span>
+      </div>
+    </div>
+  </div>
+</div>
 
-                            if (tabElement) {
-                                tabElement.classList.remove('bg-purple-600', 'text-white');
-                                tabElement.classList.add('text-gray-700', 'dark:text-gray-300');
-                            }
-                        });
+<!-- Content Tabs -->
+<div class="mb-8">
+  <!-- Tab Navigation -->
+  <div class="mb-6 w-full flex justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 flex justify-between w-full">
+      <button id="blogs-tab" class="py-2 px-4 rounded-md font-medium text-md flex-1 mx-1 focus:outline-none transition-all bg-primary_dark-600 text-white hover:bg-primary_dark-300">
+        <span class="flex items-center justify-center">
+          <span class="material-icons mr-2">article</span> Blogs
+        </span>
+      </button>
+      
+      <button id="reviews-tab" class="py-2 px-4 rounded-md font-medium text-md flex-1 mx-1 focus:outline-none transition-all text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+        <span class="flex items-center justify-center">
+          <span class="material-icons mr-2">star</span> Reseñas
+        </span>
+      </button>
+      
+      <button id="comments-tab" class="py-2 px-4 rounded-md font-medium text-md flex-1 mx-1 focus:outline-none transition-all text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+        <span class="flex items-center justify-center">
+          <span class="material-icons mr-2">comment</span> Comentarios
+        </span>
+      </button>
+    </div>
+  </div>
 
-                        // Show selected content and highlight tab
-                        const selectedContent = document.getElementById(`${tab}-content`);
-                        if (selectedContent) {
-                            selectedContent.classList.remove('hidden');
-                        }
+  <!-- Blogs Content -->
+  <div id="blogs-content" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+      <span class="material-icons mr-2">article</span>
+      {% if user == profile_user %}Tus Blogs{% else %}Blogs de {{ profile_user.username }}{% endif %}
+    </h2>
 
-                        tabButton.classList.add('bg-purple-600', 'text-white');
-                        tabButton.classList.remove('text-gray-700', 'dark:text-gray-300');
-                    });
-                }
-            });
+    {% if profile_user.blog_set.exists %}
+    <div class="space-y-4">
+      {% for blog in profile_user.blog_set.all %}
+      <div class="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0 last:pb-0">
+        <h3 class="text-lg font-medium text-gray-800 dark:text-white">
+          <a href="{% url 'blogapp:blog_detail' blog.id %}" class="hover:text-primary_dark-600 dark:hover:text-primary_dark-300">
+            {{ blog.title }}
+          </a>
+        </h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <span class="material-icons text-sm">schedule</span> Publicado el {{ blog.created_at|date:"j F, Y" }}
+        </p>
+        <p class="text-gray-600 dark:text-gray-300 mt-2">{{ blog.content|truncatewords:20|safe }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-600 dark:text-gray-400">
+      {% if user == profile_user %}Aún no has creado ningún blog.{% else %}{{ profile_user.username }} aún no ha creado ningún blog.{% endif %}
+    </p>
+    {% endif %}
+  </div>
+
+  <!-- Reviews Content -->
+  <div id="reviews-content" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hidden">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+      <span class="material-icons mr-2">star</span>
+      {% if user == profile_user %}Tus Reseñas{% else %}Reseñas de {{ profile_user.username }}{% endif %}
+    </h2>
+
+    {% if profile_user.review_set.exists %}
+    <div class="space-y-4">
+      {% for review in reviews_list %}
+      <div class="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0 last:pb-0 rounded-lg transition-all duration-200">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-lg font-medium text-gray-800 dark:text-white">
+            <a href="{% url 'blogapp:blog_detail' review.blog.id %}" class="hover:text-primary_dark-600 dark:hover:text-primary_dark-300">
+              {{ review.blog.title }}
+            </a>
+          </h3>
+          <div class="flex items-center">
+            <div class="flex text-yellow-400">
+              {% for i in "12345" %}
+                {% if forloop.counter <= review.rating %}
+                <span class="material-icons">star</span>
+                {% else %}
+                <span class="material-icons">star_border</span>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% if review.comment %}
+        <div class="italic text-sm text-gray-600 dark:text-gray-300 mb-2">{{ review.comment|safe }}</div>
+        {% endif %}
+        <p class="text-gray-600 dark:text-gray-300 mt-2">{{ review.content|truncatewords:20 }}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+          <span class="material-icons text-sm">schedule</span> Publicado el {{ review.created_at|date:"j F, Y" }}
+        </p>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-600 dark:text-gray-400">
+      {% if user == profile_user %}Aún no has creado ninguna reseña.{% else %}{{ profile_user.username }} aún no ha creado ninguna reseña.{% endif %}
+    </p>
+    {% endif %}
+  </div>
+
+  <!-- Comments Content -->
+  <div id="comments-content" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hidden">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+      <span class="material-icons mr-2">comment</span>
+      {% if user == profile_user %}Tus Comentarios{% else %}Comentarios de {{ profile_user.username }}{% endif %}
+    </h2>
+
+    {% if profile_user.comment_set.exists %}
+    <div class="space-y-4">
+      {% for comment in profile_user.comment_set.all %}
+      <div class="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0 last:pb-0">
+        <h3 class="text-lg font-medium text-gray-800 dark:text-white">
+          <a href="{% url 'blogapp:blog_detail' comment.review.blog.id %}" class="hover:text-primary_dark-600 dark:hover:text-primary_dark-300">
+            {{ comment.review.comment|truncatewords:10|safe }}
+          </a>
+        </h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <span class="material-icons text-sm">schedule</span> Publicado el {{ comment.created_at|date:"j F, Y H:i" }}
+        </p>
+        <p class="text-gray-600 dark:text-gray-300 mt-2">{{ comment.content|truncatewords:20 }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-600 dark:text-gray-400">
+      {% if user == profile_user %}Aún no has creado ningún comentario.{% else %}{{ profile_user.username }} aún no ha creado ningún comentario.{% endif %}
+    </p>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const tabs = ['blogs', 'reviews', 'comments'];
+  
+  tabs.forEach(tab => {
+    const tabButton = document.getElementById(`${tab}-tab`);
+    if (tabButton) {
+      tabButton.addEventListener('click', function() {
+        // Hide all content sections
+        tabs.forEach(t => {
+          const contentElement = document.getElementById(`${t}-content`);
+          const tabElement = document.getElementById(`${t}-tab`);
+
+          if (contentElement) {
+            contentElement.classList.add('hidden');
+          }
+
+          if (tabElement) {
+            tabElement.classList.remove('bg-primary_dark-600', 'text-white');
+            tabElement.classList.add('text-gray-700', 'dark:text-gray-300');
+          }
         });
-    </script>
+
+        // Show selected content and highlight tab
+        const selectedContent = document.getElementById(`${tab}-content`);
+        if (selectedContent) {
+          selectedContent.classList.remove('hidden');
+        }
+
+        tabButton.classList.add('bg-primary_dark-600', 'text-white');
+        tabButton.classList.remove('text-gray-700', 'dark:text-gray-300');
+      });
+    }
+  });
+  
+  // Image modal functionality
+  window.openImageModal = function(src) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    modalImage.src = src;
+    modal.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+  };
+  
+  window.closeImageModal = function() {
+    const modal = document.getElementById('imageModal');
+    modal.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+  };
+});
+</script>
 
 {% endblock %}

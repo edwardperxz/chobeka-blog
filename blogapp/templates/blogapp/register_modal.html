@@ -127,7 +127,7 @@
     <!-- Link a login -->
     <div class="mt-6 text-center text-sm text-white dark:text-gray-300">
       <p>¿Ya tienes una cuenta?</p>
-      <a href="{% url 'blogapp:login_modal' %}" class="font-medium text-red hover:text-red-600 transition">
+      <a href="{% url 'blogapp:login_modal' %}" onclick="event.preventDefault(); openModal(this.href)" class="font-medium text-red hover:text-red-600 transition">
         Inicia sesión aquí
       </a>
     </div>

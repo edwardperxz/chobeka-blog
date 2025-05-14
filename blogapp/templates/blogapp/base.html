@@ -41,6 +41,7 @@
   <link rel="icon" type="image/x-icon" href="{% static 'Images/chubekyn.ico' %}">
   <link rel="stylesheet" href="{% static 'style.css' %}">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
   <script>
@@ -216,9 +217,9 @@
         <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
         <h2 class="text-xl text-secondary_dark dark:text-white mb-6">Tags Recomendados</h2>
         <div class="flex flex-wrap gap-2">
-          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm">#Tecnología</span>
-          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm">#Diseño</span>
-          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm">#Programación</span>
+          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm dark:bg-primary_dark-600">#Tecnología</span>
+          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm dark:bg-primary_dark-600">#Diseño</span>
+          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm dark:bg-primary_dark-600">#Programación</span>
         </div>
       </div>
     </div>
@@ -226,29 +227,49 @@
     
   <script src="{% static 'js/register_validation.js' %}"></script>
   <script src="{% static 'js/toaster.js' %}"></script>
+
   <!-- Modal Login -->
-<div id="modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden justify-center items-center">
-  <div id="modal-content" class="bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md relative">
-  </div>
+<!-- En la sección final de base.html, reemplaza el modal existente con: -->
+<div id="modal-container" class="fixed inset-0 z-50 hidden items-center justify-center">
+  <div class="relative" id="modal-content"></div>
 </div>
 
 <script>
-// Function to open modal
+// Función unificada para abrir modales
 function openModal(url) {
   fetch(url)
     .then(response => response.text())
     .then(html => {
-      const modalContainer = document.createElement('div');
-      modalContainer.id = "modal-container";
-      modalContainer.innerHTML = html;
-      document.body.appendChild(modalContainer);
+      const container = document.getElementById('modal-container');
+      const content = document.getElementById('modal-content');
+      
+      content.innerHTML = html;
+      container.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
     });
 }
 
+// Función para cerrar modales
 function closeModal() {
-  const modal = document.getElementById("modal-container");
-  if (modal) modal.remove();
+  const container = document.getElementById('modal-container');
+  container.classList.add('hidden');
+  document.body.classList.remove('overflow-hidden');
 }
+
+// Cerrar al hacer clic fuera del contenido
+document.addEventListener('click', function(e) {
+  const container = document.getElementById('modal-container');
+  if (e.target === container) {
+    closeModal();
+  }
+});
+
+// Cerrar con ESC
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeModal();
+  }
+});
 </script>
 </body>
 </html>
