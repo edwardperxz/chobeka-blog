@@ -433,7 +433,7 @@ class LogoutView(RedirectView):
 
 
 class SignUpView(FormView):
-    template_name = 'blogapp/register.html'
+    template_name = 'blogapp/register_modal.html'
     form_class = UserRegisterForm
     success_url = reverse_lazy('blogapp:login_modal')
     
@@ -489,7 +489,7 @@ class RegisterView(FormView):
     success_url = reverse_lazy('blogapp:login_modal')
 
     def form_valid(self, form):
-        user = form.save()
+        User = form.save()
         messages.success(
             self.request,
             '¡Registro exitoso! Por favor inicia sesión con tus nuevas credenciales.'

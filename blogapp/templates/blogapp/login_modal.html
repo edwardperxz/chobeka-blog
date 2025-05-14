@@ -41,7 +41,7 @@
     {% endif %}
 
     <!-- Formulario -->
-    <form method="post" class="space-y-6">
+    <form method="post" action="{% url 'blogapp:login_modal' %}" class="space-y-6">
       {% csrf_token %}
       <div>
         <label for="username" class="block text-sm font-medium mb-1 text-white">Usuario</label>
@@ -53,6 +53,13 @@
         <input type="password" name="password" id="password" required
                class="bg-primary_dark-600 dark:bg-secondary_dark text-white px-4 py-3 rounded-lg w-full border border-gray-500 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
       </div>
+      <!-- Mostrar errores -->
+    {% if form.errors %}
+    <div class="text-red-400 text-sm">
+      Usuario o contraseña incorrectos
+    </div>
+    {% endif %}
+
       <button type="submit"
               class="w-full px-6 py-3 bg-red hover:bg-red-600 text-white rounded-lg transition-all duration-300">
         Pa' Lante

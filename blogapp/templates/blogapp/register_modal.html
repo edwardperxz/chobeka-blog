@@ -33,7 +33,7 @@
     {% endif %}
 
     <!-- Formulario -->
-    <form method="post" class="space-y-4" id="register-form">
+    <form method="post" action="{% url 'blogapp:register_modal' %}" class="space-y-4" id="register-form">
       {% csrf_token %}
 
       <!-- Username -->
