@@ -151,7 +151,6 @@
           {% if user.is_authenticated %}
             <li><a href="{% url 'blogapp:profile' user.username %}" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">Mi Chantin</a></li>
           {% endif %}
-          <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Mis Subidas</a></li>
         </ul>
       </div>
     </div>
@@ -211,18 +210,60 @@
   </main>
 
 
-  <!-- Sidebar Right-->
-    <div class="w-72 fixed right-0 top-16 h-[calc(100%-4rem)] bg-primary_dark-100 text-primary_dark dark:text-white dark:bg-primary_dark overflow-y-auto transition-colors border-gray-500 px-8 border-l border-secondary_dark dark:border-gray-500">
-      <div class="p-4">
-        <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
-        <h2 class="text-xl text-secondary_dark dark:text-white mb-6">Tags Recomendados</h2>
-        <div class="flex flex-wrap gap-2">
-          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm dark:bg-primary_dark-600">#Tecnología</span>
-          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm dark:bg-primary_dark-600">#Diseño</span>
-          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm dark:bg-primary_dark-600">#Programación</span>
+<!-- Sidebar Right-->
+<div class="w-80 fixed right-0 top-16 h-[calc(100%-4rem)] bg-primary_dark-100 dark:bg-primary_dark text-primary_dark dark:text-white overflow-y-auto transition-colors border-gray-500 px-6 border-l border-secondary_dark dark:border-gray-500 z-40">
+  <div class="p-4 mt-5">
+    <h2 class="text-lg font-semibold mb-4 text-secondary_dark dark:text-white">Blogs recomendados</h2>
+    <div id="recommended-blogs-list" class="space-y-6">
+      {% for blog in recommended_blogs|slice:":10" %}
+      <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="flex items-start gap-3 bg-white dark:bg-primary_dark-200 rounded-lg p-3 shadow-sm transition hover:bg-primary_dark-100 hover:dark:bg-primary_dark-300 group">
+        <div class="flex-shrink-0">
+          {% if blog.image %}
+            <img src="{{ blog.image.url }}" alt="{{ blog.title }}" class="w-14 h-14 rounded object-cover bg-gray-700">
+          {% else %}
+            <div class="w-14 h-14 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400">
+              <span class="material-icons">article</span>
+            </div>
+          {% endif %}
         </div>
-      </div>
+        <div class="flex-1 min-w-0">
+          <span class="block font-medium text-primary_dark dark:text-white group-hover:underline truncate">{{ blog.title }}</span>
+          <div class="text-xs mt-1 flex items-center gap-1 text-gray-600 dark:text-gray-300">
+            por {{ blog.author.username }}
+            {% if blog.rating %}
+              <span class="mx-1 text-gray-400">•</span>
+              <span class="flex items-center gap-1">
+                <span class="material-icons text-yellow-500 text-base align-middle">star</span>
+                {{ blog.rating }}
+              </span>
+            {% endif %}
+          </div>
+        </div>
+      </a>
+      {% endfor %}
     </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    let shown = 3;
+    const items = document.querySelectorAll('.recommended-blog-item');
+    const btn = document.getElementById('see-more-blogs');
+    if (btn) {
+      btn.addEventListener('click', function() {
+        let revealed = 0;
+        for (let i = shown; i < items.length && revealed < 3; i++, revealed++) {
+          items[i].classList.remove('hidden');
+        }
+        shown += revealed;
+        if (shown >= items.length) {
+          btn.style.display = 'none';
+        }
+      });
+    }
+  });
+</script>
 
     
   <script src="{% static 'js/register_validation.js' %}"></script>
