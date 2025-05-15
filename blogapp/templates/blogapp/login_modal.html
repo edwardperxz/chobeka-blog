@@ -53,12 +53,29 @@
         <input type="password" name="password" id="password" required
                class="bg-primary_dark-600 dark:bg-secondary_dark text-white px-4 py-3 rounded-lg w-full border border-gray-500 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
       </div>
-      <!-- Mostrar errores -->
-    {% if form.errors %}
-    <div class="text-red-400 text-sm">
-      Usuario o contraseña incorrectos
+<!-- Mostrar mensajes -->
+{% if messages %}
+  {% for message in messages %}
+    <div class="flex items-center p-4 mb-4 rounded-lg 
+                {% if message.tags == 'success' %}bg-green-100 text-green-800
+                {% elif message.tags == 'error' %}bg-red-100 text-red-800{% endif %}">
+      {% if message.tags == 'success' %}
+        <svg class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      {% endif %}
+      <span>{{ message }}</span>
     </div>
-    {% endif %}
+  {% endfor %}
+{% endif %}
+
+<!-- Mostrar errores del formulario -->
+{% if form.errors %}
+  <div class="text-red-400 text-sm">
+    Usuario o contraseña incorrectos
+  </div>
+{% endif %}
 
       <button type="submit"
               class="w-full px-6 py-3 bg-red hover:bg-red-600 text-white rounded-lg transition-all duration-300">

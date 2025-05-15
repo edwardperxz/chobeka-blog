@@ -468,6 +468,7 @@ class LoginView(FormView):
         user = authenticate(self.request, username=username, password=password)
         if user is not None:
             login(self.request, user)
+            messages.success(self.request, '¡Inicio de sesión exitoso!')
             next_url = self.request.GET.get('next', self.get_success_url())
             return redirect(next_url)
 
