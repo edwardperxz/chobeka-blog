@@ -65,6 +65,26 @@
         Pa' Lante
       </button>
     </form>
+    <br/>
+    <div class="relative">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-2 bg-primary_dark-200 dark:bg-secondary_dark text-gray-500 dark:text-gray-400">
+            O inicia sesión con
+          </span>
+        </div>
+      </div>
+     
+      <div class="mt-6 grid grid-cols-2 gap-3">
+        <a href="{% provider_login_url 'google' %}" class="google-btn w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
+          <span>Google</span>
+        </a>
+        <a href="{% url 'social:begin' 'facebook' %}" class="fb-btn w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-color-white">
+          <span>Facebook</span>
+        </a>
+      </div>
 
     <!-- Enlace para registrarse -->
     <div class="mt-6 text-center text-sm">
