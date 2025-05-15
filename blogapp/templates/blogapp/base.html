@@ -41,6 +41,7 @@
   <link rel="icon" type="image/x-icon" href="{% static 'Images/chubekyn.ico' %}">
   <link rel="stylesheet" href="{% static 'style.css' %}">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
   <script>
@@ -54,8 +55,9 @@
           colors: {
             primary_dark:{
               DEFAULT: '#101C41',
-              100: '#3A4B80',
-              200: '#263666',
+              100: '#7cb9eb',
+              200: '#214a80',
+              300: '#588fc7',
               600: '#263666',
             },
             secondary_dark: '#0B1633',
@@ -110,7 +112,7 @@
           <span id="theme-icon" class="transition-transform duration-500 transform"></span>
         </button>
 
-        {% if not request.path == '/login/' %}
+        {% if not request.path == '/login_modal/' %}
             {% if user.is_authenticated %}
             <a href="{% url 'blogapp:profile' user.username %}" class="transition-all duration-500 ease-in-out">
               <img src="{% static 'Images/gg_profile.svg' %}" alt="Mi Chantin" class="w-9 h-9 rounded-full block">
@@ -119,7 +121,7 @@
               <img src="{% static 'Images/logout.svg' %}" alt="Logout" class="w-9 h-9 rounded-full block">
             </a>
           {% else %}
-            <a href="{% url 'blogapp:login' %}" class="bg-green-600 hover:bg-green-500 text-white dark:bg-green-700 dark:hover:bg-green-600 font-medium py-2 px-4 rounded hover:scale-105 transition-all duration-500 ease-in-out">Acceder</a>
+            <a href="{% url 'blogapp:login_modal' %}" onclick="event.preventDefault(); openModal(this.href)" class="bg-primary_dark-300 hover:bg-primary_dark-600 text-white font-medium py-2 px-4 rounded hover:scale-105 transition-all duration-500 ease-in-out">Acceder</a>
           {% endif %}
         {% endif %}
       </div>
@@ -131,23 +133,25 @@
   <div class="w-72 fixed left-0 top-16 h-[calc(100%-4rem)] bg-primary_dark-100 text-white dark:bg-primary_dark overflow-y-auto transition-colors px-8 border-gray-500 border-r border-secondary_dark dark:border-gray-500">
       <div class="p-4">
         <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
-          <a href="{% url 'blogapp:add_blog' %}" class="flex justify-center items-center bg-red hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Takilla tu meme</a>
+        {% if user.is_authenticated %}  
+        <a href="{% url 'blogapp:add_blog' %}" class="flex justify-center items-center bg-red hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Takilla tu meme</a>
+        {% else %}
+            <a href="{% url 'blogapp:login_modal' %}" onclick="event.preventDefault(); openModal(this.href)" class="flex justify-center items-center bg-red hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Acceder</a></li>  
+        {% endif %}
           {% if user.is_staff %}
           <a href="{% url 'admin:index' %}" class="mt-2 flex justify-center items-center bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Chakalde</a>
           {% endif %}
         <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
         <ul class="space-y-2">
-          <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Últimos</a></li>
-          <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Top</a></li>
-          <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Más Comentados</a></li>
-          <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Aleatorios</a></li>
+          <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Últimos</a></li>
+          <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Top</a></li>
+          <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Más Comentados</a></li>
+          <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Aleatorios</a></li>
           <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
           {% if user.is_authenticated %}
-            <li><a href="{% url 'blogapp:profile' user.username %}" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Mi Chantin</a></li>
-          {% else %}
-            <li><a href="{% url 'blogapp:login' %}" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Iniciar Sesión</a></li>
+            <li><a href="{% url 'blogapp:profile' user.username %}" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">Mi Chantin</a></li>
           {% endif %}
-          <li><a href="#" class="block p-2 hover:bg-gray-200 rounded hover:dark:bg-red">Mis Subidas</a></li>
+          <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Mis Subidas</a></li>
         </ul>
       </div>
     </div>
@@ -207,23 +211,65 @@
   </main>
 
 
-
   <!-- Sidebar Right-->
     <div class="w-72 fixed right-0 top-16 h-[calc(100%-4rem)] bg-primary_dark-100 text-primary_dark dark:text-white dark:bg-primary_dark overflow-y-auto transition-colors border-gray-500 px-8 border-l border-secondary_dark dark:border-gray-500">
       <div class="p-4">
         <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
-        <h2 class="text-xl text-white mb-6">Tags Recomendados</h2>
+        <h2 class="text-xl text-secondary_dark dark:text-white mb-6">Tags Recomendados</h2>
         <div class="flex flex-wrap gap-2">
-          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm">#Tecnología</span>
-          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm">#Diseño</span>
-          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm">#Programación</span>
+          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm dark:bg-primary_dark-600">#Tecnología</span>
+          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm dark:bg-primary_dark-600">#Diseño</span>
+          <span class="bg-primary_dark-200 text-white px-3 py-2 rounded shadow-sm dark:bg-primary_dark-600">#Programación</span>
         </div>
       </div>
     </div>
 
-
+    
   <script src="{% static 'js/register_validation.js' %}"></script>
   <script src="{% static 'js/toaster.js' %}"></script>
-  <script src="{% static 'js/comments.js' %}"></script>
+
+  <!-- Modal Login -->
+<!-- En la sección final de base.html, reemplaza el modal existente con: -->
+<div id="modal-container" class="fixed inset-0 z-50 hidden items-center justify-center">
+  <div class="relative" id="modal-content"></div>
+</div>
+
+<script>
+// Función unificada para abrir modales
+function openModal(url) {
+  fetch(url)
+    .then(response => response.text())
+    .then(html => {
+      const container = document.getElementById('modal-container');
+      const content = document.getElementById('modal-content');
+      
+      content.innerHTML = html;
+      container.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+    });
+}
+
+// Función para cerrar modales
+function closeModal() {
+  const container = document.getElementById('modal-container');
+  container.classList.add('hidden');
+  document.body.classList.remove('overflow-hidden');
+}
+
+// Cerrar al hacer clic fuera del contenido
+document.addEventListener('click', function(e) {
+  const container = document.getElementById('modal-container');
+  if (e.target === container) {
+    closeModal();
+  }
+});
+
+// Cerrar con ESC
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeModal();
+  }
+});
+</script>
 </body>
 </html>
