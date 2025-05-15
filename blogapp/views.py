@@ -13,8 +13,7 @@ from social_core.exceptions import AuthCanceled, AuthForbidden
 from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
 from django import forms
-from django.db.models import Avg, Count
-from django.contrib.auth.forms import UserCreationForm
+from django.db.models import Avg, Count, Q
 
 
 
@@ -199,67 +198,135 @@ class BlogListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Blog.objects.select_related('author').prefetch_related('reviews').order_by('-created_at')
+        """Get filtered blogs with optimized database queries."""
+        queryset = Blog.objects.select_related('author', 'author__profile').prefetch_related('reviews').order_by('-created_at')
+        return self._apply_filters(queryset)
+
+    def _apply_filters(self, queryset):
+        """Apply all filters from request parameters to the queryset."""
+        filters = {}
+
+        # Filter by tag
+        tag = self.request.GET.get('tag', '').strip()
+        if tag:
+            queryset = queryset.filter(Q(tags__icontains=tag))
+
+        # Filter by author username
+        author = self.request.GET.get('author', '').strip()
+        if author:
+            filters['author__username'] = author
+
+        # Filter by province/location
+        location = (self.request.GET.get('province') or self.request.GET.get('location', '')).strip()
+        if location:
+            filters['author__profile__location'] = location
+
+        # Filter by date range
+        try:
+            date_from = self.request.GET.get('date_from', '').strip()
+            if date_from:
+                filters['created_at__gte'] = date_from
+
+            date_to = self.request.GET.get('date_to', '').strip()
+            if date_to:
+                filters['created_at__lte'] = date_to
+        except (ValueError, TypeError):
+            pass  # Ignore invalid date formats
+
+        # Apply collected filters
+        if filters:
+            queryset = queryset.filter(**filters)
+
+        # Search in title and content
+        search_query = self.request.GET.get('search', '').strip()
+        if search_query:
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) |
+                Q(content__icontains=search_query)
+            )
+
+        return queryset
 
     def get_context_data(self, **kwargs):
+        """Enhance context with blog metadata for rendering."""
         context = super().get_context_data(**kwargs)
         blogs_list = []
         all_tags = set()
 
+        if not context['blogs']:
+            context['blogs_list'] = []
+            context['tags_collection'] = []
+            return context
+
+        # Get blog IDs for batch operations
         blog_ids = [blog.id for blog in context['blogs']]
-        ratings = Review.objects.filter(blog_id__in=blog_ids).values('blog_id').annotate(
-            avg_rating=Avg('rating'),
-            review_count=Count('id')
-        )
 
-        comments = Review.objects.filter(blog_id__in=blog_ids).values('blog_id').annotate(
-            comments_count=Count('comments')
-        )
+        # Batch query for ratings and comments
+        ratings_dict = self._get_ratings_dict(blog_ids)
+        comments_dict = self._get_comments_dict(blog_ids)
 
-        ratings_dict = {item['blog_id']: {
-            'avg_rating': round(item['avg_rating'], 1) if item['avg_rating'] else 0,
-            'review_count': item['review_count']
-        } for item in ratings}
-
-        comments_dict = {item['blog_id']: item['comments_count'] for item in comments}
-
+        # Process each blog
         for blog in context['blogs']:
-            blog_tags = []
+            blog_data = self._prepare_blog_data(blog, ratings_dict, comments_dict)
+            blogs_list.append(blog_data)
 
-            try:
-                if blog.tags:
-                    blog_tags = blog.tags if isinstance(blog.tags, list) else []
-                    all_tags.update(blog_tags)
-
-                location_code = blog.author.profile.location if hasattr(blog.author, 'profile') else None
-                location_info = get_location_info(location_code)
-
-                # Get rating and comment info
-                rating_info = ratings_dict.get(blog.id, {'avg_rating': 0, 'review_count': 0})
-                comments_count = comments_dict.get(blog.id, 0)
-
-                blogs_list.append({
-                    'blog': blog,
-                    'location_info': location_info,
-                    'blog_tags': blog_tags,
-                    'avg_rating': rating_info['avg_rating'],
-                    'review_count': rating_info['review_count'],
-                    'comments_count': comments_count
-                })
-            except:
-                blogs_list.append({
-                    'blog': blog,
-                    'location_info': get_location_info(None),
-                    'blog_tags': blog_tags,
-                    'avg_rating': 0,
-                    'review_count': 0,
-                    'comments_count': 0
-                })
+            # Collect tags for all blogs
+            if blog.tags and isinstance(blog.tags, list):
+                all_tags.update(blog.tags)
 
         context['blogs_list'] = blogs_list
         context['tags_collection'] = sorted(list(all_tags))
 
         return context
+
+    def _get_ratings_dict(self, blog_ids):
+        """Get average ratings and review counts for blogs."""
+        ratings = Review.objects.filter(blog_id__in=blog_ids).values('blog_id').annotate(
+            avg_rating=Avg('rating'),
+            review_count=Count('id')
+        )
+
+        return {item['blog_id']: {
+            'avg_rating': round(item['avg_rating'], 1) if item['avg_rating'] else 0,
+            'review_count': item['review_count']
+        } for item in ratings}
+
+    def _get_comments_dict(self, blog_ids):
+        """Get comment counts for blogs."""
+        comments = Review.objects.filter(blog_id__in=blog_ids).values('blog_id').annotate(
+            comments_count=Count('comments')
+        )
+
+        return {item['blog_id']: item['comments_count'] for item in comments}
+
+    def _prepare_blog_data(self, blog, ratings_dict, comments_dict):
+        """Prepare data structure for a single blog."""
+        try:
+            blog_tags = blog.tags if blog.tags and isinstance(blog.tags, list) else []
+
+            location_code = blog.author.profile.location if hasattr(blog.author, 'profile') else None
+            location_info = get_location_info(location_code)
+
+            rating_info = ratings_dict.get(blog.id, {'avg_rating': 0, 'review_count': 0})
+            comments_count = comments_dict.get(blog.id, 0)
+
+            return {
+                'blog': blog,
+                'location_info': location_info,
+                'blog_tags': blog_tags,
+                'avg_rating': rating_info['avg_rating'],
+                'review_count': rating_info['review_count'],
+                'comments_count': comments_count
+            }
+        except Exception:
+            return {
+                'blog': blog,
+                'location_info': get_location_info(None),
+                'blog_tags': [],
+                'avg_rating': 0,
+                'review_count': 0,
+                'comments_count': 0
+            }
 
 
 class BlogDetailView(DetailView):
