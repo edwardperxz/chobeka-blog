@@ -509,3 +509,27 @@ class RegisterView(FormView):
             messages.info(request, 'Debes cerrar sesión para registrar una nueva cuenta.')
             return redirect('blogapp:blog_list')
         return super().dispatch(request, *args, **kwargs)
+
+@login_required
+def add_comment(request, blog_pk, review_pk):
+    """
+    Vista para agregar un comentario a una reseña específica de un blog.
+    """
+    review = get_object_or_404(Review, pk=review_pk, blog__pk=blog_pk)
+
+    if request.method == 'POST':
+        content = request.POST.get('content', '').strip()  # Obtener y limpiar el contenido del comentario
+        if content:
+            # Crear el comentario si el contenido no está vacío
+            Comment.objects.create(
+                review=review,
+                commenter=request.user,
+                content=content
+            )
+            messages.success(request, '¡Tu comentario ha sido publicado exitosamente!')
+        else:
+            # Mostrar un mensaje de error si el contenido está vacío
+            messages.error(request, 'El comentario no puede estar vacío.')
+
+    # Redirigir de vuelta al detalle del blog
+    return redirect('blogapp:blog_detail', pk=blog_pk)
