@@ -14,6 +14,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
 from django import forms
 from django.db.models import Avg, Count, Q
+from django.contrib.auth.forms import UserCreationForm
 
 
 
