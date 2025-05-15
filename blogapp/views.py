@@ -480,7 +480,7 @@ class LoginView(FormView):
             return redirect('blogapp:blog_list')
         return super().dispatch(request, *args, **kwargs)
     
- # modal resgiter view
+ # modal register view
 class RegisterView(FormView):
     """
     Modal registration view with improved validation
