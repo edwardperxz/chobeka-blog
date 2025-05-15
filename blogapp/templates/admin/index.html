@@ -1,0 +1,15 @@
+{% extends "admin/index.html" %}  <!-- Extiende el template original del admin -->
+
+{% block content %}
+<!-- Añade tus estadísticas ENCIMA de las secciones predeterminadas -->
+<div class="custom-stats">
+    <h1>📊 Estadísticas Rápidas</h1>
+    <ul>
+        <li><strong>Total de blogs:</strong> {{ total_blogs }}</li>
+        <li><strong>Total de comentarios:</strong> {{ total_comments }}</li>
+        <li><strong>Promedio de rating:</strong> {{ avg_rating|floatformat:2 }}</li>
+    </ul>
+</div>
+
+{{ block.super }}  <!-- Esto incluye las secciones predeterminadas (Users, Groups, etc.) -->
+{% endblock %}

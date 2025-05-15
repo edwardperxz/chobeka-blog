@@ -1,7 +1,8 @@
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, RedirectView
@@ -12,20 +13,23 @@ from social_core.exceptions import AuthCanceled, AuthForbidden
 from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
 from django import forms
+from django.db.models import Avg, Count
+from django.contrib.auth.forms import UserCreationForm
+
 
 
 def get_location_info(location_code):
     LOCATION_MAP = {
-        'BOC': {'emoji': '🌊', 'name': 'Bocas del Toro', 'color': 'lime'},
-        'CHI': {'emoji': '🏔️', 'name': 'Chiriquí', 'color': 'green'},
-        'COC': {'emoji': '🌴', 'name': 'Coclé', 'color': 'amber'},
-        'COL': {'emoji': '🏝️', 'name': 'Colón', 'color': 'indigo'},
-        'DAR': {'emoji': '🌿', 'name': 'Darién', 'color': 'cyan'},
-        'HER': {'emoji': '🌄', 'name': 'Herrera', 'color': 'yellow'},
-        'LOS': {'emoji': '🌾', 'name': 'Los Santos', 'color': 'orange'},
-        'PAN': {'emoji': '🏙️', 'name': 'Panamá', 'color': 'red'},
-        'POE': {'emoji': '🏞️', 'name': 'Panamá Oeste', 'color': 'emerald'},
-        'VER': {'emoji': '🌳', 'name': 'Veraguas', 'color': 'blue'},
+        'BOC': {'flag_url': 'Bocas_del_Toro', 'name': 'Bocas del Toro', 'color': 'lime'},
+        'CHI': {'flag_url': 'Chiriqui', 'name': 'Chiriquí', 'color': 'green'},
+        'COC': {'flag_url': 'Cocle', 'name': 'Coclé', 'color': 'amber'},
+        'COL': {'flag_url': 'Colon', 'name': 'Colón', 'color': 'indigo'},
+        'DAR': {'flag_url': 'Darien', 'name': 'Darién', 'color': 'cyan'},
+        'HER': {'flag_url': 'Herrera', 'name': 'Herrera', 'color': 'yellow'},
+        'LOS': {'flag_url': 'Los_Santos', 'name': 'Los Santos', 'color': 'orange'},
+        'PAN': {'flag_url': 'Panama', 'name': 'Panamá', 'color': 'red'},
+        'POE': {'flag_url': 'Panama_Oeste', 'name': 'Panamá Oeste', 'color': 'emerald'},
+        'VER': {'flag_url': 'Veraguas', 'name': 'Veraguas', 'color': 'blue'},
     }
     return LOCATION_MAP.get(location_code)
 
@@ -52,25 +56,75 @@ class ProfileView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         try:
             viewed_user = get_user_model().objects.get(username=self.kwargs.get('username'))
-            context['profile_user'] = viewed_user
-            context['blogs'] = Blog.objects.filter(author=viewed_user).select_related('author')
-
             profile = self.get_object()
-            if profile and profile.interests:
-                context['interests_list'] = profile.interests
-            else:
-                context['interests_list'] = []
 
-            if profile and profile.location:
-                context['location_info'] = get_location_info(profile.location)
+            # Basic user info
+            context['profile_user'] = viewed_user
+
+            # Profile info
+            context['interests_list'] = profile.interests if profile and profile.interests else []
+            context['location_info'] = get_location_info(profile.location if profile else None)
+
+            # Blogs by the user
+            user_blogs = Blog.objects.filter(author=viewed_user).select_related('author')
+            context['blogs'] = user_blogs
+            context['blogs_count'] = user_blogs.count()
+
+            # Blog ratings
+            blog_ids = [blog.id for blog in user_blogs]
+            ratings = Review.objects.filter(blog_id__in=blog_ids).values('blog_id').annotate(
+                avg_rating=Avg('rating'),
+                review_count=Count('id')
+            )
+
+            # Calculate average rating for user's blogs
+            if ratings:
+                valid_ratings = [item['avg_rating'] for item in ratings if item['avg_rating']]
+                average_rating = sum(valid_ratings) / len(valid_ratings) if valid_ratings else 0
+                context['average_rating'] = round(average_rating, 1) if average_rating else 0
             else:
-                context['location_info'] = get_location_info(None)
+                context['average_rating'] = 0
+
+            # Reviews by the user
+            user_reviews = Review.objects.filter(reviewer=viewed_user)
+            context['reviews_list'] = user_reviews
+            context['reviews_count'] = user_reviews.count()
+            context['reviewed_blogs'] = [review.blog for review in user_reviews]
+
+            # Average rating given by user in reviews
+            if user_reviews:
+                avg_review_rating = sum(review.rating for review in user_reviews) / user_reviews.count()
+                context['average_review_rating'] = round(avg_review_rating, 1) if avg_review_rating else 0
+            else:
+                context['average_review_rating'] = 0
+
+            # Comments by the user
+            user_comments = Comment.objects.filter(commenter=viewed_user)
+            context['comments_list'] = user_comments
+            context['comments_count'] = user_comments.count()
+            context['commented_blogs'] = [comment.review.blog for comment in user_comments]
+
+            # Tags used by the user
+            all_tags = set()
+            for blog in user_blogs:
+                if blog.tags:
+                    blog_tags = blog.tags if isinstance(blog.tags, list) else []
+                    all_tags.update(blog_tags)
+            context['tags_collection'] = sorted(list(all_tags))
+            context['tags_count'] = len(context['tags_collection'])
 
         except get_user_model().DoesNotExist:
             context['profile_user'] = None
             context['blogs'] = []
             context['interests_list'] = []
             context['location_info'] = get_location_info(None)
+            context['blogs_count'] = 0
+            context['reviews_count'] = 0
+            context['comments_count'] = 0
+            context['average_rating'] = 0
+            context['average_review_rating'] = 0
+            context['tags_collection'] = []
+            context['tags_count'] = 0
 
         return context
 
@@ -152,6 +206,23 @@ class BlogListView(ListView):
         blogs_list = []
         all_tags = set()
 
+        blog_ids = [blog.id for blog in context['blogs']]
+        ratings = Review.objects.filter(blog_id__in=blog_ids).values('blog_id').annotate(
+            avg_rating=Avg('rating'),
+            review_count=Count('id')
+        )
+
+        comments = Review.objects.filter(blog_id__in=blog_ids).values('blog_id').annotate(
+            comments_count=Count('comments')
+        )
+
+        ratings_dict = {item['blog_id']: {
+            'avg_rating': round(item['avg_rating'], 1) if item['avg_rating'] else 0,
+            'review_count': item['review_count']
+        } for item in ratings}
+
+        comments_dict = {item['blog_id']: item['comments_count'] for item in comments}
+
         for blog in context['blogs']:
             blog_tags = []
 
@@ -163,16 +234,26 @@ class BlogListView(ListView):
                 location_code = blog.author.profile.location if hasattr(blog.author, 'profile') else None
                 location_info = get_location_info(location_code)
 
+                # Get rating and comment info
+                rating_info = ratings_dict.get(blog.id, {'avg_rating': 0, 'review_count': 0})
+                comments_count = comments_dict.get(blog.id, 0)
+
                 blogs_list.append({
                     'blog': blog,
                     'location_info': location_info,
-                    'blog_tags': blog_tags
+                    'blog_tags': blog_tags,
+                    'avg_rating': rating_info['avg_rating'],
+                    'review_count': rating_info['review_count'],
+                    'comments_count': comments_count
                 })
             except:
                 blogs_list.append({
                     'blog': blog,
                     'location_info': get_location_info(None),
-                    'blog_tags': blog_tags
+                    'blog_tags': blog_tags,
+                    'avg_rating': 0,
+                    'review_count': 0,
+                    'comments_count': 0
                 })
 
         context['blogs_list'] = blogs_list
@@ -197,10 +278,28 @@ class BlogDetailView(DetailView):
         if blog.tags:
             blog_tags = blog.tags if isinstance(blog.tags, list) else []
 
+        reviews = blog.reviews.all()
+        if reviews.exists():
+            avg_rating = reviews.aggregate(avg_rating=Avg('rating'))['avg_rating']
+            avg_rating = round(avg_rating, 1) if avg_rating else 0
+            review_count = reviews.count()
+
+            comments_data = reviews.aggregate(
+                comments_count=Count('comments')
+            )
+            comments_count = comments_data['comments_count']
+        else:
+            avg_rating = 0
+            review_count = 0
+            comments_count = 0
+
         context['blog_tags'] = blog_tags
         context['location_info'] = get_location_info(
             blog.author.profile.location if hasattr(blog.author, 'profile') else None
         )
+        context['avg_rating'] = avg_rating
+        context['review_count'] = review_count
+        context['comments_count'] = comments_count
         return context
 
 
@@ -231,13 +330,6 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        # Handle image deletion/replacement
-        if 'image-clear' in self.request.POST and self.request.POST['image-clear'] == 'on':
-            if self.object.image:
-                self.object.image.delete(save=False)
-        elif 'image' in self.request.FILES and self.object.image:
-            self.object.image.delete(save=False)
-
         form.instance.last_updated = datetime.now()
         messages.success(self.request, '¡El blog ha sido actualizado exitosamente!')
         return super().form_valid(form)
@@ -330,28 +422,6 @@ class LoginForm(forms.Form):
         })
     )
 
-class LoginView(FormView):
-    template_name = 'blogapp/login.html'
-    form_class = LoginForm
-    success_url = reverse_lazy('blogapp:blog_list')
-
-    def form_valid(self, form):
-        username = form.cleaned_data.get("username", "")
-        password = form.cleaned_data.get("password", "")
-        user = authenticate(self.request, username=username, password=password)
-        if user is not None:
-            login(self.request, user)
-            next_url = self.request.GET.get('next', self.get_success_url())
-            return redirect(next_url)
-
-        messages.error(self.request, 'Usuario o contraseña inválidos.')
-        return self.form_invalid(form)
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('blogapp:blog_list')
-        return super().dispatch(request, *args, **kwargs)
-
 
 class LogoutView(RedirectView):
     url = reverse_lazy('blogapp:blog_list')
@@ -363,9 +433,9 @@ class LogoutView(RedirectView):
 
 
 class SignUpView(FormView):
-    template_name = 'blogapp/register.html'
+    template_name = 'blogapp/register_modal.html'
     form_class = UserRegisterForm
-    success_url = reverse_lazy('blogapp:login')
+    success_url = reverse_lazy('blogapp:login_modal')
     
     def form_valid(self, form):
         user = form.save()
@@ -385,3 +455,81 @@ class SignUpView(FormView):
         if request.user.is_authenticated:
             return redirect('blogapp:blog_list')
         return super().dispatch(request, *args, **kwargs)
+
+        # modal login view
+class LoginView(FormView):
+    template_name = 'blogapp/login_modal.html'
+    form_class = LoginForm
+    success_url = reverse_lazy('blogapp:blog_list')
+
+    def form_valid(self, form):
+        username = form.cleaned_data.get("username", "")
+        password = form.cleaned_data.get("password", "")
+        user = authenticate(self.request, username=username, password=password)
+        if user is not None:
+            login(self.request, user)
+            messages.success(self.request, '¡Inicio de sesión exitoso!')
+            next_url = self.request.GET.get('next', self.get_success_url())
+            return redirect(next_url)
+
+        messages.error(self.request, 'Usuario o contraseña inválidos.')
+        return self.form_invalid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('blogapp:blog_list')
+        return super().dispatch(request, *args, **kwargs)
+    
+ # modal register view
+class RegisterView(FormView):
+    """
+    Modal registration view with improved validation
+    """
+    template_name = 'blogapp/register_modal.html'
+    form_class = UserCreationForm
+    success_url = reverse_lazy('blogapp:login_modal')
+
+    def form_valid(self, form):
+        User = form.save()
+        messages.success(
+            self.request,
+            '¡Registro exitoso! Por favor inicia sesión con tus nuevas credenciales.'
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request,
+            'Por favor corrige los errores en el formulario.'
+        )
+        return super().form_invalid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            messages.info(request, 'Debes cerrar sesión para registrar una nueva cuenta.')
+            return redirect('blogapp:blog_list')
+        return super().dispatch(request, *args, **kwargs)
+
+@login_required
+def add_comment(request, blog_pk, review_pk):
+    """
+    Vista para agregar un comentario a una reseña específica de un blog.
+    """
+    review = get_object_or_404(Review, pk=review_pk, blog__pk=blog_pk)
+
+    if request.method == 'POST':
+        content = request.POST.get('content', '').strip()  # Obtener y limpiar el contenido del comentario
+        if content:
+            # Crear el comentario si el contenido no está vacío
+            Comment.objects.create(
+                review=review,
+                commenter=request.user,
+                content=content
+            )
+            messages.success(request, '¡Tu comentario ha sido publicado exitosamente!')
+        else:
+            # Mostrar un mensaje de error si el contenido está vacío
+            messages.error(request, 'El comentario no puede estar vacío.')
+
+    # Redirigir de vuelta al detalle del blog
+    return redirect('blogapp:blog_detail', pk=blog_pk)

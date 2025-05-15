@@ -13,5 +13,5 @@ class SocialAuthExceptionMiddleware:
     def process_exception(self, request, exception):
         if isinstance(exception, AuthCanceled):
             messages.warning(request, "Cancelaste el inicio de sesión con Facebook")
-            return redirect(reverse('blogapp:login'))
+            return redirect(reverse('blogapp:login_modal'))
         return None

@@ -1,0 +1,103 @@
+{% extends "admin/change_list.html" %}  <!-- Extiende el template de lista de cambios -->
+{% load static %}
+
+{% block content_title %}
+    <h1>📈 Estadísticas Detalladas de Blogs</h1>
+{% endblock %}
+
+{% block content %}
+<div class="custom-stats-detail">
+    <!-- Sección de métricas generales -->
+    <div class="general-stats">
+        <h2>Métricas Globales</h2>
+        <ul>
+            <li><strong>Total de reviews:</strong> {{ total_reviews }}</li>
+            <li><strong>Total de comentarios:</strong> {{ total_comments }}</li>
+            <li><strong>Promedio de calificación:</strong> {{ avg_rating|floatformat:2 }}</li>
+        </ul>
+    </div>
+
+    <!-- Top Blogs -->
+    <div class="top-blogs">
+        <h2>🏆 Top 10 Blogs Mejor Calificados</h2>
+        <ol>
+            {% for blog in top_rated_blogs %}
+                <li>{{ blog.title }} (Rating: {{ blog.avg_rating|floatformat:2 }})</li>
+            {% empty %}
+                <li>No hay datos disponibles.</li>
+            {% endfor %}
+        </ol>
+    </div>
+
+    <!-- Blogs más comentados -->
+    <div class="most-commented">
+        <h2>💬 Top 10 Blogs Más Comentados</h2>
+        <ol>
+            {% for blog in most_commented_blogs %}
+                <li>{{ blog.title }} (Comentarios: {{ blog.comment_count }})</li>
+            {% empty %}
+                <li>No hay datos disponibles.</li>
+            {% endfor %}
+        </ol>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <h2>🏅 Top 10 Creadores de Blogs</h2>
+        <ol>
+          {% for user in top_bloggers %}
+            <li>{{ user.username }} - {{ user.blog_count }} blogs</li>
+          {% empty %}
+            <li>No hay datos</li>
+          {% endfor %}
+        </ol>
+      </div>
+  
+      <div class="col">
+        <h2>🏅 Top 10 Autores Mejor Calificados</h2>
+        <ol>
+          {% for user in top_rated_users %}
+            <li>{{ user.username }} - Rating: {{ user.avg_rating|floatformat:2 }}</li>
+          {% empty %}
+            <li>No hay datos</li>
+          {% endfor %}
+        </ol>
+      </div>
+    </div>
+  
+    <!-- Sección: Estadísticas por Blog -->
+    <h2>📝 Estadísticas Detalladas por Blog</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Blog</th>
+          <th>Autor</th>
+          <th>Reviews</th>
+          <th>Comentarios</th>
+          <th>Rating Promedio</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for blog in blog_stats %}
+          <tr>
+            <td>{{ blog.title }}</td>
+            <td>{{ blog.author.username }}</td>
+            <td>{{ blog.review_count }}</td>
+            <td>{{ blog.comment_count }}</td>
+            <td>
+              {% if blog.avg_rating %}
+                {{ blog.avg_rating|floatformat:2 }}
+              {% else %}
+                <span class="text-muted">No hay reviews</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5">No hay blogs registrados</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div>
+{% endblock %}
