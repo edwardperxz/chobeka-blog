@@ -13,7 +13,7 @@
   
   <form method="post" enctype="multipart/form-data"
     class="space-y-4 transition-all duration-700 ease-in-out animate-fade-in">{% csrf_token %}
-    <div class="space-y-2 transition-all duration-700 ease-in-out">
+    <div class="space-y-2 transition-all duration-700 ease-in-out dark:text-black">
       {% for field in form %}
         <div>
           <label for="{{ field.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">{{ field.label }}</label>
