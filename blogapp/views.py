@@ -432,6 +432,9 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        # Eliminar imagen
+        if self.request.POST.get('remove_image') == "1":
+            form.instance.remove_image()
         form.instance.last_updated = datetime.now()
         messages.success(self.request, '¡El blog ha sido actualizado exitosamente!')
         return super().form_valid(form)

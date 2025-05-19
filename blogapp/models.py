@@ -50,6 +50,10 @@ class Blog(models.Model):
     def __str__(self):
         return self.title
 
+    def remove_image(self):
+        if self.image:
+            self.image.delete(save=False)
+            self.image = None
 
 class Review(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='reviews')

@@ -108,19 +108,23 @@
 
   /* CKEditor personalizado */
   .ck.ck-editor__main > .ck-editor__editable {
-    background-color: #fff;
+    background-color: transparent !important;
     color: #1F2937;
+    border: 1.5px solid #1F2937 !important;
+    transition: background 0.2s;
   }
 
   .dark .ck.ck-editor__main > .ck-editor__editable {
-    background-color: #1F2937;
+    background-color: transparent !important;
     color: #fff;
+    border: 1.5px solid #4b5563 !important;
   }
 
   .ck.ck-toolbar {
-    background-color: #fff !important;
-    color: #1F2937 !important;
     border-color: #e5e7eb !important;
+  }
+  .dark.ck.ck-toolbar {
+    border-color: #4b5563 !important;
   }
   .ck.ck-toolbar .ck-button {
     color: #1F2937 !important;
