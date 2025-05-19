@@ -115,15 +115,17 @@
           </a>
 
           <!-- Location Badge -->
-          {% for blog_content in blogs_list %}
+            {% for blog_content in blogs_list %}
             {% if blog_content.blog.id == blog.id and blog_content.location_info %}
-            <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
-                        bg-{{ blog_content.location_info.color }}-100 text-{{ blog_content.location_info.color }}-800
-                        dark:bg-{{ blog_content.location_info.color }}-900 dark:text-{{ blog_content.location_info.color }}-300">
-              <img src="static/flags/{{ blog_content.location_info.flag_url }}_flag.svg" 
-                   alt="{{ blog_content.location_info.name }}" class="h-4 w-auto mr-2">
-              {{ blog_content.location_info.name }}
-            </div>
+            <a href="{% url 'blogapp:blog_list' %}?province={{ blog_content.location_code }}"
+               class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                bg-{{ blog_content.location_info.color }}-100 text-{{ blog_content.location_info.color }}-800
+                dark:bg-{{ blog_content.location_info.color }}-900 dark:text-{{ blog_content.location_info.color }}-300
+                hover:opacity-80 transition-opacity">
+              <img src="static/flags/{{ blog_content.location_info.flag_url }}_flag.svg"
+               alt="{{ blog_content.location_info.name }}" class="h-4 w-auto mr-2">
+              <span>{{ blog_content.location_info.name }}</span>
+            </a>
             {% endif %}
           {% endfor %}
         </div>

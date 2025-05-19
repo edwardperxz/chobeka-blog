@@ -345,6 +345,7 @@ class BlogListView(ListView):
 
             return {
                 'blog': blog,
+                'location_code': location_code,
                 'location_info': location_info,
                 'blog_tags': blog_tags,
                 'avg_rating': rating_info['avg_rating'],
@@ -354,6 +355,7 @@ class BlogListView(ListView):
         except Exception:
             return {
                 'blog': blog,
+                'location_code': None,
                 'location_info': get_location_info(None),
                 'blog_tags': [],
                 'avg_rating': 0,
