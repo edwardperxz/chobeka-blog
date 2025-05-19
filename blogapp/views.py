@@ -15,6 +15,8 @@ from django.contrib.sessions.models import Session
 from django import forms
 from django.db.models import Avg, Count, Q
 from django.contrib.auth.forms import UserCreationForm
+from random import choice
+from django.shortcuts import redirect
 
 
 
@@ -197,10 +199,40 @@ class BlogListView(ListView):
     template_name = 'blogapp/blog_list.html'
     context_object_name = 'blogs'
     paginate_by = 10
+    random_blog_id = None
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.GET.get('sort') == 'random':
+            self.get_queryset()
+            if hasattr(self, 'random_blog_id') and self.random_blog_id:
+                return redirect('blogapp:blog_detail', pk=self.random_blog_id)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        """Get filtered blogs with optimized database queries."""
-        queryset = Blog.objects.select_related('author', 'author__profile').prefetch_related('reviews').order_by('-created_at')
+        queryset = Blog.objects.select_related('author', 'author__profile').prefetch_related('reviews')
+        sort = self.request.GET.get('sort', 'latest')
+
+        if sort == 'most_commented':
+            queryset = queryset.annotate(
+                comment_count=Count('reviews__comments')
+            ).order_by('-comment_count', '-created_at')
+        elif sort == 'oldest':
+            queryset = queryset.order_by('created_at')
+        elif sort == 'best_rated':
+            queryset = queryset.annotate(
+                avg_rating=Avg('reviews__rating')
+            ).order_by('-avg_rating', '-created_at')
+        elif sort == 'random':
+            blog_ids = Blog.objects.values_list('id', flat=True)
+            if blog_ids:
+                random_id = choice(list(blog_ids))
+                self.random_blog_id = random_id
+                queryset = queryset.filter(id=random_id)
+            else:
+                queryset = queryset.none()
+        else:  # default: latest
+            queryset = queryset.order_by('-created_at')
+
         return self._apply_filters(queryset)
 
     def _apply_filters(self, queryset):

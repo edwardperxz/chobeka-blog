@@ -143,10 +143,31 @@
           {% endif %}
         <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
         <ul class="space-y-2">
-          <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Últimos</a></li>
-          <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Top</a></li>
-          <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Más Comentados</a></li>
-          <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Aleatorios</a></li>
+          <li>
+            <a href="/?sort=latest" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">
+              Últimos
+            </a>
+          </li>
+          <li>
+            <a href="/?sort=best_rated" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">
+            Top Revius
+            </a>
+          </li>
+            <li>
+              <a href="/?sort=most_commented" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">
+                Más Comentados
+              </a>
+            </li>
+            <li>
+              <a href="/?sort=oldest" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">
+                Más Viejos
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'blogapp:blog_list' %}?sort=random" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">
+              Aleatorio
+              </a>
+            </li>
           <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
           {% if user.is_authenticated %}
             <li><a href="{% url 'blogapp:profile' user.username %}" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">Mi Chantin</a></li>
