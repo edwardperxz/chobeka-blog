@@ -142,35 +142,45 @@
           <a href="{% url 'admin:index' %}" class="mt-2 flex justify-center items-center bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Chakalde</a>
           {% endif %}
         <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
-        <ul class="space-y-2">
+        <ul class="space-y-3 font-medium">
           <li>
-            <a href="/?sort=latest" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">
+            <a href="/?sort=latest" class="flex items-center px-3 py-2.5 rounded-lg text-secondary_dark dark:text-white hover:bg-red hover:text-white transition-all duration-200 transform hover:translate-x-1">
+              <span class="material-icons mr-2 text-xl">update</span>
               Últimos
             </a>
           </li>
           <li>
-            <a href="/?sort=best_rated" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">
-            Top Revius
+            <a href="/?sort=best_rated" class="flex items-center px-3 py-2.5 rounded-lg text-secondary_dark dark:text-white hover:bg-red hover:text-white transition-all duration-200 transform hover:translate-x-1">
+              <span class="material-icons mr-2 text-xl">star</span>
+              Top Revius
             </a>
           </li>
-            <li>
-              <a href="/?sort=most_commented" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">
-                Más Comentados
-              </a>
-            </li>
-            <li>
-              <a href="/?sort=oldest" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">
-                Más Viejos
-              </a>
-            </li>
-            <li>
-              <a href="{% url 'blogapp:blog_list' %}?sort=random" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">
+          <li>
+            <a href="/?sort=most_commented" class="flex items-center px-3 py-2.5 rounded-lg text-secondary_dark dark:text-white hover:bg-red hover:text-white transition-all duration-200 transform hover:translate-x-1">
+              <span class="material-icons mr-2 text-xl">chat</span>
+              Más Comentados
+            </a>
+          </li>
+          <li>
+            <a href="/?sort=oldest" class="flex items-center px-3 py-2.5 rounded-lg text-secondary_dark dark:text-white hover:bg-red hover:text-white transition-all duration-200 transform hover:translate-x-1">
+              <span class="material-icons mr-2 text-xl">history</span>
+              Más Viejos
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'blogapp:blog_list' %}?sort=random" class="flex items-center px-3 py-2.5 rounded-lg text-secondary_dark dark:text-white hover:bg-red hover:text-white transition-all duration-200 transform hover:translate-x-1">
+              <span class="material-icons mr-2 text-xl">shuffle</span>
               Aleatorio
+            </a>
+          </li>
+          <div class="my-6 mx-auto h-0.5 bg-secondary_dark dark:bg-gray-500 w-full rounded"></div>
+          {% if user.is_authenticated %}
+            <li>
+              <a href="{% url 'blogapp:profile' user.username %}" class="flex items-center px-3 py-2.5 rounded-lg text-secondary_dark dark:text-white hover:bg-red hover:text-white transition-all duration-200 transform hover:translate-x-1">
+                <span class="material-icons mr-2 text-xl">person</span>
+                Mi Chantin
               </a>
             </li>
-          <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
-          {% if user.is_authenticated %}
-            <li><a href="{% url 'blogapp:profile' user.username %}" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">Mi Chantin</a></li>
           {% endif %}
         </ul>
       </div>
