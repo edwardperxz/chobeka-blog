@@ -99,7 +99,55 @@
     box-shadow: 0 0 0 3px #3b82f680;
     transition: box-shadow 0.3s ease;
   }
-</style>
+  .ck.ck-word-count {
+    color: #1a202c !important;
+  }
+  .dark .ck.ck-word-count {
+    color: #fff !important;
+  }
+
+  /* CKEditor personalizado */
+  .ck.ck-editor__main > .ck-editor__editable {
+    background-color: #fff;
+    color: #1F2937;
+  }
+
+  .dark .ck.ck-editor__main > .ck-editor__editable {
+    background-color: #1F2937;
+    color: #fff;
+  }
+
+  .ck.ck-toolbar {
+    background-color: #fff !important;
+    color: #1F2937 !important;
+    border-color: #e5e7eb !important;
+  }
+  .ck.ck-toolbar .ck-button {
+    color: #1F2937 !important;
+  }
+
+  .dark .ck.ck-toolbar {
+    background-color: #1F2937 !important;
+    color: #fff !important;
+    border-color: #374151 !important;
+  }
+  .dark .ck.ck-toolbar .ck-button {
+    color: #fff !important;
+  }
+
+  /* Hover en botones de la barra de herramientas CKEditor */
+  .ck.ck-toolbar .ck-button:hover,
+  .ck.ck-toolbar .ck-button.ck-on {
+    background-color: #e5e7eb !important;
+    color: #1F2937 !important;
+  }
+
+  .dark .ck.ck-toolbar .ck-button:hover,
+  .dark .ck.ck-toolbar .ck-button.ck-on {
+    background-color: #374151 !important;
+    color: #fff !important;
+  }
+  </style>
 </head>
 <body id="body" class="flex flex-col min-h-screen bg-gray-800 dark:bg-secondary_dark text-gray-900 dark:text-white transition-colors">
   <nav class="bg-primary_dark-200 dark:bg-secondary_dark shadow-md py-4 px-4 md:px-20 fixed top-0 left-0 right-0 z-50 transition-colors">
@@ -130,61 +178,73 @@
 
 
 <!-- Sidebar Left -->
-  <div class="w-72 fixed left-0 top-16 h-[calc(100%-4rem)] bg-primary_dark-100 text-white dark:bg-primary_dark overflow-y-auto transition-colors px-8 border-gray-500 border-r border-secondary_dark dark:border-gray-500">
-      <div class="p-4">
-        <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
-        {% if user.is_authenticated %}  
-        <a href="{% url 'blogapp:add_blog' %}" class="flex justify-center items-center bg-red hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Takilla tu meme</a>
-        {% else %}
-            <a href="{% url 'blogapp:login_modal' %}" onclick="event.preventDefault(); openModal(this.href)" class="flex justify-center items-center bg-red hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Acceder</a></li>  
+<div class="w-72 fixed left-0 top-16 h-[calc(100%-4rem)] bg-primary_dark-100 text-white dark:bg-primary_dark overflow-y-auto transition-colors px-6 border-r border-secondary_dark dark:border-gray-500 z-40">
+  <div class="py-4 flex flex-col gap-3 mt-5">
+    {% if user.is_authenticated %}  
+      <a href="{% url 'blogapp:add_blog' %}" class="w-full flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all duration-300">
+        Takilla tu meme
+      </a>
+    {% else %}
+      <a href="{% url 'blogapp:login_modal' %}" onclick="event.preventDefault(); openModal(this.href)" class="w-full flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all duration-300">
+        Acceder
+      </a>
+    {% endif %}
+    {% if user.is_staff %}
+      <a href="{% url 'admin:index' %}" class="w-full flex justify-center items-center bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg transition-all duration-300">
+        Chakalde
+      </a>
+    {% endif %}
+    <div class="my-4 h-px bg-secondary_dark dark:bg-gray-500 w-full"></div>
+    <nav>
+      <ul class="flex flex-col gap-0.5">
+        <li>
+          <a href="/?sort=latest" class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary_dark dark:text-white font-medium transition
+            hover:bg-gray-200 hover:dark:bg-primary_dark-300">
+            <span class="material-icons text-xl">update</span>
+            Últimos
+          </a>
+        </li>
+        <li>
+          <a href="/?sort=best_rated" class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary_dark dark:text-white font-medium transition
+            hover:bg-gray-200 hover:dark:bg-primary_dark-300">
+            <span class="material-icons text-xl">star</span>
+            Top Revius
+          </a>
+        </li>
+        <li>
+          <a href="/?sort=most_commented" class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary_dark dark:text-white font-medium transition
+            hover:bg-gray-200 hover:dark:bg-primary_dark-300">
+            <span class="material-icons text-xl">chat</span>
+            Más Comentados
+          </a>
+        </li>
+        <li>
+          <a href="/?sort=oldest" class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary_dark dark:text-white font-medium transition
+            hover:bg-gray-200 hover:dark:bg-primary_dark-300">
+            <span class="material-icons text-xl">history</span>
+            Más Viejos
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'blogapp:blog_list' %}?sort=random" class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary_dark dark:text-white font-medium transition
+            hover:bg-gray-200 hover:dark:bg-primary_dark-300">
+            <span class="material-icons text-xl">shuffle</span>
+            Aleatorio
+          </a>
+        </li>
+        {% if user.is_authenticated %}
+        <li>
+          <a href="{% url 'blogapp:profile' user.username %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary_dark dark:text-white font-medium transition
+            hover:bg-gray-200 hover:dark:bg-primary_dark-300">
+            <span class="material-icons text-xl">person</span>
+            Mi Chantin
+          </a>
+        </li>
         {% endif %}
-          {% if user.is_staff %}
-          <a href="{% url 'admin:index' %}" class="mt-2 flex justify-center items-center bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Chakalde</a>
-          {% endif %}
-        <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
-        <ul class="space-y-3 font-medium">
-          <li>
-            <a href="/?sort=latest" class="flex items-center px-3 py-2.5 rounded-lg text-secondary_dark dark:text-white hover:bg-red hover:text-white transition-all duration-200 transform hover:translate-x-1">
-              <span class="material-icons mr-2 text-xl">update</span>
-              Últimos
-            </a>
-          </li>
-          <li>
-            <a href="/?sort=best_rated" class="flex items-center px-3 py-2.5 rounded-lg text-secondary_dark dark:text-white hover:bg-red hover:text-white transition-all duration-200 transform hover:translate-x-1">
-              <span class="material-icons mr-2 text-xl">star</span>
-              Top Revius
-            </a>
-          </li>
-          <li>
-            <a href="/?sort=most_commented" class="flex items-center px-3 py-2.5 rounded-lg text-secondary_dark dark:text-white hover:bg-red hover:text-white transition-all duration-200 transform hover:translate-x-1">
-              <span class="material-icons mr-2 text-xl">chat</span>
-              Más Comentados
-            </a>
-          </li>
-          <li>
-            <a href="/?sort=oldest" class="flex items-center px-3 py-2.5 rounded-lg text-secondary_dark dark:text-white hover:bg-red hover:text-white transition-all duration-200 transform hover:translate-x-1">
-              <span class="material-icons mr-2 text-xl">history</span>
-              Más Viejos
-            </a>
-          </li>
-          <li>
-            <a href="{% url 'blogapp:blog_list' %}?sort=random" class="flex items-center px-3 py-2.5 rounded-lg text-secondary_dark dark:text-white hover:bg-red hover:text-white transition-all duration-200 transform hover:translate-x-1">
-              <span class="material-icons mr-2 text-xl">shuffle</span>
-              Aleatorio
-            </a>
-          </li>
-          <div class="my-6 mx-auto h-0.5 bg-secondary_dark dark:bg-gray-500 w-full rounded"></div>
-          {% if user.is_authenticated %}
-            <li>
-              <a href="{% url 'blogapp:profile' user.username %}" class="flex items-center px-3 py-2.5 rounded-lg text-secondary_dark dark:text-white hover:bg-red hover:text-white transition-all duration-200 transform hover:translate-x-1">
-                <span class="material-icons mr-2 text-xl">person</span>
-                Mi Chantin
-              </a>
-            </li>
-          {% endif %}
-        </ul>
-      </div>
-    </div>
+      </ul>
+    </nav>
+  </div>
+</div>
 
 
   <main class="flex-grow w-full bg-primary_dark-100 dark:bg-primary_dark transition-colors mt-16">
