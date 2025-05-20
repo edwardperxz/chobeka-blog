@@ -122,7 +122,7 @@
             {{ blog.author.username }}
           </a>
           <!-- Fecha -->
-          <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">{{ blog.created_at|date:"d M Y" }}</span>
+          <span class="text-xs text-gray-500 dark:text-gray-400">• {{ blog.created_at|date:"d M Y" }}</span>
           <!-- Provincia (con bandera si existe) -->
           {% for blog_content in blogs_list %}
             {% if blog_content.blog.id == blog.id and blog_content.location_info %}
