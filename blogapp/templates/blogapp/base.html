@@ -366,7 +366,7 @@
 <div id="sidebar-right"
   class="fixed top-0 right-0 z-50 w-full max-w-[90vw] h-full bg-primary_dark-100/95 dark:bg-primary_dark/95 text-primary_dark dark:text-white overflow-y-auto transition-transform duration-300 transform translate-x-full md:translate-x-0 md:w-80 md:top-16 md:h-[calc(100%-4rem)] border-l border-secondary_dark dark:border-[#374151] rounded-l-2xl shadow-2xl">
   <div class="p-6 mt-2 flex flex-col gap-6">
-    <h2 class="text-xl font-bold mb-2 text-secondary_dark dark:text-white ml-auto mt-4">Blogs recomendados</h2>
+    <h2 class="text-xl font-bold mb-2 text-secondary_dark dark:text-white ml-auto mt-4 text-left md:text-center md:ml-0">Blogs recomendados</h2>
     <div id="recommended-blogs-list" class="flex flex-col gap-4">
       {% for blog in recommended_blogs|slice:":10" %}
       <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="flex items-center gap-4 bg-white/80 dark:bg-primary_dark-200/80 rounded-xl p-3 shadow-sm transition hover:bg-primary_dark-100 hover:dark:bg-primary_dark-300 group">
