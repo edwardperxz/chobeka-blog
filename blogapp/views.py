@@ -169,6 +169,48 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         messages.success(self.request, '¡Tu perfil ha sido actualizado exitosamente!')
         return super().form_valid(form)
 
+class ProfileSettingsView(LoginRequiredMixin, DetailView):
+    model = UserProfile
+    template_name = 'blogapp/profile_settings.html'
+    context_object_name = 'profile'
+
+    def get_object(self, queryset=None):
+        try:
+            return self.request.user.profile
+        except UserProfile.DoesNotExist:
+            # Create a profile if it doesn't exist
+            return UserProfile.objects.create(user=self.request.user)
+
+
+class PasswordUpdateView(LoginRequiredMixin, FormView):
+    form_class = PasswordUpdateForm
+    template_name = 'blogapp/profile_update_password.html'
+    success_url = reverse_lazy('blogapp:profile')
+
+    def form_valid(self, form):
+        user = self.request.user
+        new_password = form.cleaned_data.get('new_password')
+        user.set_password(new_password)
+        user.save()
+        messages.success(self.request, '¡Tu contraseña ha sido actualizada exitosamente!')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('blogapp:profile', kwargs={'username': self.request.user.username})
+
+class EmailUpdateView(LoginRequiredMixin, FormView):
+    form_class = EmailUpdateForm
+    template_name = 'blogapp/profile_update_email.html'
+    success_url = reverse_lazy('blogapp:profile')
+
+    def form_valid(self, form):
+        user = self.request.user
+        new_email = form.cleaned_data.get('new_email')
+        user.email = new_email
+        user.save()
+        messages.success(self.request, '¡Tu correo electrónico ha sido actualizado exitosamente!')
+        return super().form_valid(form)
+
     def get_success_url(self):
         return reverse_lazy('blogapp:profile', kwargs={'username': self.request.user.username})
 
