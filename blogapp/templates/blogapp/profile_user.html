@@ -90,6 +90,12 @@
       <h2 class="text-2xl font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
         {{ profile_user.username }}
       </h2>
+      {% if profile_user.first_name or profile_user.last_name %}
+      <div class="text-gray-700 dark:text-gray-300 text-lg font-medium mt-1">
+        {% if profile_user.first_name %}{{ profile_user.first_name }}{% endif %}
+        {% if profile_user.last_name %} {{ profile_user.last_name }}{% endif %}
+      </div>
+      {% endif %}
     </div>
 
     <!-- Profile Info Card -->
