@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Show modal on page load
-    document.getElementById('deleteConfirmModal').classList.remove('hidden');
+    document.getElementById('confirmModal').classList.remove('hidden');
 // Handle close button
 document.getElementById('closeModal').addEventListener('click', function() {
     window.history.back();
