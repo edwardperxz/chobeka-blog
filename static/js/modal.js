@@ -1,12 +1,22 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Show modal on page load
-    document.getElementById('confirmModal').classList.remove('hidden');
-// Handle close button
-document.getElementById('closeModal').addEventListener('click', function() {
-    window.history.back();
-    });
-// Handle cancel button to redirect back
-document.getElementById('cancelButton').addEventListener('click', function() {
-    window.history.back();
-    });
+    const modal = document.getElementById('deleteConfirmModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+
+    const closeBtn = document.getElementById('closeModal');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (modal) modal.classList.add('hidden');
+        });
+    }
+
+    const cancelBtn = document.getElementById('cancelButton');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (modal) modal.classList.add('hidden');
+        });
+    }
 });
