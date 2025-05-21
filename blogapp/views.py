@@ -172,43 +172,39 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('blogapp:profile', kwargs={'username': self.request.user.username})
 
-class ProfileDeleteView(LoginRequiredMixin, DeleteView):
-    model = UserProfile
+class ProfileDeleteView(LoginRequiredMixin, FormView):
+    form_class = ProfileDeletionForm
     template_name = 'blogapp/profile_confirm_delete.html'
     success_url = reverse_lazy('blogapp:blog_list')
 
-    def get_object(self, queryset=None):
-        try:
-            profile = self.request.user.profile
-            return profile
-        except UserProfile.DoesNotExist:
-            return None
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.object is None:
-            messages.error(request, "Profile not found.")
-            return redirect('blogapp:blog_list')
-
+    def form_valid(self, form):
         user = self.request.user
 
-        # Delete profile photo if exists
-        if self.object.profile_photo:
-            self.object.profile_photo.delete(save=False)
+        try:
+            profile = user.profile
+            # Delete profile photo if exists
+            if profile and profile.profile_photo:
+                profile.profile_photo.delete(save=False)
+        except UserProfile.DoesNotExist:
+            pass
 
         # Store session key before user deletion
-        session_key = request.session.session_key
+        session_key = self.request.session.session_key
 
+        # Delete the user (this will also delete the profile via cascade)
         user.delete()
 
         # Clear the session
         if session_key:
-            print(f"Clearing session: {session_key}")
             Session.objects.filter(session_key=session_key).delete()
-            print("Session cleared")
 
-        messages.success(request, '¡Tu perfil ha sido eliminado exitosamente!')
-        return redirect('blogapp:blog_list')
+        messages.success(self.request, '¡Tu perfil ha sido eliminado exitosamente!')
+        return redirect(self.success_url)
 
 class BlogListView(ListView):
     model = Blog
