@@ -163,11 +163,22 @@
     background-color: #374151 !important;
     color: #fff !important;
   }
+
+  .dark select,
+  .dark select:focus {
+    background-color: #1F2937 !important;
+    color: #fff !important;
+    border-color: #4b5563 !important;
+  }
+  .dark option {
+    background-color: #1F2937 !important;
+    color: #fff !important;
+  }
   </style>
 </head>
 <body id="body" class="flex flex-col min-h-screen bg-gray-800 dark:bg-secondary_dark text-gray-900 dark:text-white transition-colors">
-  <nav class="bg-primary_dark-200 dark:bg-secondary_dark shadow-md py-3 px-4 md:px-20 fixed top-0 left-0 right-0 z-50 transition-colors">
-  <div class="max-w-8xl mx-auto flex justify-between items-center">
+  <nav class="bg-primary_dark-200 dark:bg-secondary_dark shadow-md py-3 px-4 md:px-20 fixed top-0 left-0 right-0 z-50 transition-colors select-none pointer-events-none">
+  <div class="max-w-8xl mx-auto flex items-center justify-between w-full pointer-events-auto">
     <!-- Mobile: solo logo centrado y menús con iconos representativos -->
     <div class="flex items-center w-full justify-between md:justify-start">
       <!-- Botón menú izquierdo -->
@@ -177,9 +188,99 @@
       <!-- Línea separadora izquierda -->
       <div class="md:hidden h-8 border-l border-gray-400 mx-2"></div>
       <!-- Logo -->
-      <a href="{% url 'blogapp:blog_list' %}" class="flex-1 flex justify-center md:justify-start">
-        <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="Logo" class="h-10 w-auto">
+      <a href="{% url 'blogapp:blog_list' %}">
+        <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="Logo" class="h-10 w-auto" />
       </a>
+      <!-- Buscador centrado y largo, solo en blog_list y solo desktop -->
+      {% if request.resolver_match.url_name == "blog_list" %}
+  <div class="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl">
+    <form method="get"
+      class="flex flex-row items-stretch bg-white/80 dark:bg-gray-800/80 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 px-2 py-1 gap-0"
+      id="filter-form">
+      <!-- Buscar -->
+      <div class="flex-1 flex flex-col justify-center px-4 py-2 min-w-[110px]">
+        <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Buscar</span>
+        <input type="text" name="search" id="search" value="{{ request.GET.search }}" placeholder="Título o contenido"
+          class="bg-transparent border-none p-0 m-0 focus:ring-0 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 text-sm w-full" />
+      </div>
+      <!-- Botón filtrar -->
+      <button type="button" id="toggle-filters"
+        class="ml-2 flex items-center justify-center w-12 h-12 rounded-full bg-gray-300 hover:bg-gray-400 transition text-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 mt-2 sm:mt-0"
+        aria-label="Mostrar filtros avanzados">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+      <!-- Botón buscar -->
+      <button type="submit"
+        class="ml-2 flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 transition text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 mt-2 sm:mt-0">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+      </button>
+    </form>
+    <!-- Filtros avanzados ocultos -->
+    <div id="advanced-filters" class="mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 px-6 py-4 hidden absolute left-0 w-full z-10 mt-2">
+      <div class="flex flex-row flex-wrap gap-4">
+        <!-- Tag -->
+        <div class="flex flex-col min-w-[90px]">
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Tag</span>
+          <input type="text" name="tag" form="filter-form" id="tag" value="{{ request.GET.tag }}" placeholder="Tag"
+            class="bg-transparent border-b border-gray-300 dark:border-gray-600 focus:ring-0 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 text-sm w-full" />
+        </div>
+        <!-- Autor -->
+        <div class="flex flex-col min-w-[90px]">
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Autor</span>
+          <input type="text" name="author" form="filter-form" id="author" value="{{ request.GET.author }}" placeholder="Usuario"
+            class="bg-transparent border-b border-gray-300 dark:border-gray-600 focus:ring-0 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 text-sm w-full" />
+        </div>
+        <!-- Provincia -->
+        <div class="flex flex-col min-w-[110px]">
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Provincia</span>
+          <select name="province" form="filter-form" id="province"
+            class="bg-transparent border-b border-gray-300 dark:border-gray-600 focus:ring-0 text-gray-800 dark:text-white text-sm appearance-none w-full">
+            <option value="">Todas</option>
+            <option value="BOC" {% if request.GET.province == 'BOC' %}selected{% endif %}>Bocas del Toro</option>
+            <option value="CHI" {% if request.GET.province == 'CHI' %}selected{% endif %}>Chiriquí</option>
+            <option value="COC" {% if request.GET.province == 'COC' %}selected{% endif %}>Coclé</option>
+            <option value="COL" {% if request.GET.province == 'COL' %}selected{% endif %}>Colón</option>
+            <option value="DAR" {% if request.GET.province == 'DAR' %}selected{% endif %}>Darién</option>
+            <option value="HER" {% if request.GET.province == 'HER' %}selected{% endif %}>Herrera</option>
+            <option value="LOS" {% if request.GET.province == 'LOS' %}selected{% endif %}>Los Santos</option>
+            <option value="PAN" {% if request.GET.province == 'PAN' %}selected{% endif %}>Panamá</option>
+            <option value="VER" {% if request.GET.province == 'VER' %}selected{% endif %}>Veraguas</option>
+            <option value="POE" {% if request.GET.province == 'POE' %}selected{% endif %}>Panamá Oeste</option>
+          </select>
+        </div>
+        <!-- Desde -->
+        <div class="flex flex-col min-w-[100px]">
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Desde</span>
+          <input type="date" name="date_from" form="filter-form" id="date_from" value="{{ request.GET.date_from }}"
+            class="bg-transparent border-b border-gray-300 dark:border-gray-600 focus:ring-0 text-gray-800 dark:text-white text-sm w-full" />
+        </div>
+        <!-- Hasta -->
+        <div class="flex flex-col min-w-[100px]">
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Hasta</span>
+          <input type="date" name="date_to" form="filter-form" id="date_to" value="{{ request.GET.date_to }}"
+            class="bg-transparent border-b border-gray-300 dark:border-gray-600 focus:ring-0 text-gray-800 dark:text-white text-sm w-full" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Mostrar/ocultar filtros avanzados
+    document.addEventListener('DOMContentLoaded', function () {
+      const toggleBtn = document.getElementById('toggle-filters');
+      const advFilters = document.getElementById('advanced-filters');
+      if (toggleBtn && advFilters) {
+        toggleBtn.addEventListener('click', function () {
+          advFilters.classList.toggle('hidden');
+        });
+      }
+    });
+  </script>
+{% endif %}
       <!-- Línea separadora derecha -->
       <div class="md:hidden h-8 border-l border-gray-400 mx-2"></div>
       <!-- Botón menú derecho -->
@@ -211,9 +312,29 @@
 
 <!-- Sidebar Left -->
 <div id="sidebar-left"
-  class="fixed top-0 left-0 z-50 w-full max-w-[90vw] h-full bg-primary_dark-100/95 dark:bg-primary_dark/95 text-white overflow-y-auto transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:w-72 md:top-16 md:h-[calc(100%-4rem)] border-r border-secondary_dark dark:border-[#374151] rounded-r-2xl md:rounded-none shadow-2xl">
+  class="fixed left-0 z-50 w-full max-w-[90vw] h-full bg-primary_dark-100/95 dark:bg-primary_dark/95 text-white overflow-y-auto transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:w-72 md:top-16 md:h-[calc(100%-4rem)] border-r border-secondary_dark dark:border-[#374151] rounded-r-2xl md:rounded-none shadow-2xl">
   <div class="flex flex-col gap-6 py-8 px-4 mt-12 md:mt-0">
     <!-- Acciones principales -->
+     {% if request.resolver_match.url_name == "blog_list" %}
+      <form method="get" class="block md:hidden w-full mt-4 mb-6 px-4">
+        <div class="flex items-center gap-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold py-3 px-4 rounded-xl text-lg transition-all duration-300 shadow border border-gray-200 dark:border-gray-700">
+          <input
+            type="text"
+            name="search"
+            id="search-mobile"
+            value="{{ request.GET.search }}"
+            placeholder="Buscar blogs..."
+            class="flex-1 bg-transparent border-none focus:ring-0 outline-none text-inherit placeholder-gray-500 dark:placeholder-gray-400 text-base"
+          />
+          <button
+            type="submit"
+            class="flex items-center justify-center h-full text-white bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg transition-colors duration-200 shadow focus:outline-none"
+          >
+            <span class="material-icons text-2xl">search</span>
+          </button>
+        </div>
+      </form>
+      {% endif %}
     <div class="flex flex-col gap-3">
       {% if user.is_authenticated %}  
         <a href="{% url 'blogapp:add_blog' %}" class="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl text-lg transition-all duration-300 shadow">
@@ -365,9 +486,9 @@
 
 <!-- Sidebar Right-->
 <div id="sidebar-right"
-  class="fixed top-0 right-0 z-50 w-full max-w-[90vw] h-full bg-primary_dark-100/95 dark:bg-primary_dark/95 text-primary_dark dark:text-white overflow-y-auto transition-transform duration-300 transform translate-x-full md:translate-x-0 md:w-80 md:top-16 md:h-[calc(100%-4rem)] border-l border-secondary_dark dark:border-[#374151] rounded-l-2xl shadow-2xl">
+  class="fixed right-0 z-50 w-full max-w-[90vw] h-full bg-primary_dark-100/95 dark:bg-primary_dark/95 text-primary_dark dark:text-white overflow-y-auto transition-transform duration-300 transform translate-x-full md:translate-x-0 md:w-80 md:top-16 md:h-[calc(100%-4rem)] border-l border-secondary_dark dark:border-[#374151] rounded-l-2xl shadow-2xl">
   <div class="p-6 mt-2 flex flex-col gap-6">
-    <h2 class="text-xl font-bold mb-2 text-secondary_dark dark:text-white ml-auto mt-4 text-left md:text-center md:ml-0">Blogs recomendados</h2>
+    <h2 class="text-2xl font-bold mb-2 text-secondary_dark dark:text-white ml-auto mt-4 text-left md:text-center md:ml-0">Blogs recomendados</h2>
     <div id="recommended-blogs-list" class="flex flex-col gap-4">
       {% for blog in recommended_blogs|slice:":10" %}
       <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="flex items-center gap-4 bg-white/80 dark:bg-primary_dark-200/80 rounded-xl p-3 shadow-sm transition hover:bg-primary_dark-100 hover:dark:bg-primary_dark-300 group">
