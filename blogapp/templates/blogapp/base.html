@@ -18,9 +18,10 @@
 
     document.addEventListener('DOMContentLoaded', function() {
       const themeIcon = document.getElementById('theme-icon');
-      if (themeIcon) {
-        themeIcon.textContent = document.documentElement.classList.contains('dark') ? "🌙" : "🌞";
-      }
+      const themeIconMobile = document.getElementById('theme-icon-mobile');
+      const isDark = document.documentElement.classList.contains('dark');
+      if (themeIcon) themeIcon.textContent = isDark ? "🌙" : "🌞";
+      if (themeIconMobile) themeIconMobile.textContent = isDark ? "🌙" : "🌞";
     });
 
     function toggleDarkMode() {
@@ -28,11 +29,19 @@
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
 
       const themeIcon = document.getElementById('theme-icon');
+      const themeIconMobile = document.getElementById('theme-icon-mobile');
       if (themeIcon) {
         themeIcon.classList.add("rotate-180");
         setTimeout(() => {
           themeIcon.textContent = isDark ? "🌙" : "🌞";
           themeIcon.classList.remove("rotate-180");
+        }, 250);
+      }
+      if (themeIconMobile) {
+        themeIconMobile.classList.add("rotate-180");
+        setTimeout(() => {
+          themeIconMobile.textContent = isDark ? "🌙" : "🌞";
+          themeIconMobile.classList.remove("rotate-180");
         }, 250);
       }
     }
@@ -84,6 +93,9 @@
   height: 100%;
   scroll-behavior: smooth;
   transition: background-color 0.5s ease-in-out;
+  overflow-x: hidden !important;
+  width: 100vw;
+  max-width: 100vw;
     }
     @keyframes fade-in {
     from { opacity: 0; transform: translateY(10px); }
@@ -99,65 +111,321 @@
     box-shadow: 0 0 0 3px #3b82f680;
     transition: box-shadow 0.3s ease;
   }
-</style>
+  .ck.ck-word-count {
+    color: #1a202c !important;
+  }
+  .dark .ck.ck-word-count {
+    color: #fff !important;
+  }
+
+  /* CKEditor personalizado */
+  .ck.ck-editor__main > .ck-editor__editable {
+    background-color: transparent !important;
+    color: #1F2937;
+    border: 1.5px solid #1F2937 !important;
+    transition: background 0.2s;
+  }
+
+  .dark .ck.ck-editor__main > .ck-editor__editable {
+    background-color: transparent !important;
+    color: #fff;
+    border: 1.5px solid #4b5563 !important;
+  }
+
+  .ck.ck-toolbar {
+    border-color: #e5e7eb !important;
+  }
+  .dark.ck.ck-toolbar {
+    border-color: #4b5563 !important;
+  }
+  .ck.ck-toolbar .ck-button {
+    color: #1F2937 !important;
+  }
+
+  .dark .ck.ck-toolbar {
+    background-color: #1F2937 !important;
+    color: #fff !important;
+    border-color: #374151 !important;
+  }
+  .dark .ck.ck-toolbar .ck-button {
+    color: #fff !important;
+  }
+
+  /* Hover en botones de la barra de herramientas CKEditor */
+  .ck.ck-toolbar .ck-button:hover,
+  .ck.ck-toolbar .ck-button.ck-on {
+    background-color: #e5e7eb !important;
+    color: #1F2937 !important;
+  }
+
+  .dark .ck.ck-toolbar .ck-button:hover,
+  .dark .ck.ck-toolbar .ck-button.ck-on {
+    background-color: #374151 !important;
+    color: #fff !important;
+  }
+
+  .dark select,
+  .dark select:focus {
+    background-color: #1F2937 !important;
+    color: #fff !important;
+    border-color: #4b5563 !important;
+  }
+  .dark option {
+    background-color: #1F2937 !important;
+    color: #fff !important;
+  }
+  </style>
 </head>
 <body id="body" class="flex flex-col min-h-screen bg-gray-800 dark:bg-secondary_dark text-gray-900 dark:text-white transition-colors">
-  <nav class="bg-primary_dark-200 dark:bg-secondary_dark shadow-md py-4 px-4 md:px-20 fixed top-0 left-0 right-0 z-50 transition-colors">
-  <div class="max-w-8xl mx-auto flex justify-between items-center">
-    <a href="{% url 'blogapp:blog_list' %}" class="text-2xl font-semibold">
-      <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="Logo" class="h-10 w-auto">
-    </a>
-    <div class="flex items-center space-x-4">
-        <button onclick="toggleDarkMode()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary_dark dark:bg-primary_dark-600 hover:scale-105 transition-all duration-300">
-          <span id="theme-icon" class="transition-transform duration-500 transform"></span>
-        </button>
-
-        {% if not request.path == '/login_modal/' %}
-            {% if user.is_authenticated %}
-            <a href="{% url 'blogapp:profile' user.username %}" class="transition-all duration-500 ease-in-out">
-              <img src="{% static 'Images/gg_profile.svg' %}" alt="Mi Chantin" class="w-9 h-9 rounded-full block">
-            
-            <a href="{% url 'blogapp:logout' %}" class="dark:hover:transition-all duration-500 ease-in-out">
-              <img src="{% static 'Images/logout.svg' %}" alt="Logout" class="w-9 h-9 rounded-full block">
-            </a>
-          {% else %}
-            <a href="{% url 'blogapp:login_modal' %}" onclick="event.preventDefault(); openModal(this.href)" class="bg-primary_dark-300 hover:bg-primary_dark-600 text-white font-medium py-2 px-4 rounded hover:scale-105 transition-all duration-500 ease-in-out">Acceder</a>
-          {% endif %}
-        {% endif %}
+  <nav class="bg-primary_dark-200 dark:bg-secondary_dark shadow-md py-3 px-4 md:px-20 fixed top-0 left-0 right-0 z-50 transition-colors select-none pointer-events-none">
+  <div class="max-w-8xl mx-auto flex items-center justify-between w-full pointer-events-auto">
+    <!-- Mobile: solo logo centrado y menús con iconos representativos -->
+    <div class="flex items-center w-full justify-between md:justify-start">
+      <!-- Botón menú izquierdo -->
+      <button id="open-left-sidebar" class="md:hidden p-2 text-gray-900 dark:text-white focus:outline-none">
+        <span class="material-icons text-3xl">apps</span>
+      </button>
+      <!-- Línea separadora izquierda -->
+      <div class="md:hidden h-8 border-l border-gray-400 mx-2"></div>
+      <!-- Logo -->
+      <a href="{% url 'blogapp:blog_list' %}">
+        <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="Logo" class="h-10 w-auto" />
+      </a>
+      <!-- Buscador centrado y largo, solo en blog_list y solo desktop -->
+      {% if request.resolver_match.url_name == "blog_list" %}
+  <div class="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl">
+    <form method="get"
+      class="flex items-center bg-white/70 dark:bg-gray-800/70 rounded-full border border-gray-200 dark:border-gray-700 px-2 py-1 gap-1 shadow-none"
+      id="filter-form">
+      <input
+        type="text"
+        name="search"
+        id="search"
+        value="{{ request.GET.search }}"
+        placeholder="Buscar..."
+        class="flex-1 bg-transparent border-none focus:ring-0 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 text-base px-3 py-2"
+      />
+      <button type="button" id="toggle-filters"
+        class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-200 hover:dark:bg-gray-700 transition text-gray-700 dark:text-gray-300 focus:outline-none"
+        aria-label="Mostrar filtros avanzados">
+        <span class="material-icons text-xl">tune</span>
+      </button>
+      <button type="submit"
+        class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 transition text-white focus:outline-none ml-1">
+        <span class="material-icons text-xl">search</span>
+      </button>
+    </form>
+    <!-- Filtros avanzados ocultos -->
+    <div id="advanced-filters" class="mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 px-6 py-4 hidden absolute left-0 w-full z-10">
+      <div class="flex flex-row flex-wrap gap-4">
+        <!-- Tag -->
+        <div class="flex flex-col min-w-[90px]">
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Tag</span>
+          <input type="text" name="tag" form="filter-form" id="tag" value="{{ request.GET.tag }}" placeholder="Tag"
+            class="bg-transparent border-b border-gray-300 dark:border-gray-600 focus:ring-0 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 text-sm w-full" />
+        </div>
+        <!-- Autor -->
+        <div class="flex flex-col min-w-[90px]">
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Autor</span>
+          <input type="text" name="author" form="filter-form" id="author" value="{{ request.GET.author }}" placeholder="Usuario"
+            class="bg-transparent border-b border-gray-300 dark:border-gray-600 focus:ring-0 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 text-sm w-full" />
+        </div>
+        <!-- Provincia -->
+        <div class="flex flex-col min-w-[110px]">
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Provincia</span>
+          <select name="province" form="filter-form" id="province"
+            class="bg-transparent border-b border-gray-300 dark:border-gray-600 focus:ring-0 text-gray-800 dark:text-white text-sm appearance-none w-full">
+            <option value="">Todas</option>
+            <option value="BOC" {% if request.GET.province == 'BOC' %}selected{% endif %}>Bocas del Toro</option>
+            <option value="CHI" {% if request.GET.province == 'CHI' %}selected{% endif %}>Chiriquí</option>
+            <option value="COC" {% if request.GET.province == 'COC' %}selected{% endif %}>Coclé</option>
+            <option value="COL" {% if request.GET.province == 'COL' %}selected{% endif %}>Colón</option>
+            <option value="DAR" {% if request.GET.province == 'DAR' %}selected{% endif %}>Darién</option>
+            <option value="HER" {% if request.GET.province == 'HER' %}selected{% endif %}>Herrera</option>
+            <option value="LOS" {% if request.GET.province == 'LOS' %}selected{% endif %}>Los Santos</option>
+            <option value="PAN" {% if request.GET.province == 'PAN' %}selected{% endif %}>Panamá</option>
+            <option value="VER" {% if request.GET.province == 'VER' %}selected{% endif %}>Veraguas</option>
+            <option value="POE" {% if request.GET.province == 'POE' %}selected{% endif %}>Panamá Oeste</option>
+          </select>
+        </div>
+        <!-- Desde -->
+        <div class="flex flex-col min-w-[100px]">
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Desde</span>
+          <input type="date" name="date_from" form="filter-form" id="date_from" value="{{ request.GET.date_from }}"
+            class="bg-transparent border-b border-gray-300 dark:border-gray-600 focus:ring-0 text-gray-800 dark:text-white text-sm w-full" />
+        </div>
+        <!-- Hasta -->
+        <div class="flex flex-col min-w-[100px]">
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Hasta</span>
+          <input type="date" name="date_to" form="filter-form" id="date_to" value="{{ request.GET.date_to }}"
+            class="bg-transparent border-b border-gray-300 dark:border-gray-600 focus:ring-0 text-gray-800 dark:text-white text-sm w-full" />
+        </div>
       </div>
     </div>
-  </nav>
+  </div>
+  <script>
+    // Mostrar/ocultar filtros avanzados
+    document.addEventListener('DOMContentLoaded', function () {
+      const toggleBtn = document.getElementById('toggle-filters');
+      const advFilters = document.getElementById('advanced-filters');
+      if (toggleBtn && advFilters) {
+        toggleBtn.addEventListener('click', function () {
+          advFilters.classList.toggle('hidden');
+        });
+      }
+    });
+  </script>
+{% endif %}
+      <!-- Línea separadora derecha -->
+      <div class="md:hidden h-8 border-l border-gray-400 mx-2"></div>
+      <!-- Botón menú derecho -->
+      <button id="open-right-sidebar" class="md:hidden p-2 text-gray-900 dark:text-white focus:outline-none">
+        <span class="material-icons text-3xl">star</span>
+      </button>
+    </div>
+    <!-- Desktop: botones normales -->
+    <div class="hidden md:flex items-center space-x-4">
+      <button onclick="toggleDarkMode()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary_dark dark:bg-primary_dark-600 hover:scale-105 transition-all duration-300">
+        <span id="theme-icon" class="transition-transform duration-500 transform"></span>
+      </button>
+      {% if not request.path == '/login_modal/' %}
+        {% if user.is_authenticated %}
+          <a href="{% url 'blogapp:profile' user.username %}" class="transition-all duration-500 ease-in-out">
+            <img src="{% static 'Images/gg_profile.svg' %}" alt="Mi Chantin" class="w-9 h-9 rounded-full block">
+          </a>
+          <a href="{% url 'blogapp:logout' %}" class="dark:hover:transition-all duration-500 ease-in-out">
+            <img src="{% static 'Images/logout.svg' %}" alt="Logout" class="w-9 h-9 rounded-full block">
+          </a>
+        {% else %}
+          <a href="{% url 'blogapp:login_modal' %}" onclick="event.preventDefault(); openModal(this.href)" class="bg-primary_dark-300 hover:bg-primary_dark-600 text-white font-medium py-2 px-4 rounded hover:scale-105 transition-all duration-500 ease-in-out">Acceder</a>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</nav>
 
 
 <!-- Sidebar Left -->
-  <div class="w-72 fixed left-0 top-16 h-[calc(100%-4rem)] bg-primary_dark-100 text-white dark:bg-primary_dark overflow-y-auto transition-colors px-8 border-gray-500 border-r border-secondary_dark dark:border-gray-500">
-      <div class="p-4">
-        <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
-        {% if user.is_authenticated %}  
-        <a href="{% url 'blogapp:add_blog' %}" class="flex justify-center items-center bg-red hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Takilla tu meme</a>
-        {% else %}
-            <a href="{% url 'blogapp:login_modal' %}" onclick="event.preventDefault(); openModal(this.href)" class="flex justify-center items-center bg-red hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Acceder</a></li>  
-        {% endif %}
-          {% if user.is_staff %}
-          <a href="{% url 'admin:index' %}" class="mt-2 flex justify-center items-center bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded transition-all duration-500 ease-in-out">Chakalde</a>
-          {% endif %}
-        <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
-        <ul class="space-y-2">
-          <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Últimos</a></li>
-          <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Top</a></li>
-          <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Más Comentados</a></li>
-          <li><a href="#" class="text-secondary_dark dark:text-white block p-2 hover:bg-red rounded hover:dark:bg-red">Aleatorios</a></li>
-          <div class="my-6 mx-auto h-px bg-secondary_dark dark:bg-gray-500 w-full max-w-[100%]"></div>
-          {% if user.is_authenticated %}
-            <li><a href="{% url 'blogapp:profile' user.username %}" class="text-secondary_dark block p-2 hover:bg-red rounded hover:dark:bg-red dark:text-white">Mi Chantin</a></li>
-          {% endif %}
-        </ul>
-      </div>
+<div id="sidebar-left"
+  class="fixed left-0 z-50 w-full max-w-[90vw] h-full bg-primary_dark-100/95 dark:bg-primary_dark/95 text-white overflow-y-auto transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:w-72 md:top-16 md:h-[calc(100%-4rem)] border-r border-secondary_dark dark:border-[#374151] rounded-r-2xl md:rounded-none shadow-2xl">
+  <div class="flex flex-col gap-6 py-8 px-4 mt-12 md:mt-0">
+    <!-- Acciones principales -->
+     {% if request.resolver_match.url_name == "blog_list" %}
+      <form method="get" class="block md:hidden w-full mt-4 mb-6 px-4">
+        <div class="flex items-center gap-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold py-3 px-4 rounded-xl text-lg transition-all duration-300 shadow border border-gray-200 dark:border-gray-700">
+          <input
+            type="text"
+            name="search"
+            id="search-mobile"
+            value="{{ request.GET.search }}"
+            placeholder="Buscar blogs..."
+            class="flex-1 bg-transparent border-none focus:ring-0 outline-none text-inherit placeholder-gray-500 dark:placeholder-gray-400 text-base"
+          />
+          <button
+            type="submit"
+            class="flex items-center justify-center h-full text-white bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg transition-colors duration-200 shadow focus:outline-none"
+          >
+            <span class="material-icons text-2xl">search</span>
+          </button>
+        </div>
+      </form>
+      {% endif %}
+    <div class="flex flex-col gap-3">
+      {% if user.is_authenticated %}  
+        <a href="{% url 'blogapp:add_blog' %}" class="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl text-lg transition-all duration-300 shadow">
+          <span class="material-icons text-2xl">add_circle</span>
+          Takilla tu meme
+        </a>
+      {% else %}
+        <a href="{% url 'blogapp:login_modal' %}" onclick="event.preventDefault(); openModal(this.href)" class="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl text-lg transition-all duration-300 shadow">
+          <span class="material-icons text-2xl">login</span>
+          Acceder
+        </a>
+      {% endif %}
+      {% if user.is_staff %}
+        <a href="{% url 'admin:index' %}" class="flex items-center gap-3 bg-[#D4AF37] hover:bg-yellow-600 text-white font-semibold py-3 px-4 rounded-xl text-lg transition-all duration-300 shadow">
+          <span class="material-icons text-2xl">admin_panel_settings</span>
+          Chakalde
+        </a>
+      {% endif %}
     </div>
+    <hr class="border-secondary_dark dark:border-gray-700 my-2">
+    <!-- Navegación -->
+    <nav>
+      <ul class="flex flex-col gap-2">
+        <li>
+          <a href="/?sort=latest" class="flex items-center gap-4 px-4 py-3 rounded-xl text-base font-medium hover:bg-gray-200 hover:dark:bg-primary_dark-300 transition">
+            <span class="material-icons text-2xl">update</span>
+            Últimos
+          </a>
+        </li>
+        <li>
+          <a href="/?sort=best_rated" class="flex items-center gap-4 px-4 py-3 rounded-xl text-base font-medium hover:bg-gray-200 hover:dark:bg-primary_dark-300 transition">
+            <span class="material-icons text-2xl">star</span>
+            Top Revius
+          </a>
+        </li>
+        <li>
+          <a href="/?sort=most_commented" class="flex items-center gap-4 px-4 py-3 rounded-xl text-base font-medium hover:bg-gray-200 hover:dark:bg-primary_dark-300 transition">
+            <span class="material-icons text-2xl">chat</span>
+            Más Comentados
+          </a>
+        </li>
+        <li>
+          <a href="/?sort=oldest" class="flex items-center gap-4 px-4 py-3 rounded-xl text-base font-medium hover:bg-gray-200 hover:dark:bg-primary_dark-300 transition">
+            <span class="material-icons text-2xl">history</span>
+            Más Viejos
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'blogapp:blog_list' %}?sort=random" class="flex items-center gap-4 px-4 py-3 rounded-xl text-base font-medium hover:bg-gray-200 hover:dark:bg-primary_dark-300 transition">
+            <span class="material-icons text-2xl">shuffle</span>
+            Aleatorio
+          </a>
+        </li>
+        {% if user.is_authenticated %}
+        <li>
+          <a href="{% url 'blogapp:profile' user.username %}" class="flex items-center gap-4 px-4 py-3 rounded-xl text-base font-medium hover:bg-gray-200 hover:dark:bg-primary_dark-300 transition">
+            <span class="material-icons text-2xl">person</span>
+            Mi Chantin
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+    <hr class="border-secondary_dark dark:border-gray-700 my-2">
+    <!-- Opciones de usuario y modo oscuro solo en mobile -->
+    <div class="md:hidden flex flex-col gap-3">
+      <button onclick="toggleDarkMode()" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary_dark dark:bg-primary_dark-600 hover:scale-105 transition-all duration-300 w-fit">
+        <span id="theme-icon-mobile" class="material-icons text-2xl"></span>
+        <span class="text-base">Modo oscuro</span>
+      </button>
+      {% if user.is_authenticated %}
+        <a href="{% url 'blogapp:profile' user.username %}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-200 hover:dark:bg-primary_dark-300 transition">
+          <img src="{% static 'Images/gg_profile.svg' %}" alt="Mi Chantin" class="w-9 h-9 rounded-full block">
+          <span class="font-medium">{{ user.username }}</span>
+        </a>
+        <a href="{% url 'blogapp:logout' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-200 hover:dark:bg-primary_dark-300 transition">
+          <img src="{% static 'Images/logout.svg' %}" alt="Logout" class="w-9 h-9 rounded-full block">
+          <span class="font-medium">Salir</span>
+        </a>
+      {% else %}
+        <a href="{% url 'blogapp:login_modal' %}" onclick="event.preventDefault(); openModal(this.href)" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary_dark-300 hover:bg-primary_dark-600 text-white font-medium transition-all duration-500 ease-in-out w-fit">
+          <span class="material-icons text-2xl">login</span>
+          Acceder
+        </a>
+      {% endif %}
+    </div>
+  </div>
+  <button id="close-left-sidebar"
+  class="md:hidden absolute top-4 right-4 z-50 p-1 rounded-full text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 focus:outline-none">
+  <span class="material-icons text-3xl">close</span>
+</button>
+</div>
 
 
-  <main class="flex-grow w-full bg-primary_dark-100 dark:bg-primary_dark transition-colors mt-16">
-    <div class="max-w-4xl mx-auto px-4 py-8">
+  <main class="flex-grow w-full bg-primary_dark-100 dark:bg-primary_dark transition-colors mt-16 flex justify-center">
+    <div class="w-full max-w-4xl px-4 py-8">
       {% block content %}
       <div class="relative w-full max-w-4xl mx-auto bg-gray-600 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
         <!-- Fondo difuminado dinámico -->
@@ -167,22 +435,26 @@
       </div>
       {% endblock %}
     </div>
-    {% if messages %}
-    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-4">
-      {% for message in messages %}
-      <div class="toast bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 rounded-lg shadow-xl border-l-4 
-      {% if message.tags == 'success' %}border-green-500{% elif message.tags == 'error' %}border-red-500{% elif message.tags == 'warning' %}border-yellow-500{% else %}border-blue-500{% endif %}
-      transform transition-all duration-500 ease-in-out opacity-0 translate-x-full" role="alert">
-      <div class="flex items-center">
+  </main>
+
+
+<!-- Toasts -->
+{% if messages %}
+<div id="toast-container" class="fixed bottom-4 right-4 md:right-6 z-1000 flex flex-col gap-4 md:mr-80">
+  {% for message in messages %}
+  <div class="toast bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 rounded-lg shadow-xl border-l-4
+    {% if message.tags == 'success' %}border-green-500{% elif message.tags == 'error' %}border-red-500{% elif message.tags == 'warning' %}border-yellow-500{% else %}border-blue-500{% endif %}
+    transform transition-all duration-500 ease-in-out opacity-0 translate-x-full" role="alert">
+    <div class="flex items-center">
       <div class="flex-shrink-0">
         {% if message.tags == 'success' %}
-        <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+        <span class="material-icons text-green-500">check_circle</span>
         {% elif message.tags == 'error' %}
-        <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+        <span class="material-icons text-red-500">error</span>
         {% elif message.tags == 'warning' %}
-        <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+        <span class="material-icons text-yellow-500">warning</span>
         {% else %}
-        <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+        <span class="material-icons text-blue-500">info</span>
         {% endif %}
       </div>
       <div class="ml-3">
@@ -190,33 +462,31 @@
       </div>
       <div class="ml-auto pl-3">
         <button type="button" class="toast-close -mx-1.5 -my-1.5 rounded-lg p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700">
-        <span class="sr-only">Close</span>
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+          <span class="sr-only">Close</span>
+          <span class="material-icons text-lg">close</span>
         </button>
       </div>
-      </div>
-      <div class="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1 overflow-hidden">
-        <div class="toast-progress-bar h-full
-        {% if message.tags == 'success' %}bg-green-500{% elif message.tags == 'error' %}bg-red-500
-        {% elif message.tags == 'warning' %}bg-yellow-500{% else %}bg-blue-500{% endif %}"
-        style="width: 0%; transition: width 3000ms linear;">
-        </div>
-      </div>
-      </div>
-      {% endfor %}
     </div>
-
-    {% endif %}
-  </main>
-
+    <div class="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1 overflow-hidden">
+      <div class="toast-progress-bar h-full
+      {% if message.tags == 'success' %}bg-green-500{% elif message.tags == 'error' %}bg-red-500
+      {% elif message.tags == 'warning' %}bg-yellow-500{% else %}bg-blue-500{% endif %}"
+      style="width: 0%; transition: width 3000ms linear;">
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
 
 <!-- Sidebar Right-->
-<div class="w-80 fixed right-0 top-16 h-[calc(100%-4rem)] bg-primary_dark-100 dark:bg-primary_dark text-primary_dark dark:text-white overflow-y-auto transition-colors border-gray-500 px-6 border-l border-secondary_dark dark:border-gray-500 z-40">
-  <div class="p-4 mt-5">
-    <h2 class="text-lg font-semibold mb-4 text-secondary_dark dark:text-white">Blogs recomendados</h2>
-    <div id="recommended-blogs-list" class="space-y-6">
+<div id="sidebar-right"
+  class="fixed right-0 z-50 w-full max-w-[90vw] h-full bg-primary_dark-100/95 dark:bg-primary_dark/95 text-primary_dark dark:text-white overflow-y-auto transition-transform duration-300 transform translate-x-full md:translate-x-0 md:w-80 md:top-16 md:h-[calc(100%-4rem)] border-l border-secondary_dark dark:border-[#374151] rounded-l-2xl shadow-2xl">
+  <div class="p-6 mt-2 flex flex-col gap-6">
+    <h2 class="text-2xl font-bold mb-2 text-secondary_dark dark:text-white ml-auto mt-4 text-left md:text-center md:ml-0">Blogs recomendados</h2>
+    <div id="recommended-blogs-list" class="flex flex-col gap-4">
       {% for blog in recommended_blogs|slice:":10" %}
-      <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="flex items-start gap-3 bg-white dark:bg-primary_dark-200 rounded-lg p-3 shadow-sm transition hover:bg-primary_dark-100 hover:dark:bg-primary_dark-300 group">
+      <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="flex items-center gap-4 bg-white/80 dark:bg-primary_dark-200/80 rounded-xl p-3 shadow-sm transition hover:bg-primary_dark-100 hover:dark:bg-primary_dark-300 group">
         <div class="flex-shrink-0">
           {% if blog.image %}
             <img src="{{ blog.image.url }}" alt="{{ blog.title }}" class="w-14 h-14 rounded object-cover bg-gray-700">
@@ -243,6 +513,10 @@
       {% endfor %}
     </div>
   </div>
+  <button id="close-right-sidebar"
+  class="md:hidden absolute top-4 left-4 z-50 p-1 rounded-full text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 focus:outline-none">
+  <span class="material-icons text-3xl">close</span>
+</button>
 </div>
 
 <script>
@@ -261,6 +535,42 @@
           btn.style.display = 'none';
         }
       });
+    }
+  });
+</script>
+
+<script>
+  // Sidebar izquierdo
+  const sidebarLeft = document.getElementById('sidebar-left');
+  const openLeftBtn = document.getElementById('open-left-sidebar');
+  const closeLeftBtn = document.getElementById('close-left-sidebar');
+  openLeftBtn && openLeftBtn.addEventListener('click', () => {
+    sidebarLeft.classList.remove('-translate-x-full');
+  });
+  closeLeftBtn && closeLeftBtn.addEventListener('click', () => {
+    sidebarLeft.classList.add('-translate-x-full');
+  });
+
+  // Sidebar derecho
+  const sidebarRight = document.getElementById('sidebar-right');
+  const openRightBtn = document.getElementById('open-right-sidebar');
+  const closeRightBtn = document.getElementById('close-right-sidebar');
+  openRightBtn && openRightBtn.addEventListener('click', () => {
+    sidebarRight.classList.remove('translate-x-full');
+  });
+  closeRightBtn && closeRightBtn.addEventListener('click', () => {
+    sidebarRight.classList.add('translate-x-full');
+  });
+
+  // Cerrar sidebars al hacer clic fuera (opcional)
+  document.addEventListener('click', function(e) {
+    if (window.innerWidth < 768) {
+      if (sidebarLeft && !sidebarLeft.contains(e.target) && !openLeftBtn.contains(e.target)) {
+        sidebarLeft.classList.add('-translate-x-full');
+      }
+      if (sidebarRight && !sidebarRight.contains(e.target) && !openRightBtn.contains(e.target)) {
+        sidebarRight.classList.add('translate-x-full');
+      }
     }
   });
 </script>

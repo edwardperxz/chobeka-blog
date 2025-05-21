@@ -3,10 +3,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegisterForm
+from .forms import UserRegisterForm, ProfileUpdateForm, PasswordUpdateForm, EmailUpdateForm, ProfileDeletionForm
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, RedirectView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from .models import Blog, Review, Comment, UserProfile
 from django.contrib.messages import get_messages
 from social_core.exceptions import AuthCanceled, AuthForbidden
@@ -15,6 +15,8 @@ from django.contrib.sessions.models import Session
 from django import forms
 from django.db.models import Avg, Count, Q
 from django.contrib.auth.forms import UserCreationForm
+from random import choice
+from django.shortcuts import redirect
 
 
 
@@ -137,8 +139,9 @@ class ProfileView(LoginRequiredMixin, DetailView):
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = UserProfile
-    fields = ['profile_photo', 'bio', 'location', 'birth_date', 'interests']
+    form_class = ProfileUpdateForm
     template_name = 'blogapp/profile_form.html'
+    success_url = None
 
     def get_object(self, queryset=None):
         try:
@@ -147,60 +150,147 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
             # Create a profile if it doesn't exist
             return UserProfile.objects.create(user=self.request.user)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
+        # Update UserProfile fields
+        profile = form.save(commit=False)
+        profile.save()
+
+        # Update User fields
+        user = self.request.user
+        user.first_name = form.cleaned_data.get('first_name', '')
+        user.last_name = form.cleaned_data.get('last_name', '')
+        user.username = form.cleaned_data.get('username', '')
+        user.save()
+
         messages.success(self.request, '¡Tu perfil ha sido actualizado exitosamente!')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('blogapp:profile', kwargs={'username': self.request.user.username})
+
+class ProfileSettingsView(LoginRequiredMixin, DetailView):
+    model = UserProfile
+    template_name = 'blogapp/profile_settings.html'
+    context_object_name = 'profile'
+
+    def get_object(self, queryset=None):
+        try:
+            return self.request.user.profile
+        except UserProfile.DoesNotExist:
+            # Create a profile if it doesn't exist
+            return UserProfile.objects.create(user=self.request.user)
+
+
+class PasswordUpdateView(LoginRequiredMixin, FormView):
+    form_class = PasswordUpdateForm
+    template_name = 'blogapp/profile_update_password.html'
+    success_url = reverse_lazy('blogapp:profile')
+
+    def form_valid(self, form):
+        user = self.request.user
+        new_password = form.cleaned_data.get('new_password')
+        user.set_password(new_password)
+        user.save()
+        messages.success(self.request, '¡Tu contraseña ha sido actualizada exitosamente!')
         return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('blogapp:profile', kwargs={'username': self.request.user.username})
 
-class ProfileDeleteView(LoginRequiredMixin, DeleteView):
-    model = UserProfile
+class EmailUpdateView(LoginRequiredMixin, FormView):
+    form_class = EmailUpdateForm
+    template_name = 'blogapp/profile_update_email.html'
+    success_url = reverse_lazy('blogapp:profile')
+
+    def form_valid(self, form):
+        user = self.request.user
+        new_email = form.cleaned_data.get('new_email')
+        user.email = new_email
+        user.save()
+        messages.success(self.request, '¡Tu correo electrónico ha sido actualizado exitosamente!')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('blogapp:profile', kwargs={'username': self.request.user.username})
+
+class ProfileDeleteView(LoginRequiredMixin, FormView):
+    form_class = ProfileDeletionForm
     template_name = 'blogapp/profile_confirm_delete.html'
     success_url = reverse_lazy('blogapp:blog_list')
 
-    def get_object(self, queryset=None):
-        try:
-            profile = self.request.user.profile
-            return profile
-        except UserProfile.DoesNotExist:
-            return None
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.object is None:
-            messages.error(request, "Profile not found.")
-            return redirect('blogapp:blog_list')
-
+    def form_valid(self, form):
         user = self.request.user
 
-        # Delete profile photo if exists
-        if self.object.profile_photo:
-            self.object.profile_photo.delete(save=False)
+        try:
+            profile = user.profile
+            # Delete profile photo if exists
+            if profile and profile.profile_photo:
+                profile.profile_photo.delete(save=False)
+        except UserProfile.DoesNotExist:
+            pass
 
         # Store session key before user deletion
-        session_key = request.session.session_key
+        session_key = self.request.session.session_key
 
+        # Delete the user (this will also delete the profile via cascade)
         user.delete()
 
         # Clear the session
         if session_key:
-            print(f"Clearing session: {session_key}")
             Session.objects.filter(session_key=session_key).delete()
-            print("Session cleared")
 
-        messages.success(request, '¡Tu perfil ha sido eliminado exitosamente!')
-        return redirect('blogapp:blog_list')
+        messages.success(self.request, '¡Tu perfil ha sido eliminado exitosamente!')
+        return redirect(self.success_url)
 
 class BlogListView(ListView):
     model = Blog
     template_name = 'blogapp/blog_list.html'
     context_object_name = 'blogs'
     paginate_by = 10
+    random_blog_id = None
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.GET.get('sort') == 'random':
+            self.get_queryset()
+            if hasattr(self, 'random_blog_id') and self.random_blog_id:
+                return redirect('blogapp:blog_detail', pk=self.random_blog_id)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        """Get filtered blogs with optimized database queries."""
-        queryset = Blog.objects.select_related('author', 'author__profile').prefetch_related('reviews').order_by('-created_at')
+        queryset = Blog.objects.select_related('author', 'author__profile').prefetch_related('reviews')
+        sort = self.request.GET.get('sort', 'latest')
+
+        if sort == 'most_commented':
+            queryset = queryset.annotate(
+                comment_count=Count('reviews__comments')
+            ).order_by('-comment_count', '-created_at')
+        elif sort == 'oldest':
+            queryset = queryset.order_by('created_at')
+        elif sort == 'best_rated':
+            queryset = queryset.annotate(
+                avg_rating=Avg('reviews__rating')
+            ).order_by('-avg_rating', '-created_at')
+        elif sort == 'random':
+            blog_ids = Blog.objects.values_list('id', flat=True)
+            if blog_ids:
+                random_id = choice(list(blog_ids))
+                self.random_blog_id = random_id
+                queryset = queryset.filter(id=random_id)
+            else:
+                queryset = queryset.none()
+        else:  # default: latest
+            queryset = queryset.order_by('-created_at')
+
         return self._apply_filters(queryset)
 
     def _apply_filters(self, queryset):
@@ -313,6 +403,7 @@ class BlogListView(ListView):
 
             return {
                 'blog': blog,
+                'location_code': location_code,
                 'location_info': location_info,
                 'blog_tags': blog_tags,
                 'avg_rating': rating_info['avg_rating'],
@@ -322,6 +413,7 @@ class BlogListView(ListView):
         except Exception:
             return {
                 'blog': blog,
+                'location_code': None,
                 'location_info': get_location_info(None),
                 'blog_tags': [],
                 'avg_rating': 0,
@@ -398,6 +490,9 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        # Eliminar imagen
+        if self.request.POST.get('remove_image') == "1":
+            form.instance.remove_image()
         form.instance.last_updated = datetime.now()
         messages.success(self.request, '¡El blog ha sido actualizado exitosamente!')
         return super().form_valid(form)
