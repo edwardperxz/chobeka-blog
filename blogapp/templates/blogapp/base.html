@@ -195,33 +195,28 @@
       {% if request.resolver_match.url_name == "blog_list" %}
   <div class="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl">
     <form method="get"
-      class="flex flex-row items-stretch bg-white/80 dark:bg-gray-800/80 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 px-2 py-1 gap-0"
+      class="flex items-center bg-white/70 dark:bg-gray-800/70 rounded-full border border-gray-200 dark:border-gray-700 px-2 py-1 gap-1 shadow-none"
       id="filter-form">
-      <!-- Buscar -->
-      <div class="flex-1 flex flex-col justify-center px-4 py-2 min-w-[110px]">
-        <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Buscar</span>
-        <input type="text" name="search" id="search" value="{{ request.GET.search }}" placeholder="Título o contenido"
-          class="bg-transparent border-none p-0 m-0 focus:ring-0 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 text-sm w-full" />
-      </div>
-      <!-- Botón filtrar -->
+      <input
+        type="text"
+        name="search"
+        id="search"
+        value="{{ request.GET.search }}"
+        placeholder="Buscar..."
+        class="flex-1 bg-transparent border-none focus:ring-0 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 text-base px-3 py-2"
+      />
       <button type="button" id="toggle-filters"
-        class="ml-2 flex items-center justify-center w-12 h-12 rounded-full bg-gray-300 hover:bg-gray-400 transition text-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 mt-2 sm:mt-0"
+        class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-200 hover:dark:bg-gray-700 transition text-gray-700 dark:text-gray-300 focus:outline-none"
         aria-label="Mostrar filtros avanzados">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
+        <span class="material-icons text-xl">tune</span>
       </button>
-      <!-- Botón buscar -->
       <button type="submit"
-        class="ml-2 flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 transition text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 mt-2 sm:mt-0">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
+        class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 transition text-white focus:outline-none ml-1">
+        <span class="material-icons text-xl">search</span>
       </button>
     </form>
     <!-- Filtros avanzados ocultos -->
-    <div id="advanced-filters" class="mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 px-6 py-4 hidden absolute left-0 w-full z-10 mt-2">
+    <div id="advanced-filters" class="mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 px-6 py-4 hidden absolute left-0 w-full z-10">
       <div class="flex flex-row flex-wrap gap-4">
         <!-- Tag -->
         <div class="flex flex-col min-w-[90px]">
