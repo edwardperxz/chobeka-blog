@@ -23,8 +23,8 @@ admin_site.register(Site)  # Sites
 
 admin_site.register(EmailAddress)
 
-admin_site.register(SocialAccount)   
-admin_site.register(SocialApp)       
+admin_site.register(SocialAccount)
+admin_site.register(SocialApp)
 admin_site.register(SocialToken)
 
 # Python Social Auth
@@ -36,14 +36,26 @@ admin_site.register(UserSocialAuth)
 
 @admin.register(Blog, site=admin_site)
 class BlogAdmin(admin.ModelAdmin):
-    list_display = ("title", "author")
+    list_display = ("title", "author", "created_at")
+    list_filter = ("author", "created_at")
+    search_fields = ("title", "content")
+    ordering = ("-created_at",)
+    list_per_page = 10
 
 @admin.register(Review, site=admin_site)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ("blog", "reviewer", "rating")
+    list_display = ("blog", "reviewer", "rating", "created_at")
+    list_filter = ("blog", "reviewer", "rating", "created_at")
+    search_fields = ("blog__title", "reviewer__username", "comment")
+    ordering = ("-created_at",)
+    list_per_page = 10
 
 @admin.register(Comment, site=admin_site)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ("review", "commenter")
+    list_display = ("review", "commenter", "content", "created_at")
+    list_filter = ("review", "commenter", "created_at")
+    search_fields = ("review__blog__title", "commenter__username", "content")
+    ordering = ("-created_at",)
+    list_per_page = 10
 
 admin_site.register(BlogStats, BlogStatsAdmin)
