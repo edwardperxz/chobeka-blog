@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm, ProfileUpdateForm, PasswordUpdateForm, EmailUpdateForm, ProfileDeletionForm
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, RedirectView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from .models import Blog, Review, Comment, UserProfile
 from django.contrib.messages import get_messages
 from social_core.exceptions import AuthCanceled, AuthForbidden
@@ -141,6 +141,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = UserProfile
     form_class = ProfileUpdateForm
     template_name = 'blogapp/profile_form.html'
+    success_url = None
 
     def get_object(self, queryset=None):
         try:
@@ -168,6 +169,9 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
 
         messages.success(self.request, '¡Tu perfil ha sido actualizado exitosamente!')
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('blogapp:profile', kwargs={'username': self.request.user.username})
 
 class ProfileSettingsView(LoginRequiredMixin, DetailView):
     model = UserProfile
