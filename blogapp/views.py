@@ -171,7 +171,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('blogapp:profile', kwargs={'username': self.request.user.username})
+        return reverse_lazy('blogapp:profile', kwargs={'username': self.request.user.username})
 
 class ProfileSettingsView(LoginRequiredMixin, DetailView):
     model = UserProfile
