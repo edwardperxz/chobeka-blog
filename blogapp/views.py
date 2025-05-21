@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegisterForm
+from .forms import UserRegisterForm, ProfileUpdateForm, PasswordUpdateForm, EmailUpdateForm, ProfileDeletionForm
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, RedirectView
 from django.urls import reverse_lazy
@@ -139,7 +139,7 @@ class ProfileView(LoginRequiredMixin, DetailView):
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = UserProfile
-    fields = ['profile_photo', 'bio', 'location', 'birth_date', 'interests']
+    form_class = ProfileUpdateForm
     template_name = 'blogapp/profile_form.html'
 
     def get_object(self, queryset=None):
@@ -149,7 +149,23 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
             # Create a profile if it doesn't exist
             return UserProfile.objects.create(user=self.request.user)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
+        # Update UserProfile fields
+        profile = form.save(commit=False)
+        profile.save()
+
+        # Update User fields
+        user = self.request.user
+        user.first_name = form.cleaned_data.get('first_name', '')
+        user.last_name = form.cleaned_data.get('last_name', '')
+        user.username = form.cleaned_data.get('username', '')
+        user.save()
+
         messages.success(self.request, '¡Tu perfil ha sido actualizado exitosamente!')
         return super().form_valid(form)
 
