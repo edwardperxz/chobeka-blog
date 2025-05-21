@@ -52,11 +52,11 @@
              class="w-32 h-32 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-xl cursor-pointer transition-transform duration-300 group-hover:scale-105 group-hover:ring-4 group-hover:ring-primary_dark-300"
              onclick="openImageModal(this.src)">
         {% endif %}
-        
+
         {% if user == profile_user %}
         <a href="{% url 'blogapp:edit_profile' user.username %}"
-           class="absolute bottom-0 right-0 bg-primary_dark-600 hover:bg-primary_dark-300 text-white p-2 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110">
-          <span class="material-icons">edit</span>
+           class="absolute bottom-0 right-0 bg-primary_dark-600 hover:bg-primary_dark-300 text-white px-1 md:px-2 md:py-1 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 transform hover:scale-110">
+            <span class="material-icons text text-lg md:text-2xl">edit</span>
         </a>
         {% endif %}
 
@@ -70,18 +70,18 @@
     </div>
 
     {% if user == profile_user %}
-    <div class="absolute top-2 right-2 flex space-x-4 transition-colors">
-      <a href="#" class="bg-white dark:bg-gray-700 p-2 rounded-full hover:bg-gray-400 dark:hover:bg-secondary_dark transition-colors" title="Configuración">
-        <span class="material-icons">settings</span>
+    <div class="absolute top-2 right-2 flex space-x-2 md:space-x-4 transition-colors">
+      <a href="#" class="bg-white dark:bg-gray-700 px-1 md:px-2 md:py-1 rounded-full flex items-center justify-center hover:bg-gray-400 dark:hover:bg-secondary_dark transition-colors" title="Configuración">
+        <span class="material-icons text text-lg md:text-2xl">settings</span>
       </a>
-      <a href="{% url 'blogapp:add_blog' %}" class="bg-white dark:bg-gray-700 p-2 rounded-full hover:bg-gray-400 dark:hover:bg-secondary_dark transition-colors" title="Crear un blog">
-        <span class="material-icons">post_add</span>
+      <a href="{% url 'blogapp:add_blog' %}" class="bg-white dark:bg-gray-700 px-1 md:px-2 md:py-1 rounded-full flex items-center justify-center hover:bg-gray-400 dark:hover:bg-secondary_dark transition-colors" title="Crear un blog">
+        <span class="material-icons text text-lg md:text-2xl">post_add</span>
       </a>
-      <a href="{% url 'blogapp:edit_profile' user.username %}" class="bg-white dark:bg-gray-700 p-2 rounded-full hover:bg-gray-400 dark:hover:bg-secondary_dark transition-colors" title="Editar perfil">
-        <span class="material-icons">edit</span>
+      <a href="{% url 'blogapp:edit_profile' user.username %}" class="bg-white dark:bg-gray-700 px-1 md:px-2 md:py-1 rounded-full flex items-center justify-center hover:bg-gray-400 dark:hover:bg-secondary_dark transition-colors" title="Editar perfil">
+        <span class="material-icons text text-lg md:text-2xl">edit</span>
       </a>
-      <a href="{% url 'blogapp:logout' %}" class="bg-white dark:bg-gray-700 p-2 rounded-full hover:bg-gray-400 dark:hover:bg-secondary_dark transition-colors" title="Cerrar sesión">
-        <span class="material-icons">logout</span>
+      <a href="{% url 'blogapp:logout' %}" class="bg-white dark:bg-gray-700 px-1 md:px-2 md:py-1 rounded-full flex items-center justify-center hover:bg-gray-400 dark:hover:bg-secondary_dark transition-colors" title="Cerrar sesión">
+        <span class="material-icons text text-lg md:text-2xl">logout</span>
       </a>
     </div>
     {% endif %}
