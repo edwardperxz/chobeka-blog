@@ -278,8 +278,9 @@ class BlogListView(ListView):
             queryset = queryset.order_by('created_at')
         elif sort == 'best_rated':
             queryset = queryset.annotate(
+                review_count=Count('reviews'),
                 avg_rating=Avg('reviews__rating')
-            ).order_by('-avg_rating', '-created_at')
+            ).order_by('-review_count', '-avg_rating', '-created_at')
         elif sort == 'random':
             blog_ids = Blog.objects.values_list('id', flat=True)
             if blog_ids:
