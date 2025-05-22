@@ -209,16 +209,16 @@
     </article>
     {% empty %}
     <div class="col-span-full text-center py-12">
-      <div class="mx-auto w-24 h-24 text-gray-400 dark:text-gray-500 mb-4">
+      <div class="mx-auto w-24 h-24 text-gray-800 dark:text-white mb-4">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
       </div>
       <h3 class="text-lg font-medium text-gray-900 dark:text-white">Sin blogs que ver.</h3>
-      <p class="mt-2 text-gray-500 dark:text-gray-400">SUBE ALGO MO!</p>
+      <p class="mt-2 text-gray-800 dark:text-white">SUBE ALGO MO!</p>
       {% if user.is_authenticated %}
       <div class="mt-6">
-        <a href="{% url 'blogapp:add_blog' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+        <a href="{% url 'blogapp:add_blog' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
           Crear tu primer Blogazo
         </a>
       </div>
