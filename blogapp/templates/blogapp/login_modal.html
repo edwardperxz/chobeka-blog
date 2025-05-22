@@ -106,8 +106,7 @@
     <!-- Enlace para registrarse -->
     <div class="mt-6 text-center text-sm">
       <p class="text-gray-300">¿No tienes cuenta?
-        <a href="#" onclick='event.preventDefault(); openModal("{% url "blogapp:register_modal" %}")'
-           class="text-red-400 hover:text-red-300 cursor-pointer">
+        <a href="{% url 'blogapp:register_modal' %}" onclick="event.preventDefault(); openModal(this.href)" class="font-medium text-red hover:text-red-600 transition">
           Regístrate Ahora
         </a>
       </p>
