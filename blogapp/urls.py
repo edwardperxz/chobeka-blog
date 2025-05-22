@@ -23,6 +23,6 @@ urlpatterns = [
     path('blog/<int:pk>/', BlogDetailView.as_view(), name='blog_detail'),
     path('blog/<int:pk>/review/', ReviewCreateView.as_view(), name='add_review'),
     path('blog/<int:blog_pk>/review/<int:review_pk>/comment/', add_comment, name='add_comment'),
-    path('login_modal', LoginView.as_view(), name='login_modal'),
-    path('register_modal', RegisterView.as_view(), name='register_modal'),
+    path('login_modal/', LoginView.as_view(), name='login_modal'),
+    path('register_modal/', RegisterView.as_view(), name='register_modal'),
 ]
