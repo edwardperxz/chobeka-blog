@@ -6,6 +6,16 @@
 {% endblock %}
 
 {% block content %}
+<div class="object-tools">
+  <ul>
+      <li>
+          <a href="{% url 'admin:export-csv' %}" class="button" style="background:#4CAF50;color:white;font-weight:bold;">
+              Exportar todos los datos a CSV
+          </a>
+      </li>
+  </ul>
+</div>
+
 <div class="custom-stats-detail">
     <!-- Sección de métricas generales -->
     <div class="general-stats">

@@ -178,3 +178,6 @@ media/
 
 # Migrations
 migrations/
+
+# Local configuration files
+tmp/
