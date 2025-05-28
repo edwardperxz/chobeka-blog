@@ -1,6 +1,9 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.db.models import Count, Avg
 from .models import Blog, Review, Comment, User
+from django.urls import path
+from django.shortcuts import redirect
+from .tasks import export_all_data_to_csv
 
 class BlogStatsAdmin(admin.ModelAdmin):
     change_list_template = "admin/blog_stats.html"
@@ -62,3 +65,16 @@ class BlogStatsAdmin(admin.ModelAdmin):
         return False
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('export-csv/', self.admin_site.admin_view(self.export_csv), name='export-csv'),
+        ]
+        return custom_urls + urls
+
+    def export_csv(self, request):
+        # Trigger Celery task
+        export_all_data_to_csv.delay()
+        self.message_user(request, "Export started! You will be notified when it's ready.", messages.INFO)
+        return redirect("..")
