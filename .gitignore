@@ -181,3 +181,6 @@ migrations/
 
 # Local configuration files
 tmp/
+
+# Archivos de exportación CSV
+*.csv
