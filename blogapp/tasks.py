@@ -20,9 +20,9 @@ def export_all_data_to_csv():
         users_path = os.path.join(base_path, 'usuarios_exportados.csv')
         with open(users_path, 'w', newline='', encoding='utf-8') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(['Username', 'Email', 'Password'])
+            writer.writerow(['Username', 'Email'])
             for user in User.objects.iterator():
-                writer.writerow([user.username, user.email, user.password])
+                writer.writerow([user.username, user.email])
 
         # Export Blogs
         blogs_path = os.path.join(base_path, 'blogs_exportados.csv')
