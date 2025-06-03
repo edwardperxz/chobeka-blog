@@ -77,4 +77,4 @@ class BlogStatsAdmin(admin.ModelAdmin):
         # Trigger Celery task
         export_all_data_to_csv.delay()
         self.message_user(request, "Export started! You will be notified when it's ready.", messages.INFO)
-        return redirect("..")
+        return redirect(reverse('admin:blogapp_blogstatsadmin_changelist'))
