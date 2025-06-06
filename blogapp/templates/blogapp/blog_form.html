@@ -1,177 +1,302 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 {% block content %}
-  <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+  <h1 class="text-3xl font-bold mb-8 text-gray-900 dark:text-white">
     {% if form.instance.pk %}
-      Edit Blog
+      Editar Blog
     {% else %}
-      Create New Blog
+      Crear Nuevo Blogazo
     {% endif %}
   </h1>
 
   {{ form.media }}
   
   <form method="post" enctype="multipart/form-data"
-    class="space-y-4 transition-all duration-700 ease-in-out animate-fade-in">{% csrf_token %}
-    <div class="space-y-2 transition-all duration-700 ease-in-out">
-      {% for field in form %}
-        <div>
-          <label for="{{ field.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">{{ field.label }}</label>
-          {% if field.name == 'image' %}
-            <input type="file" name="{{ field.name }}" id="{{ field.id_for_label }}" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" accept="image/*, video/*">
-          {% elif field.name == 'tags' %}
-          <div class="space-y-2">
-            <!-- Hide the textarea but keep it for form submission -->
-            <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" style="display: none;"
-              class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">{{ field.value }}</textarea>
+    class="max-w-8xl mx-auto dark:bg-transparent space-y-8 transition-all duration-700 ease-in-out animate-fade-in dark:border-gray-900">
+    {% csrf_token %}
+    <div class="space-y-6">
 
-            <div class="flex flex-wrap gap-2 mt-2 interest-tags">
-              <!-- Existing interests will be displayed here -->
-            </div>
-
-            <button type="button" id="add-interest-btn" class="mt-2 px-4 py-1 bg-green-500 hover:bg-green-600 text-white rounded-md text-sm transition-all">
-              Agregar Tag
-            </button>
-
-            <div id="tag-popup"
-              class="hidden mt-2 p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 shadow-md">
-              <input type="text" id="new-tag" maxlength="50" placeholder="Añade un nuevo tag (50 chars max)"
-                class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <div class="flex justify-end mt-2 space-x-2">
-                <button type="button" id="save-tag-btn"
-                  class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm">Save</button>
-                <button type="button" id="cancel-tag-btn"
-                  class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md text-sm">Cancel</button>
-              </div>
-            </div>
-
-            <script>
-              document.addEventListener('DOMContentLoaded', function () {
-                const textarea = document.getElementById('{{ field.id_for_label }}');
-                const addBtn = document.getElementById('add-interest-btn');
-                const popup = document.getElementById('tag-popup');
-                const newtagInput = document.getElementById('new-tag');
-                const saveBtn = document.getElementById('save-tag-btn');
-                const cancelBtn = document.getElementById('cancel-tag-btn');
-                const tagsContainer = document.querySelector('.interest-tags');
-
-                // Initialize tags from textarea
-                updateTagsFromTextarea();
-
-                addBtn.addEventListener('click', function () {
-                  popup.classList.remove('hidden');
-                  newtagInput.focus();
-                });
-
-                cancelBtn.addEventListener('click', function () {
-                  popup.classList.add('hidden');
-                  newtagInput.value = '';
-                });
-
-                saveBtn.addEventListener('click', function () {
-                  let tag = newtagInput.value.trim();
-                  if (tag) {
-                  // Ensure the tag has a hashtag prefix
-                  tag = tag.startsWith('#') ? tag : '#' + tag;
-
-                  const tags = parsetags(textarea.value);
-                  tags.push(tag);
-                  // Store as JSON array
-                  textarea.value = JSON.stringify(tags);
-                  updateTagsFromTextarea();
-                  popup.classList.add('hidden');
-                  newtagInput.value = '';
-                  }
-                });
-
-                newtagInput.addEventListener('keydown', function (event) {
-                  if (event.key === 'Enter') {
-                  event.preventDefault();
-                  saveBtn.click();
-                  }
-                });
-
-                function updateTagsFromTextarea() {
-                  tagsContainer.innerHTML = '';
-                  const tags = parsetags(textarea.value);
-                  tags.forEach(tagName => {
-                  const tagElement = document.createElement('div');
-                  tagElement.className = 'px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-md text-sm flex items-center';
-                  tagElement.innerHTML = `
-                    <span>${tagName}</span>
-                    <button type="button" class="ml-2 text-blue-600 dark:text-blue-300 hover:text-red-500 dark:hover:text-red-400"
-                        data-tag="${tagName}">✕</button>
-                    `;
-                  tagsContainer.appendChild(tagElement);
-                  });
-
-                  // Add event listeners after tags are created
-                  tagsContainer.querySelectorAll('button').forEach(btn => {
-                  btn.addEventListener('click', function () {
-                    const tagToRemove = this.getAttribute('data-tag');
-                    removetag(tagToRemove);
-                  });
-                  });
-                }
-
-                function parsetags(text) {
-                  if (!text || text.trim() === '') return [];
-
-                  text = text.trim();
-                  let tags = [];
-
-                  // Try to parse as JSON array
-                  if (text.startsWith('[') && text.endsWith(']')) {
-                    tags = parseJSON(text);
-                  } else {
-                    tags = parseTagsFromText(text);
-                  }
-
-                  // Ensure all tags have a hashtag prefix
-                  return tags.map(tag => tag.startsWith('#') ? tag : '#' + tag);
-                }
-
-                function parseJSON(text) {
-                  try {
-                    return JSON.parse(text);
-                  } catch (e) {
-                    return parseTagsFromText(text);
-                  }
-                }
-
-                function parseTagsFromText(text) {
-                  const tags = text.match(/("([^"]*)"|[^,]+)+(?=\s*,|\s*$)/g) || [];
-                  return tags.map(tag => tag.trim().replace(/^"|"$/g, '').trim()).filter(Boolean);
-                }
-                function removetag(tag) {
-                  const tags = parsetags(textarea.value);
-                  const filteredtags = tags.filter(i => i !== tag);
-                  // Store as JSON array
-                  textarea.value = JSON.stringify(filteredtags);
-                  updateTagsFromTextarea();
-                }
-
-                // Ensure the value is stored as a JSON array on page load
-                const initialtags = parsetags(textarea.value);
-                textarea.value = JSON.stringify(initialtags);
-                });
-            </script>
-          </div>
-          {% else %}
-            {{ field|add_class:"bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
-          {% endif %}
-          {% if field.errors %}
-            <p class="text-red-500 text-sm">{{ field.errors|striptags }}</p>
-          {% endif %}
+      {# Campo de título grande #}
+      <div>
+        <label for="id_title" class="block text-lg font-medium text-gray-900 dark:text-white mb-2">Título<span class="text-red-500">*</span></label>
+        {{ form.title|add_class:"w-full text-lg px-6 py-4 rounded-2xl border border-gray-900 dark:border-gray-600 bg-transparent text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+        <div class="flex justify-end mt-1">
+          <span class="text-sm text-gray-600 dark:text-gray-400" id="title-counter">0/300</span>
         </div>
+      </div>
+
+      {# Campo de tags #}
+      <div>
+        <div class="flex items-center mb-2 justify-between">
+          <label for="{{ form.tags.id_for_label }}" class="block text-lg font-medium text-gray-900 dark:text-white">Tags</label>
+          <button type="button" id="add-interest-btn"
+            class="w-10 h-10 p-0 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white flex items-center justify-center transition-all duration-150 transform hover:scale-110 focus:outline-none"
+            title="Agregar Tag">
+            <span class="material-icons text-2xl">add</span>
+          </button>
+        </div>
+        <!-- Hide the textarea but keep it for form submission -->
+        <textarea name="{{ form.tags.name }}" id="{{ form.tags.id_for_label }}" style="display: none;"
+          class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">{{ form.tags.value }}</textarea>
+        <div class="flex flex-wrap gap-2 mt-2 interest-tags"></div>
+        <div id="tag-popup"
+          class="hidden mt-2 p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+          <input type="text" id="new-tag" maxlength="50" placeholder="Añade un nuevo tag (50 chars max)"
+            class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <div class="flex justify-end mt-2 space-x-2">
+            <button type="button" id="save-tag-btn"
+              class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm">Guardar</button>
+            <button type="button" id="cancel-tag-btn"
+              class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md text-sm">Cancelar</button>
+          </div>
+        </div>
+      </div>
+
+      {# Campo de contenido (CKEditor) #}
+      <div>
+        <label for="id_content" class="block text-lg font-medium text-gray-900 dark:text-white mb-2">Cuerpo de texto <span class="text-gray-500 dark:text-gray-400 text-base">(opcional)</span></label>
+        {{ form.content|add_class:"w-full rounded-2xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+      </div>
+
+      {# Otros campos (por ejemplo, imagen) #}
+      {% for field in form %}
+        {% if field.name not in 'title tags content' %}
+          <div>
+            <label for="{{ field.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">{{ field.label }}</label>
+            {% if field.name == 'image' %}
+              <div class="flex items-center gap-3">
+                <input type="file" name="{{ field.name }}" id="{{ field.id_for_label }}"
+                  class="hidden" accept="image/*">
+                <button type="button" id="image-action-btn"
+                  class="w-10 h-10 p-0 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white flex items-center justify-center transition-all duration-150 transform hover:scale-110 focus:outline-none"
+                  title="Agregar o eliminar imagen">
+                  <span id="image-action-icon" class="material-icons text-2xl">
+                    {% if form.instance.image %}
+                      close
+                    {% else %}
+                      add
+                    {% endif %}
+                  </span>
+                </button>
+                <span id="image-file-name" class="text-gray-700 dark:text-gray-300 text-sm">
+                  {% if form.instance.image %}
+                    {{ form.instance.image.name|default_if_none:"" }}
+                  {% endif %}
+                </span>
+                <img
+                  id="image-preview"
+                  src="{% if form.instance.image %}{{ form.instance.image.url }}{% endif %}"
+                  alt="Vista previa"
+                  class="w-14 h-14 object-cover rounded-lg border border-gray-300 dark:border-gray-700 {% if not form.instance.image %}hidden{% endif %}">
+                <input type="hidden" name="remove_image" id="remove-image-flag" value="0">
+              </div>
+              <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                  const input = document.getElementById('{{ field.id_for_label }}');
+                  const actionBtn = document.getElementById('image-action-btn');
+                  const actionIcon = document.getElementById('image-action-icon');
+                  const fileNameSpan = document.getElementById('image-file-name');
+                  const preview = document.getElementById('image-preview');
+                  const removeFlag = document.getElementById('remove-image-flag');
+
+                  function setToAdd() {
+                    actionIcon.textContent = 'add';
+                    actionBtn.title = 'Agregar imagen';
+                    removeFlag.value = "0";
+                  }
+                  function setToRemove() {
+                    actionIcon.textContent = 'close';
+                    actionBtn.title = 'Eliminar imagen';
+                    removeFlag.value = "0";
+                  }
+
+                  // Estado inicial robusto:
+                  if (preview && preview.src && !preview.classList.contains('hidden')) {
+                    setToRemove();
+                  } else {
+                    setToAdd();
+                  }
+
+                  actionBtn.addEventListener('click', function () {
+                    if (actionIcon.textContent === 'add') {
+                      input.click();
+                    } else {
+                      // Eliminar imagen
+                      input.value = '';
+                      fileNameSpan.textContent = '';
+                      preview.src = '';
+                      preview.classList.add('hidden');
+                      setToAdd();
+                      removeFlag.value = "1";
+                    }
+                  });
+
+                  if (input) {
+                    input.addEventListener('change', function () {
+                      if (input.files.length) {
+                        fileNameSpan.textContent = input.files[0].name;
+                        // Mostrar vista previa
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                          preview.src = e.target.result;
+                          preview.classList.remove('hidden');
+                        }
+                        reader.readAsDataURL(input.files[0]);
+                        setToRemove();
+                        removeFlag.value = "0";
+                      } else {
+                        fileNameSpan.textContent = '';
+                        preview.src = '';
+                        preview.classList.add('hidden');
+                        setToAdd();
+                      }
+                    });
+                  }
+                });
+              </script>
+            {% else %}
+              {{ field|add_class:"bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+            {% endif %}
+            {% if field.errors %}
+              <p class="text-red-500 text-sm">{{ field.errors|striptags }}</p>
+            {% endif %}
+          </div>
+        {% endif %}
       {% endfor %}
+
     </div>
-    <button type="submit" class="px-6 py-2 bg-red hover:bg-red-600 text-white dark:bg-red dark:hover:bg-red-700 rounded transition-all duration-500 ease-in-out w-full sm:w-auto">
-      {% if form.instance.pk %}
-        Update Blog
-      {% else %}
-        Publicar
-      {% endif %}
-    </button>
+    <div class="flex justify-end gap-4 mt-8">
+      <button type="submit" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold text-lg transition-all duration-300">
+        {% if form.instance.pk %}
+          Actualizar
+        {% else %}
+          Publicar
+        {% endif %}
+      </button>
+    </div>
   </form>
+
+  <script>
+    // Contador de título
+    document.addEventListener('DOMContentLoaded', function () {
+      const titleInput = document.getElementById('id_title');
+      const titleCounter = document.getElementById('title-counter');
+      if (titleInput && titleCounter) {
+        function updateCounter() {
+          titleCounter.textContent = `${titleInput.value.length}/300`;
+        }
+        titleInput.addEventListener('input', updateCounter);
+        updateCounter();
+      }
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+      const textarea = document.getElementById('{{ form.tags.id_for_label }}');
+      const addBtn = document.getElementById('add-interest-btn');
+      const popup = document.getElementById('tag-popup');
+      const newtagInput = document.getElementById('new-tag');
+      const saveBtn = document.getElementById('save-tag-btn');
+      const cancelBtn = document.getElementById('cancel-tag-btn');
+      const tagsContainer = document.querySelector('.interest-tags');
+
+      // Initialize tags from textarea
+      updateTagsFromTextarea();
+
+      addBtn.addEventListener('click', function () {
+        popup.classList.remove('hidden');
+        newtagInput.focus();
+      });
+
+      cancelBtn.addEventListener('click', function () {
+        popup.classList.add('hidden');
+        newtagInput.value = '';
+      });
+
+      saveBtn.addEventListener('click', function () {
+        let tag = newtagInput.value.trim();
+        if (tag) {
+          // Ensure the tag has a hashtag prefix
+          tag = tag.startsWith('#') ? tag : '#' + tag;
+
+          const tags = parsetags(textarea.value);
+          tags.push(tag);
+          // Store as JSON array
+          textarea.value = JSON.stringify(tags);
+          updateTagsFromTextarea();
+          popup.classList.add('hidden');
+          newtagInput.value = '';
+        }
+      });
+
+      newtagInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          saveBtn.click();
+        }
+      });
+
+      function updateTagsFromTextarea() {
+        tagsContainer.innerHTML = '';
+        const tags = parsetags(textarea.value);
+        tags.forEach(tagName => {
+          const tagElement = document.createElement('div');
+          tagElement.className = 'px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-md text-sm flex items-center';
+          tagElement.innerHTML = `
+            <span>${tagName}</span>
+            <button type="button" class="ml-2 text-blue-600 dark:text-blue-300 hover:text-red-500 dark:hover:text-red-400"
+                data-tag="${tagName}">✕</button>
+            `;
+          tagsContainer.appendChild(tagElement);
+        });
+
+        // Add event listeners after tags are created
+        tagsContainer.querySelectorAll('button').forEach(btn => {
+          btn.addEventListener('click', function () {
+            const tagToRemove = this.getAttribute('data-tag');
+            removetag(tagToRemove);
+          });
+        });
+      }
+
+      function parsetags(text) {
+        if (!text || text.trim() === '') return [];
+
+        text = text.trim();
+        let tags = [];
+
+        // Try to parse as JSON array
+        if (text.startsWith('[') && text.endsWith(']')) {
+          tags = parseJSON(text);
+        } else {
+          tags = parseTagsFromText(text);
+        }
+
+        // Ensure all tags have a hashtag prefix
+        return tags.map(tag => tag.startsWith('#') ? tag : '#' + tag);
+      }
+
+      function parseJSON(text) {
+        try {
+          return JSON.parse(text);
+        } catch (e) {
+          return parseTagsFromText(text);
+        }
+      }
+
+      function parseTagsFromText(text) {
+        const tags = text.match(/("([^"]*)"|[^,]+)+(?=\s*,|\s*$)/g) || [];
+        return tags.map(tag => tag.trim().replace(/^"|"$/g, '').trim()).filter(Boolean);
+      }
+      function removetag(tag) {
+        const tags = parsetags(textarea.value);
+        const filteredtags = tags.filter(i => i !== tag);
+        // Store as JSON array
+        textarea.value = JSON.stringify(filteredtags);
+        updateTagsFromTextarea();
+      }
+
+      // Ensure the value is stored as a JSON array on page load
+      const initialtags = parsetags(textarea.value);
+      textarea.value = JSON.stringify(initialtags);
+    });
+  </script>
 {% endblock %}

@@ -1,210 +1,296 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h1 class="text-3xl font-bold mb-6 text-center text-gray-900 dark:text-white">Todos los Blogs</h1>
-  <div class="max-w-[1440px] mx-auto px-6 lg:px-12 space-y-6">
-    <!-- Main Content -->
-    <main class="space-y-6">
-      {% for blog in object_list %}
-        <div class="block bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-700 ease-in-out dark:text-white text-gray-900 animate-fade-in">
-          <!-- Encabezado de la publicación -->
-          <div class="flex justify-between items-center mb-4">
-            <div class="flex items-center space-x-3">
-              <!-- Enlace al perfil del usuario -->
-              <a href="{% url 'blogapp:profile' blog.author.username %}" class="flex items-center hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
-                {% if blog.author.profile.profile_photo %}
-                  <img src="{{ blog.author.profile.profile_photo.url }}" alt="Foto de Perfil" class="w-8 h-8 rounded-full">
-                {% else %}
-                  <img src="/static/Images/default-avatar.jpg" alt="Foto de Perfil Predeterminada" class="w-8 h-8 rounded-full">
-                {% endif %}
-                <span class="ml-2 font-medium">{{ blog.author.username }}</span>
-              </a>
-              <span class="text-gray-500 dark:text-gray-400">• {{ blog.created_at|date:"M d, Y" }}</span>
-              {% for blog_content in blogs_list %}
-                {% if blog_content.blog.id == blog.id and blog_content.location_info %}
-                  <div class="inline-block px-3 py-1.5 rounded-full
-                        bg-{{ blog_content.location_info.color }}-100
-                        text-{{ blog_content.location_info.color }}-800
-                        dark:bg-{{ blog_content.location_info.color }}-900
-                        dark:text-{{ blog_content.location_info.color }}-300">
-                    {{ blog_content.location_info.emoji }} {{ blog_content.location_info.name }}
-                  </div>
-                {% endif %}
-              {% endfor %}
-            </div>
-            <!-- Menú desplegable de tres puntos -->
-            <div class="relative">
-              <button class="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none" id="menu-button-{{ blog.pk }}">
-                <span class="sr-only">Abrir menú</span>
-                <span class="text-gray-500 dark:text-gray-400 text-lg font-bold">...</span>
-              </button>
-              <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 hidden" id="menu-dropdown-{{ blog.pk }}">
-                {% if user.is_authenticated %}
-                  {% if user == blog.author %}
-                    <!-- Opciones para el creador del blog -->
-                    <a href="{% url 'blogapp:edit_blog' blog.pk %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">Editar</a>
-                    <a href="{% url 'blogapp:delete_blog' blog.pk %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">Eliminar</a>
-                  {% else %}
-                    <!-- Opciones para otros usuarios autenticados -->
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">Compartir</a>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">Guardar</a>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">Ocultar</a>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">Denunciar</a>
-                  {% endif %}
-                {% else %}
-                  <!-- Opciones para usuarios no autenticados -->
-                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">Denunciar</a>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-          {% for blog_content in blogs_list %}
-            {% if blog_content.blog.id == blog.id and blog_content.blog_tags %}
-              <div class="mb-4">
-                <div class="flex flex-wrap gap-2">
-                  {% for tag in blog_content.blog_tags %}
-                    <span
-                      class="px-3 py-1 bg-slate-100 text-slate-800 text-sm font-medium rounded-full dark:bg-slate-900 dark:text-slate-300">
-                      {{ tag }}
-                    </span>
-                  {% endfor %}
-                </div>
-              </div>
-            {% endif %}
-          {% endfor %}
-          <!-- Contenido de la publicación -->
-          <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="block">
-            <h2 class="text-xl font-semibold mb-2">
-              {{ blog.title }}
-            </h2>
-            <p class="text-gray-700 dark:text-gray-300 line-clamp-3 mb-4">{{ blog.content|truncatewords:30|safe }}</p>
-            {% if blog.image %}
-              <div class="mb-4">
-                <div class="relative w-full max-w-4xl mx-auto bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
-                  <!-- Fondo difuminado dinámico -->
-                  <div class="absolute inset-0 bg-cover bg-center blur-md" style="background-image: url('{{ blog.image.url }}');"></div>
-                  <!-- Imagen centrada -->
-                  <img src="{{ blog.image.url }}" alt="{{ blog.title }}" class="relative z-10 w-full h-auto max-h-[56.25vw] object-contain md:max-h-[40vw] lg:max-h-[30vw]">
-                </div>
-              </div>
-            {% endif %}
-          </a>
-
-          <div class="flex gap-4 items-center mb-3">
-            <!-- Calificación promedio -->
-            <div class="flex items-center">
-              {% for blog_content in blogs_list %}
-                {% if blog_content.blog.id == blog.id %}
-                  {% if blog_content.avg_rating > 0 %}
-                    {% for i in "12345" %}
-                      {% if forloop.counter <= blog_content.avg_rating %}
-                      <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path
-                          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
-                        </path>
-                        </svg>
-                        {% else %}
-                        <svg class="w-5 h-5 text-gray-300 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg">
-                          <path
-                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
-                          </path>
-                        </svg>
-                      {% endif %}
-                    {% endfor %}
-                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ blog_content.avg_rating|floatformat:1 }} ({{ blog_content.review_count }} {% if blog_content.review_count == 1 %}reseña{% else %}reseñas{% endif %})</span>
-                  {% else %}
-                    <span class="text-sm text-gray-500 dark:text-gray-400">Sin reseñas</span>
-                  {% endif %}
-                {% endif %}
-              {% endfor %}
-            </div>
-
-            <!-- Contador de comentarios -->
-            <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="flex items-center px-3 py-1.5 rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
-              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
-                </path>
-              </svg>
-              <span class="text-md font-medium">
-                {% for blog_content in blogs_list %}
-                  {% if blog_content.blog.id == blog.id %}
-                    {{ blog_content.comments_count }}
-                  {% endif %}
-                {% endfor %}
-              </span>
-            </a>
-
-          </div>
-
-        </div>
-      {% empty %}
-        <p class="text-gray-500 dark:text-gray-400 text-center">No se han publicado blogs todavía.</p>
-      {% endfor %}
-      <!-- Paginación -->
-    <div class="flex justify-center mt-6">
-      {% if is_paginated %}
-      <div class="flex justify-center mt-8">
-        <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-          {% if page_obj.has_previous %}
-          <a href="?page={{ page_obj.previous_page_number }}"
-            class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700">
-            Anterior
-          </a>
-          {% else %}
-          <span
-            class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-md cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400">
-            Anterior
-          </span>
-          {% endif %}
-          {% for num in page_obj.paginator.page_range %}
-          {% if page_obj.number == num %}
-          <span
-            class="relative z-10 inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-500 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-800">
-            {{ num }}
-          </span>
-          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a href="?page={{ num }}"
-            class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700">
-            {{ num }}
-            </a>
-            {% endif %}
-            {% endfor %}
-            {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}"
-              class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700">
-              Siguiente
-            </a>
-            {% else %}
-            <span
-              class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400">
-              Siguiente
-            </span>
-            {% endif %}
-        </nav>
-      </div>
-      {% endif %}
-    </main>
-  </div>
 
   <script>
-    // Mostrar/ocultar el menú desplegable
-    document.querySelectorAll('[id^="menu-button-"]').forEach(button => {
-      button.addEventListener('click', function () {
-        const dropdownId = this.id.replace('menu-button', 'menu-dropdown');
-        const dropdown = document.getElementById(dropdownId);
-        dropdown.classList.toggle('hidden');
-      });
-    });
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('filter-form').addEventListener('submit', function(e) {
+        e.preventDefault();
 
-    document.addEventListener('click', function (event) {
-      document.querySelectorAll('[id^="menu-dropdown-"]').forEach(dropdown => {
-        const buttonId = dropdown.id.replace('menu-dropdown', 'menu-button');
-        const button = document.getElementById(buttonId);
-        if (!button.contains(event.target) && !dropdown.contains(event.target)) {
-          dropdown.classList.add('hidden');
-        }
+        const params = new URLSearchParams();
+        let hasValues = false;
+
+        // Añadir solo valores no vacíos a los parámetros de URL
+        this.querySelectorAll('input, select').forEach(input => {
+          if (input.value.trim()) {
+            params.append(input.name, input.value.trim());
+            hasValues = true;
+          }
+        });
+
+        // Navegar a la URL filtrada o URL base si no hay filtros
+        window.location.href = hasValues
+          ? window.location.pathname + '?' + params.toString()
+          : window.location.pathname;
       });
     });
   </script>
+
+  <!-- Blog List -->
+  <div class="grid gap-8 md:grid-cols-1 lg:grid-cols-1">
+    {% for blog in object_list %}
+    <article class="bg-primary_dark-100 hover:bg-primary_dark-300 dark:bg-primary_dark rounded-xl overflow-hidden hover:shadow-xl hover:dark:bg-secondary_dark transition-colors">
+      <!-- Blog Header -->
+      <div class="p-6 flex items-center justify-between flex-wrap gap-y-2">
+        <!-- Foto, nombre, fecha, provincia -->
+        <div class="flex items-center min-w-0 gap-2 flex-1 flex-wrap justify-start">
+          <!-- Foto de perfil -->
+          <a href="{% url 'blogapp:profile' blog.author.username %}" class="flex-shrink-0 group transition">
+            {% if blog.author.profile.profile_photo %}
+              <img src="{{ blog.author.profile.profile_photo.url }}" alt="{{ blog.author.username }}"
+                   class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600 group-hover:border-blue-500 group-hover:ring-2 group-hover:ring-blue-300 dark:group-hover:border-blue-400 dark:group-hover:ring-blue-700 transition">
+            {% else %}
+              <span class="w-10 h-10 flex items-center justify-center rounded-full border-2 border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-400 group-hover:border-blue-500 group-hover:ring-2 group-hover:ring-blue-300 dark:group-hover:border-blue-400 dark:group-hover:ring-blue-700 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </span>
+            {% endif %}
+          </a>
+          <!-- Nombre -->
+          <a href="{% url 'blogapp:profile' blog.author.username %}" class="ml-2 font-medium text-secondary_dark dark:text-white truncate hover:text-blue-700 dark:hover:text-blue-300 transition group">
+            {{ blog.author.username }}
+          </a>
+          <!-- Fecha -->
+          <span class="text-xs text-gray-700 dark:text-gray-400">• {{ blog.created_at|date:"d M Y" }}</span>
+          <!-- Provincia (con bandera si existe) -->
+          {% for blog_content in blogs_list %}
+            {% if blog_content.blog.id == blog.id and blog_content.location_info %}
+              <a href="{% url 'blogapp:blog_list' %}?province={{ blog_content.location_code }}"
+                 class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                 bg-{{ blog_content.location_info.color }}-100 text-{{ blog_content.location_info.color }}-800
+                 dark:bg-{{ blog_content.location_info.color }}-900 dark:text-{{ blog_content.location_info.color }}-300
+                 hover:bg-blue-100 hover:text-blue-800 dark:hover:bg-blue-900 dark:hover:text-blue-200 transition">
+                {% if blog_content.location_info.flag_url %}
+                  <img src="/static/flags/{{ blog_content.location_info.flag_url }}_flag.svg"
+                       alt="{{ blog_content.location_info.name }} province flag"
+                       class="h-4 w-auto mr-2 inline">
+                {% endif %}
+                {{ blog_content.location_info.name }}
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+        <!-- Tres puntos -->
+        <div class="relative flex-shrink-0 ml-2">
+          <button class="p-1 rounded-full hover:bg-gray-400 dark:hover:bg-gray-700 focus:outline-none"
+                  id="menu-button-{{ blog.pk }}" aria-expanded="false" aria-haspopup="true">
+            <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <circle cx="5" cy="12" r="1.5"/>
+              <circle cx="12" cy="12" r="1.5"/>
+              <circle cx="19" cy="12" r="1.5"/>
+            </svg>
+          </button>
+          <div class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10"
+               id="menu-dropdown-{{ blog.pk }}" role="menu" aria-orientation="vertical">
+            <div class="py-1">
+              {% if user.is_authenticated %}
+                {% if user == blog.author %}
+                  <a href="{% url 'blogapp:edit_blog' blog.pk %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">
+                    <i class="fas fa-edit mr-2"></i> Editar
+                  </a>
+                  <a href="{% url 'blogapp:delete_blog' blog.pk %}" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">
+                    <i class="fas fa-trash-alt mr-2"></i> Eliminar
+                  </a>
+                {% else %}
+                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">
+                    <i class="fas fa-share-alt mr-2"></i> Compartir
+                  </a>
+                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">
+                    <i class="fas fa-bookmark mr-2"></i> Guardar
+                  </a>
+                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">
+                    <i class="fas fa-eye-slash mr-2"></i> Ocultar
+                  </a>
+                  <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">
+                    <i class="fas fa-flag mr-2"></i> Denunciar
+                  </a>
+                {% endif %}
+              {% else %}
+                <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">
+                  <i class="fas fa-flag mr-2"></i> Denunciar
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Título -->
+      <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="block group px-6 pt-2 -mt-4">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors break-words">
+          {{ blog.title }}
+        </h2>
+      </a>
+
+      <!-- Tags -->
+      {% for blog_content in blogs_list %}
+        {% if blog_content.blog.id == blog.id and blog_content.blog_tags %}
+        <div class="px-6 pb-2">
+          <div class="flex flex-wrap gap-2">
+            {% for tag in blog_content.blog_tags %}
+            <a href="{% url 'blogapp:blog_list' %}?tag={{ tag|cut:'#' }}"
+               class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 hover:bg-blue-200 hover:text-blue-900 dark:hover:bg-blue-800 dark:hover:text-blue-200 transition">
+              {{ tag }}
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+
+      <!-- Blog Content -->
+      <div class="px-6 pb-6">
+        <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="block group">
+          {% if blog.content and blog.content|striptags|length > 0 and blog.content|striptags != "&nbsp;" %}
+            <p class="text-gray-600 dark:text-gray-300 mb-6 line-clamp-3">
+              {{ blog.content|striptags|truncatewords:30 }}
+            </p>
+          {% endif %}
+        </a>
+
+        <!-- Blog Image -->
+        {% if blog.image %}
+        <div class="mb-6 rounded-lg overflow-hidden">
+          <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="block group">
+            <div class="relative aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700">
+              <img src="{{ blog.image.url }}" alt="{{ blog.title }}"
+                   class="object-cover w-full h-full group-hover:opacity-90 transition-opacity">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+            </div>
+          </a>
+        </div>
+        {% endif %}
+
+        <!-- Footer: Comentarios y Rating -->
+        <div class="flex items-center justify-between mt-4 flex-wrap gap-y-2">
+          <!-- Botón comentarios -->
+          <a href="{% url 'blogapp:blog_detail' blog.pk %}#comments"
+             class="flex items-center px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-blue-100 hover:text-blue-900 dark:hover:bg-blue-800 dark:hover:text-blue-200 transition">
+            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            </svg>
+            {% for blog_content in blogs_list %}
+              {% if blog_content.blog.id == blog.id %}
+                {{ blog_content.comments_count }}
+              {% endif %}
+            {% endfor %}
+          </a>
+          <!-- Rating -->
+          {% for blog_content in blogs_list %}
+            {% if blog_content.blog.id == blog.id %}
+              {% if blog_content.avg_rating > 0 %}
+                <div class="flex items-center ml-4">
+                  <div class="flex items-center mr-2">
+                    {% for i in "12345" %}
+                      {% if forloop.counter <= blog_content.avg_rating %}
+                      <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                      {% else %}
+                      <svg class="w-5 h-5 text-gray-300 dark:text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {{ blog_content.avg_rating|floatformat:1 }} ({{ blog_content.review_count }} review{{ blog_content.review_count|pluralize }})
+                  </span>
+                </div>
+              {% else %}
+                <span class="text-sm text-gray-900 dark:text-gray-400 ml-4">Sin calificaciones moh</span>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </article>
+    {% empty %}
+    <div class="col-span-full text-center py-12">
+      <div class="mx-auto w-24 h-24 text-gray-800 dark:text-white mb-4">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white">Sin blogs que ver.</h3>
+      <p class="mt-2 text-gray-800 dark:text-white">SUBE ALGO MO!</p>
+      {% if user.is_authenticated %}
+      <div class="mt-6">
+        <a href="{% url 'blogapp:add_blog' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+          Crear tu primer Blogazo
+        </a>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if is_paginated %}
+  <div class="mt-12 flex justify-center">
+    <nav class="flex items-center space-x-2">
+      {% if page_obj.has_previous %}
+        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700">
+          &larr; Previous
+        </a>
+      {% else %}
+        <span class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-400 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-500 cursor-not-allowed">
+          &larr; Previous
+        </span>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <span class="inline-flex items-center px-4 py-2 border border-red-500 text-sm font-medium rounded-md text-white bg-red-500">
+            {{ num }}
+          </span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700">
+            {{ num }}
+          </a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700">
+          Next &rarr;
+        </a>
+      {% else %}
+        <span class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-400 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-500 cursor-not-allowed">
+          Next &rarr;
+        </span>
+      {% endif %}
+    </nav>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  // Funcionalidad del Dropdown
+  document.querySelectorAll('[id^="menu-button-"]').forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const dropdownId = this.id.replace('menu-button', 'menu-dropdown');
+      const dropdown = document.getElementById(dropdownId);
+
+      // Cerrar todos los otros Dropdowns
+      document.querySelectorAll('[id^="menu-dropdown-"]').forEach(d => {
+        if (d.id !== dropdownId) d.classList.add('hidden');
+      });
+
+      // Alternar visibilidad del menú actual
+      dropdown.classList.toggle('hidden');
+    });
+  });
+
+  // Cerrar el Dropdown cuando se hace clic afuera
+  document.addEventListener('click', function() {
+    document.querySelectorAll('[id^="menu-dropdown-"]').forEach(dropdown => {
+      dropdown.classList.add('hidden');
+    });
+  });
+</script>
+
 {% endblock %}

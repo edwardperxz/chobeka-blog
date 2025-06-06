@@ -1,31 +1,68 @@
-{% extends 'blogapp/profile_user.html' %}
+{% extends 'blogapp/profile_settings.html' %}
 {% load static %}
+{% load widget_tweaks %}
 {% block content %}
-{{ block.super }}  <!-- This displays the parent template's content -->
+{{ block.super }}
 
-<div id="deleteConfirmModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50" tabindex="-1" role="dialog">
-    <div class="relative mx-auto p-4 w-full max-w-md">
-        <div class="bg-white rounded-lg shadow-lg">
-            <div class="flex items-center justify-between p-4 border-b">
-                <h5 class="text-lg font-medium">Hipotecando la chantin</h5>
-                <button type="button" class="text-gray-500 hover:text-gray-700" id="closeModal">
-                    <span aria-hidden="true">&times;</span>
+<div id="deleteConfirmModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-60 dark:bg-gray-900 dark:bg-opacity-80 backdrop-blur-sm" tabindex="-1" role="dialog">
+    <div class="relative mx-auto w-full max-w-md">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-0 overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+                <h5 class="text-xl font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                    <span class="material-icons text-red-600 dark:text-red-400">warning</span>
+                    Hipotecando la chantin
+                </h5>
+                <button type="button" class="flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition" id="closeModal" aria-label="Cerrar">
+                    <span class="material-icons text-2xl">close</span>
                 </button>
             </div>
-            <div class="p-4">
-                <p class="mb-2">¿Seguro que quieres borrar tu perfil? Esta acción no se puede deshacer mopri juega vivo</p>
-                <p class="mb-2">Cuidao pue, Todos tus posts y comentarios se van pa' la basura.</p>
-            </div>
-            <div class="flex justify-end p-4 border-t">
-                <form method="post" class="flex space-x-2">
+            <div class="px-6 py-6">
+                <div class="mb-4">
+                    <p class="mb-2 text-gray-800 dark:text-gray-200 text-base">
+                        ¿Seguro que quieres borrar tu perfil? <span class="font-semibold text-red-600 dark:text-red-400"> Esta acción no se puede deshacer mopri juega vivo</span>
+                    </p>
+                    <p class="mb-2 text-gray-700 dark:text-gray-300 text-sm">
+                        Cuidao pue, Todos tus posts y comentarios se van pa' la basura.
+                    </p>
+                </div>
+                <form method="post" class="space-y-5">
                     {% csrf_token %}
-                    <button type="button" id="cancelButton" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">Chuzo mejor dejalo asi</button>
-                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Mándalo pa lante</button>
+                    <div>
+                        <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ form.username.label }}</label>
+                        {{ form.username|add_class:"w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-400" }}
+                        {% if form.username.errors %}
+                            <p class="text-red-600 dark:text-red-400 text-xs mt-1">{{ form.username.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ form.password.label }}</label>
+                        {{ form.password|add_class:"w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-400" }}
+                        {% if form.password.errors %}
+                            <p class="text-red-600 dark:text-red-400 text-xs mt-1">{{ form.password.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="flex items-center">
+                        {{ form.confirmation }}
+                        <label for="{{ form.confirmation.id_for_label }}" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            {{ form.confirmation.label }}
+                        </label>
+                    </div>
+                    {% if form.confirmation.errors %}
+                        <p class="text-red-600 dark:text-red-400 text-xs mt-1">{{ form.confirmation.errors.0 }}</p>
+                    {% endif %}
+                    <div class="flex justify-end gap-3 pt-4">
+                        <button type="button" id="cancelButton" class="px-5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                            Chuzo mejor dejalo asi
+                        </button>
+                        <button type="submit" class="px-5 py-2 bg-red-600 text-white rounded-full font-semibold hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 transition">
+                            Mándalo pa lante
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-<script src="{% static 'js/delete_modal.js' %}"></script>
+<script src="{% static 'js/modal.js' %}"></script>
 {% endblock %}

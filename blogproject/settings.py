@@ -91,6 +91,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'social_django.context_processors.backends',
+                'blogapp.context_processors.recommended_blogs',
             ],
         },
     },
@@ -153,10 +154,10 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Login and Logout redirects
-LOGIN_URL = '/login/'
+LOGIN_URL = '/login_modal/'
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/login/'
-ACCOUNT_LOGOUT_REDIRECT_URL = '/login/'
+LOGOUT_REDIRECT_URL = '/login_modal/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/login_modal/'
 SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_AUTO_SIGNUP = False
 
@@ -222,9 +223,9 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
 )
 
-SOCIAL_AUTH_LOGIN_ERROR_URL = '/login/'
-SOCIAL_AUTH_BACKEND_ERROR_URL = '/login/'
-SOCIAL_AUTH_INACTIVE_USER_URL = '/login/'
+SOCIAL_AUTH_LOGIN_ERROR_URL = '/login_modal/'
+SOCIAL_AUTH_BACKEND_ERROR_URL = '/login_modal/'
+SOCIAL_AUTH_INACTIVE_USER_URL = '/login_modal/'
 
 SOCIALACCOUNT_STORE_TOKENS = True
 
@@ -334,3 +335,6 @@ CKEDITOR_5_CONFIGS = {
         }
     }
 }
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'

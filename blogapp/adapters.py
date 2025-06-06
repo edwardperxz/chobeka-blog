@@ -29,4 +29,4 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             message = f"Error en autenticación con {provider_name}. Por favor intenta nuevamente."
             messages.error(request, message) 
             
-        raise ImmediateHttpResponse(redirect(reverse('blogapp:login')))
+        raise ImmediateHttpResponse(redirect(reverse('blogapp:login_modal')))
