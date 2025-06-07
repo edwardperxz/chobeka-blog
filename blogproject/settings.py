@@ -26,16 +26,13 @@ SECRET_KEY = 'django-insecure-ukz72g)*267@$nvdk**+6#+a*nyzh_1t3o2=@wxtpga$cew)2^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    '127.0.0.1', 
-    'localhost', 
-]
 SITE_ID = 1
 
 ALLOWED_HOSTS = [
-    '127.0.0.1', 
-    'localhost', 
+    '127.0.0.1',
+    'localhost',
     'deb9-201-218-230-34.ngrok-free.app',
+    'leivadev.pythonanywhere.com',
 ]
 
 # Application definition
