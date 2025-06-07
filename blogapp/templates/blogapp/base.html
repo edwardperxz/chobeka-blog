@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}CHOBEKABlog || Inicio {% endblock %}</title>
+  <title>{% block title %}ChobekaBlog | Inicio {% endblock %}</title>
 
   <script>
     (function () {
@@ -178,7 +178,7 @@
 </head>
 <body id="body" class="flex flex-col min-h-screen bg-gray-800 dark:bg-secondary_dark text-gray-900 dark:text-white transition-colors">
   <nav class="bg-primary_dark-200 dark:bg-secondary_dark shadow-md py-3 px-4 md:px-20 fixed top-0 left-0 right-0 z-50 transition-colors select-none pointer-events-none">
-  <div class="max-w-8xl mx-auto flex items-center justify-between w-full pointer-events-auto">
+    <div class="max-w-8xl mx-auto flex items-center justify-between w-full pointer-events-auto">
     <!-- Mobile: solo logo centrado y menús con iconos representativos -->
     <div class="flex items-center w-full justify-between md:justify-start">
       <!-- Botón menú izquierdo -->
@@ -299,7 +299,7 @@
             <img src="{% static 'Images/logout.svg' %}" alt="Logout" class="w-9 h-9 rounded-full block">
           </a>
         {% else %}
-          <a href="{% url 'blogapp:login_modal' %}" onclick="event.preventDefault(); openModal(this.href)" class="bg-primary_dark-300 hover:bg-primary_dark-600 text-white font-medium py-2 px-4 rounded hover:scale-105 transition-all duration-500 ease-in-out">Acceder</a>
+          <a href="{% url 'blogapp:login_modal' %}" class="bg-primary_dark-300 hover:bg-primary_dark-600 text-white font-medium py-2 px-4 rounded hover:scale-105 transition-all duration-500 ease-in-out">Acceder</a>
         {% endif %}
       {% endif %}
     </div>
@@ -339,7 +339,7 @@
           Takilla tu meme
         </a>
       {% else %}
-        <a href="{% url 'blogapp:login_modal' %}" onclick="event.preventDefault(); openModal(this.href)" class="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl text-lg transition-all duration-300 shadow">
+        <a href="{% url 'blogapp:login_modal' %}" class="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl text-lg transition-all duration-300 shadow">
           <span class="material-icons text-2xl">login</span>
           Acceder
         </a>
@@ -582,48 +582,24 @@
   <script src="{% static 'js/toaster.js' %}"></script>
   <script src="{% static 'js/comments.js' %}"></script>
 
-  <!-- Modal Login -->
-<!-- En la sección final de base.html, reemplaza el modal existente con: -->
-<div id="modal-container" class="fixed inset-0 z-50 hidden items-center justify-center">
-  <div class="relative" id="modal-content"></div>
-</div>
-
+<!-- Modal Login/Register -->
+{% block extra_scripts %}
 <script>
-// Función unificada para abrir modales
-function openModal(url) {
-  fetch(url)
-    .then(response => response.text())
-    .then(html => {
-      const container = document.getElementById('modal-container');
-      const content = document.getElementById('modal-content');
-      
-      content.innerHTML = html;
-      container.classList.remove('hidden');
-      document.body.classList.add('overflow-hidden');
-    });
-}
-
-// Función para cerrar modales
-function closeModal() {
-  const container = document.getElementById('modal-container');
-  container.classList.add('hidden');
-  document.body.classList.remove('overflow-hidden');
-}
-
-// Cerrar al hacer clic fuera del contenido
-document.addEventListener('click', function(e) {
-  const container = document.getElementById('modal-container');
-  if (e.target === container) {
-    closeModal();
+document.addEventListener('DOMContentLoaded', function() {
+  // Cambia el título dinámicamente según la URL
+  if (window.location.pathname === '/login_modal/') {
+    document.title = "ChobekaBlog | Login";
+  } else if (window.location.pathname === '/register_modal/') {
+    document.title = "ChobekaBlog | Registrarme";
   }
-});
 
-// Cerrar con ESC
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    closeModal();
+  window.closeModal = function() {
+    // Redirige a la página principal sin recargar
+    window.history.replaceState({}, '', '/');
+    window.location = '/';
   }
 });
 </script>
+{% endblock %}
 </body>
 </html>

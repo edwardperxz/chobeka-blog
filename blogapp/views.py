@@ -17,6 +17,8 @@ from django.db.models import Avg, Count, Q
 from django.contrib.auth.forms import UserCreationForm
 from random import choice
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
+from django.http import HttpResponse
 
 
 
@@ -642,7 +644,6 @@ class LoginView(FormView):
             messages.success(self.request, '¡Inicio de sesión exitoso!')
             next_url = self.request.GET.get('next', self.get_success_url())
             return redirect(next_url)
-
         messages.error(self.request, 'Usuario o contraseña inválidos.')
         return self.form_invalid(form)
 
@@ -661,18 +662,16 @@ class RegisterView(FormView):
     success_url = reverse_lazy('blogapp:login_modal')
 
     def form_valid(self, form):
-        User = form.save()
-        messages.success(
-            self.request,
-            '¡Registro exitoso! Por favor inicia sesión con tus nuevas credenciales.'
-        )
+        form.save()
+        messages.success(self.request, '¡Registro exitoso! Por favor inicia sesión con tus nuevas credenciales.')
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return HttpResponse('', status=204)
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(
-            self.request,
-            'Por favor corrige los errores en el formulario.'
-        )
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            html = render_to_string(self.template_name, {'form': form, 'messages': messages.get_messages(self.request)}, self.request)
+            return HttpResponse(html)
         return super().form_invalid(form)
 
     def dispatch(self, request, *args, **kwargs):

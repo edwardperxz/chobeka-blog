@@ -1,6 +1,34 @@
 {% extends 'base.html' %}
 {% block content %}
 
+  <!-- Pop-up explicativo (solo primera vez) -->
+  <div id="guia-popup"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 hidden">
+    <!-- Desktop -->
+    <div id="guia-desktop"
+         class="hidden md:flex flex-col items-center justify-center w-full max-w-2xl min-h-[400px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-10 text-center animate-fade-in">
+      <!-- GIF ilustrativo del sidebar -->
+      <div class="w-full flex justify-center mb-6">
+        <img src="static\Images\happy_chobeka_star.png" alt="Guía Sidebar" class="max-h-64 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+      </div>
+      <!-- Mensaje explicativo -->
+      <h2 class="text-3xl font-bold mb-4 text-gray-900 dark:text-white">¡Explora el Sidebar!</h2>
+      <p class="mb-6 text-gray-700 dark:text-gray-300">
+        Aquí encontrarás accesos rápidos para buscar, filtrar, crear blogs y navegar por la plataforma.<br>
+        Usa el menú de la izquierda para moverte fácilmente.
+      </p>
+      <button id="guia-entendido-btn"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+        Entendido
+      </button>
+    </div>
+    <!-- Mobile -->
+    <div id="guia-mobile"
+         class="md:hidden flex flex-col items-center justify-center w-[90vw] max-w-sm min-h-[320px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 text-center animate-fade-in">
+      <!-- Aquí irá la guía por partes para mobile (de momento vacío) -->
+    </div>
+  </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('filter-form').addEventListener('submit', function(e) {
@@ -291,6 +319,17 @@
       dropdown.classList.add('hidden');
     });
   });
+
+  // Cerrar el pop-up explicativo y mostrarlo en el futuro
+  document.getElementById('guia-entendido-btn').addEventListener('click', function() {
+    document.getElementById('guia-popup').classList.add('hidden');
+    localStorage.setItem('entryTutorialCheck', 'true');
+  });
+
+  // Mostrar el pop-up explicativo si es la primera visita
+  if (!localStorage.getItem('entryTutorialCheck')) {
+    document.getElementById('guia-popup').classList.remove('hidden');
+  }
 </script>
 
 {% endblock %}

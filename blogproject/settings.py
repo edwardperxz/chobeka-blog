@@ -155,9 +155,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Login and Logout redirects
 LOGIN_URL = '/login_modal/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/login_modal/'
-ACCOUNT_LOGOUT_REDIRECT_URL = '/login_modal/'
+LOGIN_REDIRECT_URL = '/login_modal/'
+LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+SOCIAL_AUTH_LOGIN_ERROR_URL = '/login_modal/'
+SOCIAL_AUTH_BACKEND_ERROR_URL = '/'
+SOCIAL_AUTH_INACTIVE_USER_URL = '/'
 SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_AUTO_SIGNUP = False
 
@@ -167,7 +170,7 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://deb9-201-218-230-34.ngrok-free.app', 
+    "http://localhost:8000/", "https://deb9-201-218-230-34.ngrok-free.app", "https://leivadev.pythonanywhere.com/", "http://127.0.0.1:8000/"
 ]
 
 # Configuración de sesión segura

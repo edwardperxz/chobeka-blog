@@ -1,5 +1,5 @@
 {% extends "blogapp/base.html" %}
-{% block title %}CHOBEKABlog || Register{% endblock %}
+{% block title %}ChobekaBlog | Register{% endblock %}
 {% load socialaccount %}
 {% block content %}
 <main class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
@@ -127,9 +127,9 @@
     <!-- Link a login -->
     <div class="mt-6 text-center text-sm text-white dark:text-gray-300">
       <p>¿Ya tienes una cuenta?</p>
-      <a href="{% url 'blogapp:login_modal' %}" onclick="event.preventDefault(); openModal(this.href)" class="font-medium text-red hover:text-red-600 transition">
-        Inicia sesión aquí
-      </a>
+        <a href="{% url 'blogapp:login_modal' %}" class="font-medium text-red hover:text-red-600 transition">
+          Inicia sesión aquí
+        </a>
     </div>
   </div>
 </main>
