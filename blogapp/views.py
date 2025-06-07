@@ -461,6 +461,13 @@ class BlogDetailView(DetailView):
         context['avg_rating'] = avg_rating
         context['review_count'] = review_count
         context['comments_count'] = comments_count
+        
+        user = self.request.user
+        if user.is_authenticated and user != blog.author:
+            has_reviewed = blog.reviews.filter(reviewer=user).exists()
+        else:
+            has_reviewed = False
+        context['can_add_review'] = user.is_authenticated and user != blog.author and not has_reviewed
         return context
 
 

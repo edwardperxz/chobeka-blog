@@ -139,7 +139,7 @@
     {% empty %}
       <p class="text-gray-900 dark:text-gray-400">Aqui no hay nada mo'. *Sonido de grillo*</p>
     {% endfor %}
-    {% if user.is_authenticated and user != object.author %}
+    {% if can_add_review %}
       <!-- Solo los usuarios que no son el autor pueden agregar una reseña -->
       <a href="{% url 'blogapp:add_review' object.pk %}" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors animate-fade-in">Agregar Reseña</a>
     {% endif %}
