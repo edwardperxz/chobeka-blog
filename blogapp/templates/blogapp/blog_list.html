@@ -41,7 +41,7 @@
         ¡Aquí el relajo y la creatividad no tienen límites!
       </p>
       <!-- Mobile -->
-      <button id="guia-entendido-btn"
+      <button id="guia-entendido-btn-mdm"
               class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-xl font-bold text-lg transition-colors shadow-md">
         ¡Cuero!
       </button>
@@ -340,10 +340,12 @@
     });
   });
 
-  // Cerrar el pop-up explicativo y mostrarlo en el futuro
-  document.getElementById('guia-entendido-btn').addEventListener('click', function() {
-    document.getElementById('guia-popup').classList.add('hidden');
-    localStorage.setItem('entryTutorialCheck', 'true');
+  // Cerrar el pop-up explicativo y mostrarlo en el futuro (funciona para ambos botones)
+  document.querySelectorAll('#guia-entendido-btn, #guia-entendido-btn-mdm').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.getElementById('guia-popup').classList.add('hidden');
+      localStorage.setItem('entryTutorialCheck', 'true');
+    });
   });
 
   // Mostrar el pop-up explicativo si es la primera visita
