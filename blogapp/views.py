@@ -17,6 +17,8 @@ from django.db.models import Avg, Count, Q
 from django.contrib.auth.forms import UserCreationForm
 from random import choice
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
+from django.http import HttpResponse
 
 
 
@@ -296,46 +298,34 @@ class BlogListView(ListView):
 
     def _apply_filters(self, queryset):
         """Apply all filters from request parameters to the queryset."""
-        filters = {}
-
-        # Filter by tag
-        tag = self.request.GET.get('tag', '').strip()
-        if tag:
-            queryset = queryset.filter(Q(tags__icontains=tag))
-
-        # Filter by author username
-        author = self.request.GET.get('author', '').strip()
-        if author:
-            filters['author__username'] = author
-
-        # Filter by province/location
-        location = (self.request.GET.get('province') or self.request.GET.get('location', '')).strip()
-        if location:
-            filters['author__profile__location'] = location
-
-        # Filter by date range
-        try:
-            date_from = self.request.GET.get('date_from', '').strip()
-            if date_from:
-                filters['created_at__gte'] = date_from
-
-            date_to = self.request.GET.get('date_to', '').strip()
-            if date_to:
-                filters['created_at__lte'] = date_to
-        except (ValueError, TypeError):
-            pass  # Ignore invalid date formats
-
-        # Apply collected filters
-        if filters:
-            queryset = queryset.filter(**filters)
-
-        # Search in title and content
         search_query = self.request.GET.get('search', '').strip()
+        tag = self.request.GET.get('tag', '').strip()
+        author = self.request.GET.get('author', '').strip()
+        province = (self.request.GET.get('province') or self.request.GET.get('location', '')).strip()
+        date_from = self.request.GET.get('date_from', '').strip()
+        date_to = self.request.GET.get('date_to', '').strip()
+
+        # Construir el filtro Q para OR global
+        q_objects = Q()
         if search_query:
-            queryset = queryset.filter(
-                Q(title__icontains=search_query) |
-                Q(content__icontains=search_query)
-            )
+            q_objects |= Q(title__icontains=search_query)
+            q_objects |= Q(content__icontains=search_query)
+            q_objects |= Q(tags__icontains=search_query)
+            q_objects |= Q(author__username__icontains=search_query)
+            q_objects |= Q(author__profile__location__icontains=search_query)
+        if tag:
+            q_objects |= Q(tags__icontains=tag)
+        if author:
+            q_objects |= Q(author__username__icontains=author)
+        if province:
+            q_objects |= Q(author__profile__location__icontains=province)
+        if date_from:
+            q_objects |= Q(created_at__gte=date_from)
+        if date_to:
+            q_objects |= Q(created_at__lte=date_to)
+
+        if q_objects:
+            queryset = queryset.filter(q_objects).distinct()
 
         return queryset
 
@@ -642,7 +632,6 @@ class LoginView(FormView):
             messages.success(self.request, '¡Inicio de sesión exitoso!')
             next_url = self.request.GET.get('next', self.get_success_url())
             return redirect(next_url)
-
         messages.error(self.request, 'Usuario o contraseña inválidos.')
         return self.form_invalid(form)
 
@@ -661,18 +650,16 @@ class RegisterView(FormView):
     success_url = reverse_lazy('blogapp:login_modal')
 
     def form_valid(self, form):
-        User = form.save()
-        messages.success(
-            self.request,
-            '¡Registro exitoso! Por favor inicia sesión con tus nuevas credenciales.'
-        )
+        form.save()
+        messages.success(self.request, '¡Registro exitoso! Por favor inicia sesión con tus nuevas credenciales.')
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return HttpResponse('', status=204)
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(
-            self.request,
-            'Por favor corrige los errores en el formulario.'
-        )
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            html = render_to_string(self.template_name, {'form': form, 'messages': messages.get_messages(self.request)}, self.request)
+            return HttpResponse(html)
         return super().form_invalid(form)
 
     def dispatch(self, request, *args, **kwargs):
