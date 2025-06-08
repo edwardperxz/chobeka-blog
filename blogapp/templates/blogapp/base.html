@@ -182,7 +182,7 @@
     <!-- Mobile: solo logo centrado y menús con iconos representativos -->
     <div class="flex items-center w-full justify-between md:justify-start">
       <!-- Botón menú izquierdo -->
-      <button id="open-left-sidebar" class="md:hidden p-2 text-gray-900 dark:text-white focus:outline-none">
+      <button id="open-left-sidebar" class="md:hidden p-2 text-white focus:outline-none">
         <span class="material-icons text-3xl">apps</span>
       </button>
       <!-- Línea separadora izquierda -->
@@ -281,7 +281,7 @@
       <!-- Línea separadora derecha -->
       <div class="md:hidden h-8 border-l border-gray-400 mx-2"></div>
       <!-- Botón menú derecho -->
-      <button id="open-right-sidebar" class="md:hidden p-2 text-gray-900 dark:text-white focus:outline-none">
+      <button id="open-right-sidebar" class="md:hidden p-2 text-white focus:outline-none">
         <span class="material-icons text-3xl">star</span>
       </button>
     </div>
@@ -313,19 +313,25 @@
   <div class="flex flex-col gap-6 py-8 px-4 mt-12 md:mt-0">
     <!-- Acciones principales -->
      {% if request.resolver_match.url_name == "blog_list" %}
-      <form method="get" class="block md:hidden w-full mt-4 mb-6 px-4">
+      <form method="get" class="block md:hidden w-full">
         <div class="flex items-center gap-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold py-3 px-4 rounded-xl text-lg transition-all duration-300 shadow border border-gray-200 dark:border-gray-700">
           <input
             type="text"
             name="search"
             id="search-mobile"
             value="{{ request.GET.search }}"
-            placeholder="Buscar blogs..."
+            placeholder="Buscar blogs, tags, autor..."
             class="flex-1 bg-transparent border-none focus:ring-0 outline-none text-inherit placeholder-gray-500 dark:placeholder-gray-400 text-base"
           />
+          <!-- Filtros avanzados ocultos para mantenerlos al buscar -->
+          <input type="hidden" name="tag" value="{{ request.GET.tag }}">
+          <input type="hidden" name="author" value="{{ request.GET.author }}">
+          <input type="hidden" name="province" value="{{ request.GET.province }}">
+          <input type="hidden" name="date_from" value="{{ request.GET.date_from }}">
+          <input type="hidden" name="date_to" value="{{ request.GET.date_to }}">
           <button
             type="submit"
-            class="flex items-center justify-center h-full text-white bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg transition-colors duration-200 shadow focus:outline-none"
+            class="flex items-center justify-center h-full text-white bg-blue-600 hover:bg-blue-700 px-4 py-3 rounded-lg transition-colors duration-200 shadow focus:outline-none"
           >
             <span class="material-icons text-2xl">search</span>
           </button>
@@ -337,11 +343,6 @@
         <a href="{% url 'blogapp:add_blog' %}" class="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl text-lg transition-all duration-300 shadow">
           <span class="material-icons text-2xl">add_circle</span>
           Takilla tu meme
-        </a>
-      {% else %}
-        <a href="{% url 'blogapp:login_modal' %}" class="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl text-lg transition-all duration-300 shadow">
-          <span class="material-icons text-2xl">login</span>
-          Acceder
         </a>
       {% endif %}
       {% if user.is_staff %}
@@ -385,42 +386,50 @@
             Aleatorio
           </a>
         </li>
-        {% if user.is_authenticated %}
-        <li>
-          <a href="{% url 'blogapp:profile' user.username %}" class="flex items-center gap-4 px-4 py-3 rounded-xl text-base font-medium hover:bg-gray-200 hover:dark:bg-primary_dark-300 transition">
-            <span class="material-icons text-2xl">person</span>
-            Mi Chantin
-          </a>
-        </li>
-        {% endif %}
       </ul>
     </nav>
     <hr class="border-secondary_dark dark:border-gray-700 my-2">
     <!-- Opciones de usuario y modo oscuro solo en mobile -->
     <div class="md:hidden flex flex-col gap-3">
-      <button onclick="toggleDarkMode()" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary_dark dark:bg-primary_dark-600 hover:scale-105 transition-all duration-300 w-fit">
-        <span id="theme-icon-mobile" class="material-icons text-2xl"></span>
-        <span class="text-base">Modo oscuro</span>
+      <button id="darkmode-btn-mobile" onclick="toggleDarkMode()" class="flex items-center gap-3 py-3 px-4 rounded-xl text-lg font-semibold bg-blue-600 text-white transition-all duration-300 shadow">
+        <span id="theme-icon-mobile" class="inline-block align-middle text-2xl w-7 h-7 text-center leading-none"></span>
+        <span id="theme-text-mobile" class="text-lg font-semibold">Modo oscuro</span>
       </button>
       {% if user.is_authenticated %}
-        <a href="{% url 'blogapp:profile' user.username %}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-200 hover:dark:bg-primary_dark-300 transition">
-          <img src="{% static 'Images/gg_profile.svg' %}" alt="Mi Chantin" class="w-9 h-9 rounded-full block">
-          <span class="font-medium">{{ user.username }}</span>
+        <a href="{% url 'blogapp:profile' user.username %}" class="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl text-lg transition-all duration-300 shadow">
+          <span class="material-icons text-2xl w-7 h-7 text-center align-middle">person</span>
+          <span class="text-lg font-semibold">Mi Chantin</span>
         </a>
-        <a href="{% url 'blogapp:logout' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-200 hover:dark:bg-primary_dark-300 transition">
-          <img src="{% static 'Images/logout.svg' %}" alt="Logout" class="w-9 h-9 rounded-full block">
-          <span class="font-medium">Salir</span>
-        </a>
+        <a href="{% url 'blogapp:logout' %}" class="flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl text-lg transition-all duration-300 shadow">
+          <span class="inline-block align-middle w-7 h-7 text-center">
+        <img src="{% static 'Images/logout.svg' %}" alt="Logout" class="w-7 h-7 rounded-full inline-block align-middle">
+      </span>
+      <span class="text-lg font-semibold">Salir</span>
+    </a>
       {% else %}
-        <a href="{% url 'blogapp:login_modal' %}" onclick="event.preventDefault(); openModal(this.href)" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary_dark-300 hover:bg-primary_dark-600 text-white font-medium transition-all duration-500 ease-in-out w-fit">
-          <span class="material-icons text-2xl">login</span>
+        <a href="{% url 'blogapp:login_modal' %}" class="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl text-lg transition-all duration-300 shadow">
+          <span class="material-icons text-2xl w-7 h-7 text-center align-middle">login</span>
           Acceder
         </a>
       {% endif %}
     </div>
+    <script>
+      function updateThemeTextMobile() {
+        const text = document.getElementById('theme-text-mobile');
+        const isDark = document.documentElement.classList.contains('dark');
+        text.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
+      }
+      document.addEventListener('DOMContentLoaded', updateThemeTextMobile);
+      // Llama a esta función después de cambiar el modo
+      const originalToggleDarkMode = window.toggleDarkMode;
+      window.toggleDarkMode = function() {
+        originalToggleDarkMode();
+        updateThemeTextMobile();
+      }
+    </script>
   </div>
   <button id="close-left-sidebar"
-  class="md:hidden absolute top-4 right-4 z-50 p-1 rounded-full text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 focus:outline-none">
+  class="md:hidden absolute top-4 left-4 z-50 p-1 rounded-full text-secondary_dark dark:text-white hover:text-gray-900 dark:hover:text-white transition-colors duration-200 focus:outline-none">
   <span class="material-icons text-3xl">close</span>
 </button>
 </div>
@@ -483,7 +492,7 @@
 
 <!-- Sidebar Right-->
 <div id="sidebar-right"
-  class="fixed right-0 z-10 w-full max-w-[90vw] h-full bg-primary_dark-100/95 dark:bg-primary_dark/95 text-primary_dark dark:text-white overflow-y-auto transition-transform duration-300 transform translate-x-full md:translate-x-0 md:w-80 md:top-16 md:h-[calc(100%-4rem)] border-l border-secondary_dark dark:border-[#374151] rounded-l-2xl shadow-2xl">
+  class="fixed right-0 z-50 w-full max-w-[90vw] h-full bg-primary_dark-100/95 dark:bg-primary_dark/95 text-white overflow-y-auto transition-transform duration-300 transform translate-x-full md:translate-x-0 md:w-72 md:top-16 md:h-[calc(100%-4rem)] border-l border-secondary_dark dark:border-[#374151] rounded-l-2xl md:rounded-none shadow-2xl">
   <div class="p-6 mt-2 flex flex-col gap-6">
     <h2 class="text-2xl font-bold mb-2 text-secondary_dark dark:text-white ml-auto mt-4 text-left md:text-center md:ml-0">Blogs recomendados</h2>
     <div id="recommended-blogs-list" class="flex flex-col gap-4">
@@ -516,7 +525,7 @@
     </div>
   </div>
   <button id="close-right-sidebar"
-  class="md:hidden absolute top-4 left-4 z-50 p-1 rounded-full text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 focus:outline-none">
+  class="md:hidden absolute top-4 left-4 z-50 p-1 rounded-full text-secondary_dark dark:text-white hover:text-gray-900 dark:hover:text-white transition-colors duration-200 focus:outline-none">
   <span class="material-icons text-3xl">close</span>
 </button>
 </div>

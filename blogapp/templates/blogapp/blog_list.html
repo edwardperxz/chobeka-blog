@@ -76,7 +76,7 @@
             {% endif %}
           </a>
           <!-- Nombre -->
-          <a href="{% url 'blogapp:profile' blog.author.username %}" class="ml-2 font-medium text-secondary_dark dark:text-white truncate hover:text-blue-700 dark:hover:text-blue-300 transition group">
+          <a href="{% url 'blogapp:profile' blog.author.username %}" class="ml-2 font-medium text-secondary_dark dark:text-white truncate hover:text-blue-300 transition group">
             {{ blog.author.username }}
           </a>
           <!-- Fecha -->
@@ -101,9 +101,9 @@
         </div>
         <!-- Tres puntos -->
         <div class="relative flex-shrink-0 ml-2">
-          <button class="p-1 rounded-full hover:bg-gray-400 dark:hover:bg-gray-700 focus:outline-none"
+          <button class="p-1 rounded-full hover:bg-gray-300 dark:hover:bg-gray-700 focus:outline-none"
                   id="menu-button-{{ blog.pk }}" aria-expanded="false" aria-haspopup="true">
-            <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="h-6 w-6 dark:text-white text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <circle cx="5" cy="12" r="1.5"/>
               <circle cx="12" cy="12" r="1.5"/>
               <circle cx="19" cy="12" r="1.5"/>
@@ -146,7 +146,7 @@
 
       <!-- Título -->
       <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="block group px-6 pt-2 -mt-4">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors break-words">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-300 transition-colors break-words">
           {{ blog.title }}
         </h2>
       </a>
