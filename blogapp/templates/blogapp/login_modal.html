@@ -7,7 +7,7 @@
 
 <!-- Desktop -->
 <div class="hidden md:flex fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-60">
-  <div class="w-full max-w-lg flex flex-col items-center bg-zinc-900 rounded-2xl shadow-2xl p-12 relative">
+  <div class="w-full max-w-lg flex flex-col items-center bg-[#214a80] dark:bg-[#0b1633] rounded-2xl shadow-2xl p-12 relative">
     <!-- Logo ChobekaBlog -->
     <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-20 my-8 select-none pointer-events-none">
     <h1 class="text-4xl font-bold text-white text-center mb-8">Iniciar sesión</h1>
@@ -54,7 +54,7 @@
     </form>
     <div class="flex items-center w-full my-6">
       <div class="flex-1 border-t border-[#ef4444]"></div>
-      <span class="mx-3 text-zinc-400 text-base">o</span>
+      <span class="mx-3 text-zinc-300 text-base">o</span>
       <div class="flex-1 border-t border-[#ef4444]"></div>
     </div>
     <div class="w-full flex flex-row gap-4 mb-2">
@@ -70,8 +70,8 @@
       </a>
     </div>
     <div class="w-full text-center mt-8">
-      <p class="text-gray-400 text-base dark:text-zinc-400">¿No tienes cuenta?
-        <a href="{% url 'blogapp:register_modal' %}" class="font-medium text-blue-500 hover:text-blue-700 transition">
+      <p class="text-gray-300 text-base dark:text-zinc-300">¿No tienes cuenta?
+        <a href="{% url 'blogapp:register_modal' %}" class="font-medium text-blue-300 hover:text-white transition">
           Regístrate Ahora
         </a>
       </p>
@@ -87,11 +87,11 @@
       {% csrf_token %}
       <input type="text" name="username" id="username-mobile" required
              placeholder="Usuario"
-             class="bg-zinc-900 text-white px-4 py-3 rounded border border-[#ef4444] focus:outline-none focus:ring-2 focus:ring-blue-500 w-full text-base">
+             class="bg-[#214a80] dark:bg-[#0b1633] text-white px-4 py-3 rounded border border-[#ef4444] focus:outline-none focus:ring-2 focus:ring-blue-500 w-full text-base">
       <div class="relative w-full">
         <input type="password" name="password" id="password-mobile" required
                placeholder="Contraseña"
-               class="bg-zinc-900 text-white px-4 py-3 rounded border border-[#ef4444] focus:outline-none focus:ring-2 focus:ring-blue-500 w-full pr-12 text-base">
+               class="bg-[#214a80] dark:bg-[#0b1633] text-white px-4 py-3 rounded border border-[#ef4444] focus:outline-none focus:ring-2 focus:ring-blue-500 w-full pr-12 text-base">
         <button type="button" tabindex="-1"
                 class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
                 onclick="togglePassword('password-mobile', 'toggle-password-icon-mobile')">

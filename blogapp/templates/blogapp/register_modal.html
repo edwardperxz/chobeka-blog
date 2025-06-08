@@ -142,7 +142,7 @@
       <!-- Username -->
       <input type="text" name="username" id="id_username_mobile"
         placeholder="Nombre de usuario"
-        class="w-full px-4 py-3 rounded border border-[#ef4444] bg-zinc-900 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+        class="w-full px-4 py-3 rounded border border-[#ef4444] bg-[#214a80] dark:bg-[#0b1633] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
         value="{{ form.username.value|default:'' }}">
       {% if form.username.errors %}
         <div class="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -155,7 +155,7 @@
       <!-- Email -->
       <input type="email" name="email" id="id_email_mobile"
         placeholder="Correo electrónico"
-        class="w-full px-4 py-3 rounded border border-[#ef4444] bg-zinc-900 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+        class="w-full px-4 py-3 rounded border border-[#ef4444] bg-[#214a80] dark:bg-[#0b1633] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
         value="{{ form.email.value|default:'' }}">
       {% if form.email.errors %}
         <div class="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -169,7 +169,7 @@
       <div class="relative w-full">
         <input type="password" name="password1" id="id_password1_mobile"
           placeholder="Contraseña"
-          class="w-full px-4 py-3 rounded border border-[#ef4444] bg-zinc-900 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base pr-12">
+          class="w-full px-4 py-3 rounded border border-[#ef4444] bg-[#214a80] dark:bg-[#0b1633] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base pr-12">
         <button type="button" tabindex="-1"
                 class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
                 onclick="togglePassword('id_password1_mobile', 'toggle-password-icon-register1-mobile')">
@@ -189,7 +189,7 @@
       <div class="relative w-full">
         <input type="password" name="password2" id="id_password2_mobile"
           placeholder="Confirmar contraseña"
-          class="w-full px-4 py-3 rounded border border-[#ef4444] bg-zinc-900 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base pr-12">
+          class="w-full px-4 py-3 rounded border border-[#ef4444] bg-[#214a80] dark:bg-[#0b1633] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base pr-12">
         <button type="button" tabindex="-1"
                 class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
                 onclick="togglePassword('id_password2_mobile', 'toggle-password-icon-register2-mobile')">
