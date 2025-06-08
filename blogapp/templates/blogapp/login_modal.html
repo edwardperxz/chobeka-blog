@@ -5,17 +5,14 @@
 
 {% block content %}
 
-<!-- Modal contenedor centrado -->
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-  <div class="bg-primary_dark-200 dark:bg-secondary_dark w-full max-w-md rounded-2xl shadow-xl p-6 relative">
-    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white" aria-label="Cerrar">
-      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-      </svg>
-    </button>
-    <h1 class="text-4xl font-bold text-white text-center mb-6">Iniciar sesión</h1>
+<!-- Desktop -->
+<div class="hidden md:flex fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-60">
+  <div class="w-full max-w-lg flex flex-col items-center bg-zinc-900 rounded-2xl shadow-2xl p-12 relative">
+    <!-- Logo ChobekaBlog -->
+    <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-20 my-8 select-none pointer-events-none">
+    <h1 class="text-4xl font-bold text-white text-center mb-8">Iniciar sesión</h1>
     {% if messages %}
-    <div class="mb-6">
+    <div class="mb-6 w-full">
         {% for message in messages %}
         <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-100{% else %}bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-100{% endif %}">
           <div class="flex items-center">
@@ -35,61 +32,116 @@
       </div>
     {% endif %}
 
-    <!-- Formulario -->
-    <form method="post" action="{% url 'blogapp:login_modal' %}" class="space-y-6">
+    <form method="post" action="{% url 'blogapp:login_modal' %}" class="w-full flex flex-col gap-4">
       {% csrf_token %}
-      <div>
-        <label for="username" class="block text-sm font-medium mb-1 text-white">Usuario</label>
-        <input type="text" name="username" id="username" required
-               class="bg-primary_dark-600 dark:bg-secondary_dark text-white px-4 py-3 rounded-lg w-full border border-gray-500 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <input type="text" name="username" id="username-desktop" required
+             placeholder="Usuario"
+             class="bg-zinc-800 text-white px-4 py-3 rounded border border-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full text-lg">
+      <div class="relative w-full">
+        <input type="password" name="password" id="password-desktop" required
+               placeholder="Contraseña"
+               class="bg-zinc-800 text-white px-4 py-3 rounded border border-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full pr-12 text-lg">
+        <button type="button" tabindex="-1"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                onclick="togglePassword('password-desktop', 'toggle-password-icon-desktop')">
+          <span id="toggle-password-icon-desktop" class="material-icons text-xl select-none">visibility_off</span>
+        </button>
       </div>
-      <div>
-        <label for="password" class="block text-sm font-medium mb-1 text-white">Contraseña</label>
-                  <input type="password" name="password" id="password" required
-               class="bg-primary_dark-600 dark:bg-secondary_dark text-white px-4 py-3 rounded-lg w-full border border-gray-500 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-      </div>
-
       <button type="submit"
-              class="w-full px-6 py-3 bg-red hover:bg-red-600 text-white rounded-lg transition-all duration-300">
+              class="w-full mt-2 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-lg font-semibold transition-all duration-300">
         Pa' Lante
       </button>
     </form>
-    <br/>
-    <div class="relative">
-        <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
-        </div>
-        <div class="relative flex justify-center text-sm">
-          <span class="px-2 bg-primary_dark-200 dark:bg-secondary_dark text-gray-500 dark:text-gray-400">
-            O inicia sesión con
-          </span>
-        </div>
-      </div>
-     
-      <div class="mt-6 grid grid-cols-2 gap-3">
-        <a href="{% provider_login_url 'google' %}"
-           class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
-           style="min-height:44px;">
-          <img src="{% static 'Images/google-icon.svg' %}" alt="Google" class="h-6 w-6 mr-2">
-          <span class="flex-1 text-center font-medium text-gray-700 dark:text-gray-200">Google</span>
-        </a>
-        <a href="{% url 'social:begin' 'facebook' %}"
-           class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-blue-600 hover:bg-blue-700 transition-all"
-           style="min-height:44px;">
-          <img src="{% static 'Images/facebook-icon.svg' %}" alt="Facebook" class="h-6 w-6 mr-2">
-          <span class="flex-1 text-center font-medium text-white">Facebook</span>
-        </a>
-      </div>
-
-    <!-- Enlace para registrarse -->
-    <div class="mt-6 text-center text-sm">
-      <p class="text-gray-300">¿No tienes cuenta?
-        <a href="{% url 'blogapp:register_modal' %}" class="font-medium text-red hover:text-red-600 transition">
+    <div class="flex items-center w-full my-6">
+      <div class="flex-1 border-t border-[#ef4444]"></div>
+      <span class="mx-3 text-zinc-400 text-base">o</span>
+      <div class="flex-1 border-t border-[#ef4444]"></div>
+    </div>
+    <div class="w-full flex flex-row gap-4 mb-2">
+      <a href="{% provider_login_url 'google' %}"
+         class="flex-1 flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all min-h-[48px]">
+        <img src="{% static 'Images/google-icon.svg' %}" alt="Google" class="h-6 w-6 mr-2">
+        <span class="flex-1 text-center font-medium text-gray-700 dark:text-gray-200">Google</span>
+      </a>
+      <a href="{% url 'social:begin' 'facebook' %}"
+         class="flex-1 flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-blue-600 hover:bg-blue-700 transition-all min-h-[48px]">
+        <img src="{% static 'Images/facebook-icon.svg' %}" alt="Facebook" class="h-6 w-6 mr-2">
+        <span class="flex-1 text-center font-medium text-white">Facebook</span>
+      </a>
+    </div>
+    <div class="w-full text-center mt-8">
+      <p class="text-gray-400 text-base dark:text-zinc-400">¿No tienes cuenta?
+        <a href="{% url 'blogapp:register_modal' %}" class="font-medium text-blue-500 hover:text-blue-700 transition">
           Regístrate Ahora
         </a>
       </p>
     </div>
   </div>
 </div>
+
+<!-- Mobile -->
+<div class="md:hidden fixed inset-0 z-40 w-full h-full flex flex-col justify-center items-center">
+  <div class="w-full max-w-xs flex flex-col items-center px-4">
+    <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-16 my-8 select-none pointer-events-none">
+    <form method="post" action="{% url 'blogapp:login_modal' %}" class="w-full flex flex-col gap-3">
+      {% csrf_token %}
+      <input type="text" name="username" id="username-mobile" required
+             placeholder="Usuario"
+             class="bg-zinc-900 text-white px-4 py-3 rounded border border-[#ef4444] focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+      <div class="relative w-full">
+        <input type="password" name="password" id="password-mobile" required
+               placeholder="Contraseña"
+               class="bg-zinc-900 text-white px-4 py-3 rounded border border-[#ef4444] focus:outline-none focus:ring-2 focus:ring-blue-500 w-full pr-12">
+        <button type="button" tabindex="-1"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                onclick="togglePassword('password-mobile', 'toggle-password-icon-mobile')">
+          <span id="toggle-password-icon-mobile" class="material-icons text-xl select-none">visibility_off</span>
+        </button>
+      </div>
+      <button type="submit"
+              class="w-full mt-2 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-base font-semibold transition-all duration-300">
+        Pa' Lante
+      </button>
+    </form>
+    <div class="flex items-center w-full my-4">
+      <div class="flex-1 border-t border-[#ef4444]"></div>
+      <span class="mx-3 text-gray-700 text-sm dark:text-zinc-400">o</span>
+      <div class="flex-1 border-t border-[#ef4444]"></div>
+    </div>
+    <div class="w-full flex flex-col gap-3">
+      <a href="{% provider_login_url 'google' %}"
+         class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+        <img src="{% static 'Images/google-icon.svg' %}" alt="Google" class="h-6 w-6 mr-2">
+        <span class="flex-1 text-center font-medium text-gray-700 dark:text-gray-200">Google</span>
+      </a>
+      <a href="{% url 'social:begin' 'facebook' %}"
+         class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-blue-600 hover:bg-blue-700 transition-all">
+        <img src="{% static 'Images/facebook-icon.svg' %}" alt="Facebook" class="h-6 w-6 mr-2">
+        <span class="flex-1 text-center font-medium text-white">Facebook</span>
+      </a>
+    </div>
+    <div class="w-full text-center mt-6">
+      <p class="text-gray-700 text-sm dark:text-zinc-400">¿No tienes cuenta?
+        <a href="{% url 'blogapp:register_modal' %}" class="font-medium text-blue-600 dark:text-blue-400 font-bold transition">
+          Regístrate Ahora
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function togglePassword(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.textContent = 'visibility';
+    } else {
+      input.type = 'password';
+      icon.textContent = 'visibility_off';
+    }
+  }
+</script>
 
 {% endblock %}
