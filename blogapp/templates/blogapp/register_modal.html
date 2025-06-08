@@ -3,141 +3,256 @@
 {% block title %}ChobekaBlog | Register{% endblock %}
 {% load socialaccount %}
 {% block content %}
-<main class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
-  <div class="w-full max-w-md bg-primary_dark-200 dark:bg-secondary_dark rounded-2xl shadow-xl p-6 relative">
 
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-4xl font-bold text-white text-center w-full">Registrarse</h1>
-      <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white" aria-label="Cerrar">
-        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
-    </div>
-
-    <!-- Mensajes del sistema -->
+<!-- Desktop -->
+<div class="hidden md:flex fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-60">
+  <div class="w-full max-w-lg flex flex-col items-center bg-[#214a80] dark:bg-[#0b1633] rounded-2xl shadow-2xl p-12 relative">
+    <!-- Logo ChobekaBlog -->
+    <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-20 my-8 select-none pointer-events-none">
+    <h1 class="text-4xl font-bold text-white text-center mb-8">Registrarse</h1>
     {% if messages %}
-      <div class="mb-6 space-y-2">
+    <div class="mb-6 w-full">
         {% for message in messages %}
-          <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-100{% else %}bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-100{% endif %}">
-            <div class="flex items-center space-x-2">
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="{% if message.tags == 'error' %}M6 18L18 6M6 6l12 12{% else %}M12 4v16m8-8H4{% endif %}" />
+        <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-100{% else %}bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-100{% endif %}">
+          <div class="flex items-center">
+            {% if message.tags == 'error' %}
+              <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
-              <span>{{ message }}</span>
-            </div>
+            {% else %}
+              <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            {% endif %}
+            {{ message }}
           </div>
+        </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <!-- Formulario -->
-    <form method="post" action="{% url 'blogapp:register_modal' %}" class="space-y-4" id="register-form">
+    <form method="post" action="{% url 'blogapp:register_modal' %}" class="w-full flex flex-col gap-4" id="register-form">
       {% csrf_token %}
-
       <!-- Username -->
-      <div>
-        <label for="id_username" class="block text-sm font-medium text-white mb-1">Nombre de usuario</label>
-        <input type="text" name="username" id="id_username"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-secondary_dark dark:text-white"
-          value="{{ form.username.value|default:'' }}">
-        {% if form.username.errors %}
-          <div class="mt-1 text-sm text-red-600 dark:text-red-400">
-            {% for error in form.username.errors %}
-              <p>{{ error }}</p>
-            {% endfor %}
-          </div>
-        {% endif %}
-      </div>
+      <input type="text" name="username" id="id_username"
+        placeholder="Nombre de usuario"
+        class="w-full px-4 py-3 rounded border border-[#ef4444] bg-zinc-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+        value="{{ form.username.value|default:'' }}">
+      {% if form.username.errors %}
+        <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {% for error in form.username.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
 
       <!-- Email -->
-      <div>
-        <label for="id_email" class="block text-sm font-medium mb-1 text-white">Correo electrónico</label>
-        <input type="email" name="email" id="id_email"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-secondary_dark dark:text-white"
-          value="{{ form.email.value|default:'' }}">
-        {% if form.email.errors %}
-          <div class="mt-1 text-sm text-red-600 dark:text-red-400">
-            {% for error in form.email.errors %}
-              <p>{{ error }}</p>
-            {% endfor %}
-          </div>
-        {% endif %}
-      </div>
+      <input type="email" name="email" id="id_email"
+        placeholder="Correo electrónico"
+        class="w-full px-4 py-3 rounded border border-[#ef4444] bg-zinc-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+        value="{{ form.email.value|default:'' }}">
+      {% if form.email.errors %}
+        <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {% for error in form.email.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
 
       <!-- Contraseña -->
-      <div>
-        <label for="id_password1" class="block text-sm font-medium text-white mb-1">Contraseña</label>
+      <div class="relative w-full">
         <input type="password" name="password1" id="id_password1"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-secondary_dark dark:text-white">
-        {% if form.password1.errors %}
-          <div class="mt-1 text-sm text-red-600 dark:text-red-400">
-            {% for error in form.password1.errors %}
-              <p>{{ error }}</p>
-            {% endfor %}
-          </div>
-        {% endif %}
-        <p class="mt-1 text-xs text-gray-300 dark:text-gray-400">
-          {{ form.password1.help_text }}
-        </p>
+          placeholder="Contraseña"
+          class="w-full px-4 py-3 rounded border border-[#ef4444] bg-zinc-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg pr-12">
+        <button type="button" tabindex="-1"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                onclick="togglePassword('id_password1', 'toggle-password-icon-register1')">
+          <span id="toggle-password-icon-register1" class="material-icons text-xl select-none">visibility_off</span>
+        </button>
       </div>
+      {% if form.password1.errors %}
+        <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {% for error in form.password1.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
 
       <!-- Confirmar contraseña -->
-      <div>
-        <label for="id_password2" class="block text-sm font-medium text-white mb-1">Confirmar contraseña</label>
+      <div class="relative w-full">
         <input type="password" name="password2" id="id_password2"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-secondary_dark dark:text-white">
-        {% if form.password2.errors %}
-          <div class="mt-1 text-sm text-red-600 dark:text-red-400">
-            {% for error in form.password2.errors %}
-              <p>{{ error }}</p>
-            {% endfor %}
-          </div>
-        {% endif %}
+          placeholder="Confirmar contraseña"
+          class="w-full px-4 py-3 rounded border border-[#ef4444] bg-zinc-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg pr-12">
+        <button type="button" tabindex="-1"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                onclick="togglePassword('id_password2', 'toggle-password-icon-register2')">
+          <span id="toggle-password-icon-register2" class="material-icons text-xl select-none">visibility_off</span>
+        </button>
       </div>
+      {% if form.password2.errors %}
+        <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {% for error in form.password2.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
 
       <!-- Botón -->
       <button type="submit"
-        class="w-full bg-red hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg text-lg transition duration-200">
         Registrarse
       </button>
     </form>
 
-    <!-- Divider -->
-    <div class="mt-6 relative">
-      <div class="absolute inset-0 flex items-center">
-        <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
-      </div>
-      <div class="relative flex justify-center text-sm">
-        <span class="px-2 bg-primary_dark-200 dark:bg-secondary_dark text-gray-400">O regístrate con</span>
-      </div>
+    <div class="flex items-center w-full my-6">
+      <div class="flex-1 border-t border-[#ef4444]"></div>
+      <span class="mx-3 text-zinc-300 text-base">o</span>
+      <div class="flex-1 border-t border-[#ef4444]"></div>
     </div>
 
-    <!-- Redes sociales -->
-    <div class="mt-6 grid grid-cols-2 gap-3">
+    <div class="w-full flex flex-row gap-4 mb-2">
       <a href="{% provider_login_url 'google' %}"
-         class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
-         style="min-height:44px;">
+         class="flex-1 flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-200 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all min-h-[48px]">
         <img src="{% static 'Images/google-icon.svg' %}" alt="Google" class="h-6 w-6 mr-2">
         <span class="flex-1 text-center font-medium text-gray-700 dark:text-gray-200">Google</span>
       </a>
       <a href="{% url 'social:begin' 'facebook' %}"
-         class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-blue-600 hover:bg-blue-700 transition-all"
-         style="min-height:44px;">
+         class="flex-1 flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-blue-600 hover:bg-blue-700 transition-all min-h-[48px]">
         <img src="{% static 'Images/facebook-icon.svg' %}" alt="Facebook" class="h-6 w-6 mr-2">
         <span class="flex-1 text-center font-medium text-white">Facebook</span>
       </a>
     </div>
 
-    <!-- Link a login -->
-    <div class="mt-6 text-center text-sm text-white dark:text-gray-300">
-      <p>¿Ya tienes una cuenta?</p>
-        <a href="{% url 'blogapp:login_modal' %}" class="font-medium text-red hover:text-red-600 transition">
+    <div class="w-full text-center mt-8">
+      <p class="text-gray-300 text-base dark:text-zinc-300">¿Ya tienes una cuenta?
+        <a href="{% url 'blogapp:login_modal' %}" class="text-blue-300 hover:text-white font-bold transition">
           Inicia sesión aquí
         </a>
+      </p>
     </div>
   </div>
-</main>
+</div>
+
+<!-- Mobile -->
+<div class="md:hidden fixed inset-0 z-40 w-full h-full flex flex-col justify-center items-center">
+  <div class="w-full max-w-sm flex flex-col items-center px-4 mt-6"> <!-- Cambiado max-w-xs a max-w-sm -->
+    <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-16 my-8 select-none pointer-events-none"> <!-- Logo más grande -->
+    <form method="post" action="{% url 'blogapp:register_modal' %}" class="w-full flex flex-col gap-3" id="register-form-mobile"> <!-- gap-3 para más espacio -->
+      {% csrf_token %}
+      <!-- Username -->
+      <input type="text" name="username" id="id_username_mobile"
+        placeholder="Nombre de usuario"
+        class="w-full px-4 py-3 rounded border border-[#ef4444] bg-[#214a80] dark:bg-[#0b1633] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+        value="{{ form.username.value|default:'' }}">
+      {% if form.username.errors %}
+        <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {% for error in form.username.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Email -->
+      <input type="email" name="email" id="id_email_mobile"
+        placeholder="Correo electrónico"
+        class="w-full px-4 py-3 rounded border border-[#ef4444] bg-[#214a80] dark:bg-[#0b1633] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+        value="{{ form.email.value|default:'' }}">
+      {% if form.email.errors %}
+        <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {% for error in form.email.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Contraseña -->
+      <div class="relative w-full">
+        <input type="password" name="password1" id="id_password1_mobile"
+          placeholder="Contraseña"
+          class="w-full px-4 py-3 rounded border border-[#ef4444] bg-[#214a80] dark:bg-[#0b1633] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base pr-12">
+        <button type="button" tabindex="-1"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                onclick="togglePassword('id_password1_mobile', 'toggle-password-icon-register1-mobile')">
+          <span id="toggle-password-icon-register1-mobile" class="material-icons text-xl select-none">visibility_off</span>
+        </button>
+      </div>
+      {% if form.password1.errors %}
+        <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {% for error in form.password1.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+
+      <!-- Confirmar contraseña -->
+      <div class="relative w-full">
+        <input type="password" name="password2" id="id_password2_mobile"
+          placeholder="Confirmar contraseña"
+          class="w-full px-4 py-3 rounded border border-[#ef4444] bg-[#214a80] dark:bg-[#0b1633] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base pr-12">
+        <button type="button" tabindex="-1"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                onclick="togglePassword('id_password2_mobile', 'toggle-password-icon-register2-mobile')">
+          <span id="toggle-password-icon-register2-mobile" class="material-icons text-xl select-none">visibility_off</span>
+        </button>
+      </div>
+      {% if form.password2.errors %}
+        <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {% for error in form.password2.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Botón -->
+      <button type="submit"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg text-base transition duration-200">
+        Registrarse
+      </button>
+    </form>
+
+    <div class="flex items-center w-full my-4">
+      <div class="flex-1 border-t border-[#ef4444]"></div>
+      <span class="mx-3 text-gray-700 text-sm dark:text-zinc-400">o</span>
+      <div class="flex-1 border-t border-[#ef4444]"></div>
+    </div>
+
+    <div class="w-full flex flex-col gap-3 mb-2">
+      <a href="{% provider_login_url 'google' %}"
+         class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all min-h-[44px]">
+        <img src="{% static 'Images/google-icon.svg' %}" alt="Google" class="h-6 w-6 mr-2">
+        <span class="flex-1 text-center font-medium text-gray-700 dark:text-gray-200">Google</span>
+      </a>
+      <a href="{% url 'social:begin' 'facebook' %}"
+         class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-blue-600 hover:bg-blue-700 transition-all min-h-[44px]">
+        <img src="{% static 'Images/facebook-icon.svg' %}" alt="Facebook" class="h-6 w-6 mr-2">
+        <span class="flex-1 text-center font-medium text-white">Facebook</span>
+      </a>
+    </div>
+
+    <div class="w-full text-center mt-6">
+      <p class="text-gray-700 text-sm dark:text-zinc-400">¿Ya tienes una cuenta?
+        <a href="{% url 'blogapp:login_modal' %}" class="font-medium text-blue-600 dark:text-blue-400 font-bold transition">
+          Inicia sesión aquí
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function togglePassword(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (input && icon) {
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = 'visibility';
+      } else {
+        input.type = 'password';
+        icon.textContent = 'visibility_off';
+      }
+    }
+  }
+</script>
 {% endblock %}

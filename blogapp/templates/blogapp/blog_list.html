@@ -9,23 +9,42 @@
          class="hidden md:flex flex-col items-center justify-center w-full max-w-2xl min-h-[400px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-10 text-center animate-fade-in">
       <!-- GIF ilustrativo del sidebar -->
       <div class="w-full flex justify-center mb-6">
-        <img src="static\Images\happy_chobeka_star.png" alt="Guía Sidebar" class="max-h-64 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+        <img src="static/Images/cp-dance.gif" alt="Guía Sidebar" class="w-[200px] h-auto rounded-lg">
       </div>
       <!-- Mensaje explicativo -->
-      <h2 class="text-3xl font-bold mb-4 text-gray-900 dark:text-white">¡Explora el Sidebar!</h2>
+      <h2 class="text-3xl font-bold mb-4 text-gray-900 dark:text-white">¡Bienvenido a ChobekaBlog! 😎</h2>
       <p class="mb-6 text-gray-700 dark:text-gray-300">
-        Aquí encontrarás accesos rápidos para buscar, filtrar, crear blogs y navegar por la plataforma.<br>
-        Usa el menú de la izquierda para moverte fácilmente.
+        ¡Estás en la mejor plataforma 100% panameña para compartir y descubrir memes!<br>
+        Explora, crea y comenta los memes más chuchones de la comunidad.<br>
+        Usa el menú de la izquierda para buscar, filtrar o takillar tu propio meme y únete a la salsa.<br>
+        ¡Aquí el relajo y la creatividad no tienen límites!
       </p>
+      <!-- Desktop -->
       <button id="guia-entendido-btn"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
-        Entendido
+              class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-xl font-bold text-lg transition-colors shadow-md">
+        ¡Cuero!
       </button>
     </div>
     <!-- Mobile -->
     <div id="guia-mobile"
-         class="md:hidden flex flex-col items-center justify-center w-[90vw] max-w-sm min-h-[320px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 text-center animate-fade-in">
-      <!-- Aquí irá la guía por partes para mobile (de momento vacío) -->
+         class="md:hidden flex flex-col items-center justify-center w-full max-w-xs min-h-[60vh] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-4 text-center animate-fade-in">
+      <!-- GIF ilustrativo del sidebar -->
+      <div class="w-full flex justify-center mb-4">
+        <img src="static/Images/cp-dance.gif" alt="Guía Sidebar" class="w-[200px] h-auto rounded-lg">
+      </div>
+      <!-- Mensaje explicativo -->
+      <h2 class="text-2xl font-bold mb-3 text-gray-900 dark:text-white leading-tight">¡Bienvenido a ChobekaBlog! 😎</h2>
+      <p class="mb-5 text-base text-gray-700 dark:text-gray-300 leading-snug">
+        ¡Estás en la mejor plataforma 100% panameña para compartir y descubrir memes!<br>
+        Explora, crea y comenta los memes más chuchones de la comunidad.<br>
+        Usa el menú de la izquierda para buscar, filtrar o takillar tu propio meme y únete a la salsa.<br>
+        ¡Aquí el relajo y la creatividad no tienen límites!
+      </p>
+      <!-- Mobile -->
+      <button id="guia-entendido-btn"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-xl font-bold text-lg transition-colors shadow-md">
+        ¡Cuero!
+      </button>
     </div>
   </div>
 
@@ -65,9 +84,9 @@
           <a href="{% url 'blogapp:profile' blog.author.username %}" class="flex-shrink-0 group transition">
             {% if blog.author.profile.profile_photo %}
               <img src="{{ blog.author.profile.profile_photo.url }}" alt="{{ blog.author.username }}"
-                   class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600 group-hover:border-blue-500 group-hover:ring-2 group-hover:ring-blue-300 dark:group-hover:border-blue-400 dark:group-hover:ring-blue-700 transition">
+                   class="w-10 h-10 rounded-full object-cover border-2 border-gray-600 dark:border-gray-600 group-hover:ring-2 group-hover:ring-gray-200 dark:group-hover:border-primary_dark-300 transition">
             {% else %}
-              <span class="w-10 h-10 flex items-center justify-center rounded-full border-2 border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-400 group-hover:border-blue-500 group-hover:ring-2 group-hover:ring-blue-300 dark:group-hover:border-blue-400 dark:group-hover:ring-blue-700 transition">
+              <span class="w-10 h-10 flex items-center justify-center rounded-full border-2 border-gray-600 dark:border-gray-600 group-hover:ring-2 group-hover:ring-gray-200 dark:group-hover:border-primary_dark-300 group-hover:border-primary_dark-300 dark:group-hover:border-primary_dark-300 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round"
                     d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
@@ -76,7 +95,7 @@
             {% endif %}
           </a>
           <!-- Nombre -->
-          <a href="{% url 'blogapp:profile' blog.author.username %}" class="ml-2 font-medium text-secondary_dark dark:text-white truncate hover:text-blue-300 transition group">
+          <a href="{% url 'blogapp:profile' blog.author.username %}" class="ml-2 font-medium text-secondary_dark dark:text-white truncate hover:text-blue-300 dark:hover:text-blue-300 transition group">
             {{ blog.author.username }}
           </a>
           <!-- Fecha -->
@@ -194,7 +213,7 @@
         <div class="flex items-center justify-between mt-4 flex-wrap gap-y-2">
           <!-- Botón comentarios -->
           <a href="{% url 'blogapp:blog_detail' blog.pk %}#comments"
-             class="flex items-center px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-blue-100 hover:text-blue-900 dark:hover:bg-blue-800 dark:hover:text-blue-200 transition">
+             class="flex items-center px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-blue-100 hover:text-blue-900 dark:hover:bg-blue-300 dark:hover:text-primary_dark transition">
             <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                     d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
