@@ -1,4 +1,5 @@
 {% extends "blogapp/base.html" %}
+{% load static %}
 {% block title %}ChobekaBlog | Register{% endblock %}
 {% load socialaccount %}
 {% block content %}
@@ -116,12 +117,18 @@
 
     <!-- Redes sociales -->
     <div class="mt-6 grid grid-cols-2 gap-3">
-      <a href="{% provider_login_url 'google' %}" class="google-btn w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
-          <span>Google</span>
-        </a>
-        <a href="{% url 'social:begin' 'facebook' %}" class="fb-btn w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-color-white">
-          <span class="w-full text-center ml-8 mt-6">Facebook</span>
-        </a>
+      <a href="{% provider_login_url 'google' %}"
+         class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+         style="min-height:44px;">
+        <img src="{% static 'Images/google-icon.svg' %}" alt="Google" class="h-6 w-6 mr-2">
+        <span class="flex-1 text-center font-medium text-gray-700 dark:text-gray-200">Google</span>
+      </a>
+      <a href="{% url 'social:begin' 'facebook' %}"
+         class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-blue-600 hover:bg-blue-700 transition-all"
+         style="min-height:44px;">
+        <img src="{% static 'Images/facebook-icon.svg' %}" alt="Facebook" class="h-6 w-6 mr-2">
+        <span class="flex-1 text-center font-medium text-white">Facebook</span>
+      </a>
     </div>
 
     <!-- Link a login -->
