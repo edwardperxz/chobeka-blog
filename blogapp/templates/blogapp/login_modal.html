@@ -81,17 +81,17 @@
 
 <!-- Mobile -->
 <div class="md:hidden fixed inset-0 z-40 w-full h-full flex flex-col justify-center items-center">
-  <div class="w-full max-w-xs flex flex-col items-center px-4">
+  <div class="w-full max-w-sm flex flex-col items-center px-4 mt-6">
     <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-16 my-8 select-none pointer-events-none">
     <form method="post" action="{% url 'blogapp:login_modal' %}" class="w-full flex flex-col gap-3">
       {% csrf_token %}
       <input type="text" name="username" id="username-mobile" required
              placeholder="Usuario"
-             class="bg-zinc-900 text-white px-4 py-3 rounded border border-[#ef4444] focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+             class="bg-zinc-900 text-white px-4 py-3 rounded border border-[#ef4444] focus:outline-none focus:ring-2 focus:ring-blue-500 w-full text-base">
       <div class="relative w-full">
         <input type="password" name="password" id="password-mobile" required
                placeholder="Contraseña"
-               class="bg-zinc-900 text-white px-4 py-3 rounded border border-[#ef4444] focus:outline-none focus:ring-2 focus:ring-blue-500 w-full pr-12">
+               class="bg-zinc-900 text-white px-4 py-3 rounded border border-[#ef4444] focus:outline-none focus:ring-2 focus:ring-blue-500 w-full pr-12 text-base">
         <button type="button" tabindex="-1"
                 class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
                 onclick="togglePassword('password-mobile', 'toggle-password-icon-mobile')">
@@ -110,12 +110,12 @@
     </div>
     <div class="w-full flex flex-col gap-3">
       <a href="{% provider_login_url 'google' %}"
-         class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+         class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all min-h-[44px]">
         <img src="{% static 'Images/google-icon.svg' %}" alt="Google" class="h-6 w-6 mr-2">
         <span class="flex-1 text-center font-medium text-gray-700 dark:text-gray-200">Google</span>
       </a>
       <a href="{% url 'social:begin' 'facebook' %}"
-         class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-blue-600 hover:bg-blue-700 transition-all">
+         class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-blue-600 hover:bg-blue-700 transition-all min-h-[44px]">
         <img src="{% static 'Images/facebook-icon.svg' %}" alt="Facebook" class="h-6 w-6 mr-2">
         <span class="flex-1 text-center font-medium text-white">Facebook</span>
       </a>

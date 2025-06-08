@@ -12,7 +12,11 @@ class UserRegisterForm(UserCreationForm):
         widget=forms.EmailInput(attrs={
             'class': 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
             'placeholder': 'Correo electrónico'
-        })
+        }),
+        error_messages={
+            'required': _('Este campo es obligatorio.'),
+            'invalid': _('Introduce una dirección de correo válida.'),
+        }
     )
 
     username = forms.CharField(
@@ -20,7 +24,11 @@ class UserRegisterForm(UserCreationForm):
         widget=forms.TextInput(attrs={
             'class': 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
             'placeholder': 'Nombre de usuario'
-        })
+        }),
+        error_messages={
+            'required': _('Este campo es obligatorio.'),
+            'unique': _('Este nombre de usuario ya está en uso.'),
+        }
     )
 
     password1 = forms.CharField(
@@ -29,7 +37,10 @@ class UserRegisterForm(UserCreationForm):
         widget=forms.PasswordInput(attrs={
             'class': 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
             'placeholder': 'Contraseña'
-        })
+        }),
+        error_messages={
+            'required': _('Este campo es obligatorio.'),
+        }
     )
     password2 = forms.CharField(
         required=True,
@@ -37,7 +48,10 @@ class UserRegisterForm(UserCreationForm):
         widget=forms.PasswordInput(attrs={
             'class': 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
             'placeholder': 'Confirmar contraseña'
-        })
+        }),
+        error_messages={
+            'required': _('Este campo es obligatorio.'),
+        }
     )
 
     class Meta:
@@ -68,7 +82,7 @@ class UserRegisterForm(UserCreationForm):
         # Solo validar coincidencia, omitir otras validaciones
         if password1 and password2 and password1 != password2:
             raise ValidationError(
-                "Las contraseñas no coinciden.",
+                _("Las contraseñas no coinciden."),
                 code='password_mismatch',
             )
         return password2
@@ -109,7 +123,10 @@ class PasswordUpdateForm(forms.Form):
             'placeholder': 'Contraseña actual'
         }),
         required=True,
-        label=_('Contraseña actual')
+        label=_('Contraseña actual'),
+        error_messages={
+            'required': _('Este campo es obligatorio.'),
+        }
     )
     new_password1 = forms.CharField(
         widget=forms.PasswordInput(attrs={
@@ -117,7 +134,10 @@ class PasswordUpdateForm(forms.Form):
             'placeholder': 'Nueva contraseña'
         }),
         required=True,
-        label=_('Nueva contraseña')
+        label=_('Nueva contraseña'),
+        error_messages={
+            'required': _('Este campo es obligatorio.'),
+        }
     )
     new_password2 = forms.CharField(
         widget=forms.PasswordInput(attrs={
@@ -125,7 +145,10 @@ class PasswordUpdateForm(forms.Form):
             'placeholder': 'Confirmar nueva contraseña'
         }),
         required=True,
-        label=_('Confirmar nueva contraseña')
+        label=_('Confirmar nueva contraseña'),
+        error_messages={
+            'required': _('Este campo es obligatorio.'),
+        }
     )
 
     def __init__(self, *args, **kwargs):
@@ -164,7 +187,11 @@ class EmailUpdateForm(forms.Form):
             'placeholder': 'Nuevo correo electrónico'
         }),
         required=True,
-        label=_('Nuevo correo electrónico')
+        label=_('Nuevo correo electrónico'),
+        error_messages={
+            'required': _('Este campo es obligatorio.'),
+            'invalid': _('Introduce una dirección de correo válida.'),
+        }
     )
     confirm_new_email = forms.EmailField(
         widget=forms.EmailInput(attrs={
@@ -172,7 +199,11 @@ class EmailUpdateForm(forms.Form):
             'placeholder': 'Confirmar nuevo correo electrónico'
         }),
         required=True,
-        label=_('Confirmar nuevo correo electrónico')
+        label=_('Confirmar nuevo correo electrónico'),
+        error_messages={
+            'required': _('Este campo es obligatorio.'),
+            'invalid': _('Introduce una dirección de correo válida.'),
+        }
     )
 
     def __init__(self, *args, **kwargs):
@@ -208,7 +239,10 @@ class ProfileDeletionForm(forms.Form):
             'placeholder': 'Nombre de usuario'
         }),
         required=True,
-        label=_('Nombre de usuario')
+        label=_('Nombre de usuario'),
+        error_messages={
+            'required': _('Este campo es obligatorio.'),
+        }
     )
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
@@ -216,14 +250,20 @@ class ProfileDeletionForm(forms.Form):
             'placeholder': 'Contraseña'
         }),
         required=True,
-        label=_('Contraseña')
+        label=_('Contraseña'),
+        error_messages={
+            'required': _('Este campo es obligatorio.'),
+        }
     )
     confirmation = forms.BooleanField(
         required=True,
         label=_('Confirmo que deseo eliminar mi cuenta permanentemente'),
         widget=forms.CheckboxInput(attrs={
             'class': 'h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500'
-        })
+        }),
+        error_messages={
+            'required': _('Debes confirmar que deseas eliminar tu cuenta.'),
+        }
     )
 
     def __init__(self, *args, **kwargs):
