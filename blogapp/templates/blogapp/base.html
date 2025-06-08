@@ -59,8 +59,8 @@
       theme: {
         extend: {
           fontFamily: {
-          sans: ['Roboto', 'sans-serif'], // Roboto como fuente predeterminada
-        },
+            sans: ['Roboto', 'sans-serif'],
+          },
           colors: {
             primary_dark:{
               DEFAULT: '#101C41',
@@ -75,7 +75,11 @@
               600: '#CC1E2C',
             },
           },
-        }
+        },
+        // breakpoint md a 1440px
+        screens: {
+          'md': '1440px',
+        },
       },
       plugins: []
     }
@@ -174,9 +178,29 @@
     background-color: #1F2937 !important;
     color: #fff !important;
   }
+
+  /* Overlay para mobile cuando sidebar está abierto */
+#sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(16,28,65,0.55);
+  z-index: 49;
+  transition: opacity 0.3s;
+}
+#sidebar-overlay.active {
+  display: block;
+  opacity: 1;
+}
+@media (min-width: 1025px) {
+  #sidebar-overlay { display: none !important; }
+}
   </style>
 </head>
 <body id="body" class="flex flex-col min-h-screen bg-gray-800 dark:bg-secondary_dark text-gray-900 dark:text-white transition-colors">
+
+<!-- Overlay para mobile -->
+<div id="sidebar-overlay"></div>
   <nav class="bg-primary_dark-200 dark:bg-secondary_dark shadow-md py-3 px-4 md:px-20 fixed top-0 left-0 right-0 z-50 transition-colors select-none pointer-events-none">
     <div class="max-w-8xl mx-auto flex items-center justify-between w-full pointer-events-auto">
     <!-- Mobile: solo logo centrado y menús con iconos representativos -->
@@ -556,6 +580,19 @@
 </script>
 
 <script>
+  // Forzar mobile si la pantalla es menor a 1440px
+  function forceMobileView() {
+    if (window.innerWidth < 1440) {
+      document.body.classList.add('force-mobile');
+    } else {
+      document.body.classList.remove('force-mobile');
+    }
+  }
+  window.addEventListener('DOMContentLoaded', forceMobileView);
+  window.addEventListener('resize', forceMobileView);
+</script>
+
+<script>
   // Sidebar izquierdo
   const sidebarLeft = document.getElementById('sidebar-left');
   const openLeftBtn = document.getElementById('open-left-sidebar');
@@ -580,7 +617,8 @@
 
   // Cerrar sidebars al hacer clic fuera (opcional)
   document.addEventListener('click', function(e) {
-    if (window.innerWidth < 768) {
+    // Forzar mobile si la clase está presente o si la pantalla es menor o igual a 1024px
+    if (document.body.classList.contains('force-mobile') || window.innerWidth <= 1024) {
       if (sidebarLeft && !sidebarLeft.contains(e.target) && !openLeftBtn.contains(e.target)) {
         sidebarLeft.classList.add('-translate-x-full');
       }
@@ -589,6 +627,80 @@
       }
     }
   });
+</script>
+
+<script>
+// Sidebar funcionalidad mejorada para mobile
+document.addEventListener('DOMContentLoaded', function() {
+  const sidebarLeft = document.getElementById('sidebar-left');
+  const openLeftBtn = document.getElementById('open-left-sidebar');
+  const closeLeftBtn = document.getElementById('close-left-sidebar');
+  const sidebarRight = document.getElementById('sidebar-right');
+  const openRightBtn = document.getElementById('open-right-sidebar');
+  const closeRightBtn = document.getElementById('close-right-sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+
+  function openSidebar(side) {
+    if (side === 'left') {
+      sidebarLeft.classList.remove('-translate-x-full');
+      sidebarRight.classList.add('translate-x-full');
+    } else {
+      sidebarRight.classList.remove('translate-x-full');
+      sidebarLeft.classList.add('-translate-x-full');
+    }
+    if (window.innerWidth < 1440) {
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+  function closeSidebars() {
+    sidebarLeft.classList.add('-translate-x-full');
+    sidebarRight.classList.add('translate-x-full');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  openLeftBtn && openLeftBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    openSidebar('left');
+  });
+  closeLeftBtn && closeLeftBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    closeSidebars();
+  });
+  openRightBtn && openRightBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    openSidebar('right');
+  });
+  closeRightBtn && closeRightBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    closeSidebars();
+  });
+
+  // Cerrar sidebars al hacer clic fuera
+  overlay && overlay.addEventListener('click', closeSidebars);
+
+  // Evita cerrar sidebar si haces clic dentro
+  sidebarLeft && sidebarLeft.addEventListener('click', function(e) {
+    if (window.innerWidth <= 1024) e.stopPropagation();
+  });
+  sidebarRight && sidebarRight.addEventListener('click', function(e) {
+    if (window.innerWidth <= 1024) e.stopPropagation();
+  });
+
+  // Cierra sidebars al cambiar tamaño a desktop
+  window.addEventListener('resize', function() {
+    if (window.innerWidth >= 1440) {
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+      sidebarLeft.classList.remove('-translate-x-full');
+      sidebarRight.classList.remove('translate-x-full');
+    } else {
+      sidebarLeft.classList.add('-translate-x-full');
+      sidebarRight.classList.add('translate-x-full');
+    }
+  });
+});
 </script>
 
     
