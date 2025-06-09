@@ -2,14 +2,15 @@
 {% load static %}
 {% block title %}ChobekaBlog | Register{% endblock %}
 {% load socialaccount %}
+{% block body_class %}register-modal-nav-logo{% endblock %}
 {% block content %}
 
 <!-- Desktop -->
-<div class="hidden md:flex fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-60">
-  <div class="w-full max-w-lg flex flex-col items-center bg-[#214a80] dark:bg-[#0b1633] rounded-2xl shadow-2xl p-12 relative">
+<div class="hidden md:flex fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-60" id="desktop-modal-overlay">
+  <div class="w-full max-w-lg flex flex-col items-center bg-[#214a80] dark:bg-[#0b1633] rounded-2xl shadow-2xl p-12 relative" style="max-height: calc(100vh - 109px); overflow-y: auto;">
     <!-- Logo ChobekaBlog -->
-    <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-20 my-8 select-none pointer-events-none">
-    <h1 class="text-4xl font-bold text-white text-center mb-8">Registrarse</h1>
+    <img src="{% static 'Images/registro_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-20 my-8 select-none pointer-events-none">
+    <h1 class="mb-8"></h1>
     {% if messages %}
     <div class="mb-6 w-full">
         {% for message in messages %}
@@ -112,9 +113,9 @@
 
     <div class="w-full flex flex-row gap-4 mb-2">
       <a href="{% provider_login_url 'google' %}"
-         class="flex-1 flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-200 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all min-h-[48px]">
+         class="flex-1 flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-white hover:bg-gray-300 dark:hover:bg-gray-300 transition-all min-h-[48px]">
         <img src="{% static 'Images/google-icon.svg' %}" alt="Google" class="h-6 w-6 mr-2">
-        <span class="flex-1 text-center font-medium text-gray-700 dark:text-gray-200">Google</span>
+        <span class="flex-1 text-center font-medium text-gray-700 dark:text-gray-700">Google</span>
       </a>
       <a href="{% url 'social:begin' 'facebook' %}"
          class="flex-1 flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-blue-600 hover:bg-blue-700 transition-all min-h-[48px]">
@@ -130,13 +131,17 @@
         </a>
       </p>
     </div>
+    <!-- Botón X -->
+    <button id="close-modal-desktop" class="absolute top-4 right-4 text-white hover:text-red-400 transition-colors p-1 z-50" aria-label="Cerrar">
+      <span class="material-icons text-2xl">close</span>
+    </button>
   </div>
 </div>
 
 <!-- Mobile -->
 <div class="md:hidden fixed inset-0 z-40 w-full h-full flex flex-col justify-center items-center">
-  <div class="w-full max-w-sm flex flex-col items-center px-4 mt-6"> <!-- Cambiado max-w-xs a max-w-sm -->
-    <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-16 my-8 select-none pointer-events-none"> <!-- Logo más grande -->
+  <div class="w-full max-w-sm flex flex-col items-center px-4 mt-6 register-mobile-modal"> <!-- Cambiado max-w-xs a max-w-sm -->
+    <img src="{% static 'Images/registro_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-16 my-8 select-none pointer-events-none"> <!-- Logo más grande -->
     <form method="post" action="{% url 'blogapp:register_modal' %}" class="w-full flex flex-col gap-3" id="register-form-mobile"> <!-- gap-3 para más espacio -->
       {% csrf_token %}
       <!-- Username -->
@@ -219,12 +224,12 @@
 
     <div class="w-full flex flex-col gap-3 mb-2">
       <a href="{% provider_login_url 'google' %}"
-         class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all min-h-[44px]">
+         class="w-full flex items-center justify-center py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm bg-white dark:bg-white hover:bg-gray-300 dark:hover:bg-gray-300 transition-all text-base">
         <img src="{% static 'Images/google-icon.svg' %}" alt="Google" class="h-6 w-6 mr-2">
-        <span class="flex-1 text-center font-medium text-gray-700 dark:text-gray-200">Google</span>
+        <span class="flex-1 text-center font-medium text-gray-700 dark:text-gray-700">Google</span>
       </a>
       <a href="{% url 'social:begin' 'facebook' %}"
-         class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-blue-600 hover:bg-blue-700 transition-all min-h-[44px]">
+         class="w-full flex items-center justify-center py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm bg-blue-600 hover:bg-blue-700 transition-all text-base">
         <img src="{% static 'Images/facebook-icon.svg' %}" alt="Facebook" class="h-6 w-6 mr-2">
         <span class="flex-1 text-center font-medium text-white">Facebook</span>
       </a>
@@ -240,6 +245,7 @@
   </div>
 </div>
 
+<script src="{% static 'js/modal.js' %}"></script>
 <script>
   function togglePassword(inputId, iconId) {
     const input = document.getElementById(inputId);
