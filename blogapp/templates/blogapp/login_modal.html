@@ -9,7 +9,7 @@
 
 <!-- Desktop -->
 <div class="hidden md:flex fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-60" id="desktop-modal-overlay">
-  <div class="w-full max-w-lg flex flex-col items-center bg-[#214a80] dark:bg-[#0b1633] rounded-2xl shadow-2xl p-12 relative">
+  <div class="w-full max-w-lg flex flex-col items-center bg-[#214a80] dark:bg-[#0b1633] rounded-2xl shadow-2xl p-12 relative" style="max-height: calc(100vh - 70px); overflow-y: auto;">
     <!-- Logo ChobekaBlog -->
     <img src="{% static 'Images/login_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-20 my-8 select-none pointer-events-none">
     <h1 class="mb-8"></h1>
@@ -38,11 +38,11 @@
       {% csrf_token %}
       <input type="text" name="username" id="username-desktop" required
              placeholder="Usuario"
-             class="bg-zinc-800 text-white px-4 py-3 rounded border border-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full text-lg">
+             class="w-full px-4 py-3 rounded border border-[#ef4444] bg-zinc-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg transition-colors">
       <div class="relative w-full">
         <input type="password" name="password" id="password-desktop" required
                placeholder="Contraseña"
-               class="bg-zinc-800 text-white px-4 py-3 rounded border border-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full pr-12 text-lg">
+               class="w-full px-4 py-3 rounded border border-[#ef4444] bg-zinc-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg pr-12 transition-colors">
         <button type="button" tabindex="-1"
                 class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
                 onclick="togglePassword('password-desktop', 'toggle-password-icon-desktop')">
@@ -93,11 +93,11 @@
       {% csrf_token %}
       <input type="text" name="username" id="username-mobile" required
              placeholder="Usuario"
-             class="bg-[#214a80] dark:bg-[#0b1633] text-white px-4 py-3 rounded border border-[#ef4444] focus:outline-none focus:ring-2 focus:ring-blue-500 w-full text-base">
+             class="w-full px-4 py-3 rounded border border-[#ef4444] bg-[#214a80] dark:bg-[#0b1633] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base transition-colors">
       <div class="relative w-full">
         <input type="password" name="password" id="password-mobile" required
                placeholder="Contraseña"
-               class="bg-[#214a80] dark:bg-[#0b1633] text-white px-4 py-3 rounded border border-[#ef4444] focus:outline-none focus:ring-2 focus:ring-blue-500 w-full pr-12 text-base">
+               class="w-full px-4 py-3 rounded border border-[#ef4444] bg-[#214a80] dark:bg-[#0b1633] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base pr-12 transition-colors">
         <button type="button" tabindex="-1"
                 class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
                 onclick="togglePassword('password-mobile', 'toggle-password-icon-mobile')">

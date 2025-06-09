@@ -7,7 +7,7 @@
 
 <!-- Desktop -->
 <div class="hidden md:flex fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-60" id="desktop-modal-overlay">
-  <div class="w-full max-w-lg flex flex-col items-center bg-[#214a80] dark:bg-[#0b1633] rounded-2xl shadow-2xl p-12 relative">
+  <div class="w-full max-w-lg flex flex-col items-center bg-[#214a80] dark:bg-[#0b1633] rounded-2xl shadow-2xl p-12 relative" style="max-height: calc(100vh - 109px); overflow-y: auto;">
     <!-- Logo ChobekaBlog -->
     <img src="{% static 'Images/registro_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-20 my-8 select-none pointer-events-none">
     <h1 class="mb-8"></h1>
@@ -111,14 +111,14 @@
       <div class="flex-1 border-t border-[#ef4444]"></div>
     </div>
 
-    <div class="w-full flex flex-col gap-3 mb-2">
+    <div class="w-full flex flex-row gap-4 mb-2">
       <a href="{% provider_login_url 'google' %}"
-         class="w-full flex items-center justify-center py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm bg-white dark:bg-white hover:bg-gray-300 dark:hover:bg-gray-300 transition-all text-base">
+         class="flex-1 flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-white hover:bg-gray-300 dark:hover:bg-gray-300 transition-all min-h-[48px]">
         <img src="{% static 'Images/google-icon.svg' %}" alt="Google" class="h-6 w-6 mr-2">
         <span class="flex-1 text-center font-medium text-gray-700 dark:text-gray-700">Google</span>
       </a>
       <a href="{% url 'social:begin' 'facebook' %}"
-         class="w-full flex items-center justify-center py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm bg-blue-600 hover:bg-blue-700 transition-all text-base">
+         class="flex-1 flex items-center justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-blue-600 hover:bg-blue-700 transition-all min-h-[48px]">
         <img src="{% static 'Images/facebook-icon.svg' %}" alt="Facebook" class="h-6 w-6 mr-2">
         <span class="flex-1 text-center font-medium text-white">Facebook</span>
       </a>
