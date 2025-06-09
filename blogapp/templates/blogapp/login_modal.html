@@ -3,14 +3,16 @@
 {% block title %}ChobekaBlog | Login{% endblock %}
 {% load socialaccount %}
 
+{% block body_class %}login-modal-nav-logo{% endblock %}
+
 {% block content %}
 
 <!-- Desktop -->
 <div class="hidden md:flex fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-60">
   <div class="w-full max-w-lg flex flex-col items-center bg-[#214a80] dark:bg-[#0b1633] rounded-2xl shadow-2xl p-12 relative">
     <!-- Logo ChobekaBlog -->
-    <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-20 my-8 select-none pointer-events-none">
-    <h1 class="text-4xl font-bold text-white text-center mb-8">Iniciar sesión</h1>
+    <img src="{% static 'Images/login_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-20 my-8 select-none pointer-events-none">
+    <h1 class="mb-8"></h1>
     {% if messages %}
     <div class="mb-6 w-full">
         {% for message in messages %}
@@ -82,7 +84,7 @@
 <!-- Mobile -->
 <div class="md:hidden fixed inset-0 z-40 w-full h-full flex flex-col justify-center items-center">
   <div class="w-full max-w-sm flex flex-col items-center px-4 mt-6">
-    <img src="{% static 'Images/logo_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-16 my-8 select-none pointer-events-none">
+    <img src="{% static 'Images/login_chobeka_blog.png' %}" alt="ChobekaBlog" class="h-16 my-8 select-none pointer-events-none">
     <form method="post" action="{% url 'blogapp:login_modal' %}" class="w-full flex flex-col gap-3">
       {% csrf_token %}
       <input type="text" name="username" id="username-mobile" required
