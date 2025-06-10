@@ -105,3 +105,11 @@ input:invalid, textarea:invalid {
     content: url('/static/Images/logo_chobeka_blog.png');
   }
 }
+
+@media (max-width: 775px) {
+  .mobile-scroll {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    max-height: 90vh;
+  }
+}
