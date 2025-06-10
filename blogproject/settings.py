@@ -84,7 +84,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'blogapp', 'templates', 'blogapp'),
+            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'blogapp', 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -95,6 +96,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'social_django.context_processors.backends',
                 'blogapp.context_processors.recommended_blogs',
+                'blogapp.context_processors.env_flags',
             ],
         },
     },
