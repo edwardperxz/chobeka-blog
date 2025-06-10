@@ -1,4 +1,6 @@
 import random
+import os
+from django.conf import settings
 from .models import Blog
 
 def recommended_blogs(request):
@@ -9,4 +11,10 @@ def recommended_blogs(request):
     random.shuffle(blogs)
     return {
         'recommended_blogs': blogs[:12]
+    }
+
+def env_flags(request):
+    return {
+        'debug': settings.DEBUG,
+        'pythonanywhere': 'PYTHONANYWHERE_DOMAIN' in os.environ,
     }

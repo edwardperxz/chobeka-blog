@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from blogapp.admin import admin_site 
+from blogapp.admin_tools import restart_pythonanywhere_server, get_restart_cooldown
 
 urlpatterns = [
     path('admin/', admin_site.urls),
@@ -27,4 +28,6 @@ urlpatterns = [
     path('social-auth/', include('social_django.urls', namespace='social')),
     path('accounts/google/login/callback/', include('allauth.socialaccount.urls')),
     path("ckeditor5/", include('django_ckeditor_5.urls')),
+    path('admin-tools/restart-server/', restart_pythonanywhere_server, name='restart_pythonanywhere_server'),
+    path('admin/restart_cooldown/', get_restart_cooldown, name='get_restart_cooldown'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
