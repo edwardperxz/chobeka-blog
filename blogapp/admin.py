@@ -8,12 +8,23 @@ from allauth.account.models import EmailAddress
 from allauth.socialaccount.models import SocialAccount, SocialToken, SocialApp
 from .models import BlogStats, Blog, Review, Comment
 from .admin_stats import BlogStatsAdmin
+from .admin_tools import get_last_restart, COOLDOWN_SECONDS
+import time
 
 # Custom admin site
 class CustomAdminSite(admin.AdminSite):
     site_header = "Blog de Memes Admin"
     site_title = "Panel de Administración"
     index_title = "Bienvenido al Dashboard"
+    index_template = "admin/index.html" 
+
+    def each_context(self, request):
+        context = super().each_context(request)
+        now = time.time()
+        last_restart = get_last_restart()
+        remaining = max(0, int(COOLDOWN_SECONDS - (now - last_restart)))
+        context['restart_cooldown_remaining'] = remaining
+        return context
 
 admin_site = CustomAdminSite(name='admin')
 

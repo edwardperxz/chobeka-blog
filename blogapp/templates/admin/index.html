@@ -1,4 +1,39 @@
 {% extends "admin/index.html" %}  <!-- Extiende el template original del admin -->
+{% load static %}
+{% load i18n %}
+{% load admin_urls %}
+
+{% block nav-global %}
+  {{ block.super }}
+  {% if request.user.is_staff %}
+    <form method="post" action="{% url 'restart_pythonanywhere_server' %}" id="restart-form">
+      {% csrf_token %}
+      <button type="submit"
+              id="restart-btn"
+              style="
+                background: none;
+                border: none;
+                color: #fff;
+                font-size: 15px;
+                font-family: inherit;
+                cursor: pointer;
+                padding: 0 0.5em;
+                margin: 0;
+                text-decoration: underline;
+                transition: color 0.2s;
+              "
+              {% if restart_cooldown_remaining > 0 %}disabled style="opacity:0.5;cursor:not-allowed;"{% endif %}
+      >
+        &#x21bb; Reiniciar servidor
+      </button>
+      {% if restart_cooldown_remaining > 0 %}
+        <span style="margin-left:8px; font-size:13px; color:#ffe;">
+          No disponible. Debes esperar antes de reiniciar el servidor nuevamente.
+        </span>
+      {% endif %}
+    </form>
+  {% endif %}
+{% endblock %}
 
 {% block content %}
 <!-- Añade tus estadísticas ENCIMA de las secciones predeterminadas -->
