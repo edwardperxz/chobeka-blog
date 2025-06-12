@@ -292,35 +292,9 @@ CKEDITOR_5_CONFIGS = {
     ],
     'toolbar': {
         'items': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
-                    'code','subscript', 'superscript', 'highlight', '|', 'codeBlock', 'sourceEditing', 'insertImage',
-                'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', 'imageUpload', '|',
-                'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
-                'insertTable',
+                'bulletedList', 'numberedList', 'todoList', '|', 'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor','removeFormat',
                 ],
         'shouldNotGroupWhenFull': True
-    },
-    'image': {
-        'toolbar': ['imageTextAlternative', '|', 'imageStyle:alignLeft',
-                    'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side',  '|'],
-        'styles': [
-            'full',
-            'side',
-            'alignLeft',
-            'alignRight',
-            'alignCenter',
-        ]
-    },
-    'table': {
-        'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
-        'tableProperties', 'tableCellProperties' ],
-        'tableProperties': {
-            'borderColors': customColorPalette,
-            'backgroundColors': customColorPalette
-        },
-        'tableCellProperties': {
-            'borderColors': customColorPalette,
-            'backgroundColors': customColorPalette
-        }
     },
     'heading' : {
         'options': [
