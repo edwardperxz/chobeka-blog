@@ -78,7 +78,7 @@
         },
         // breakpoint md a 1440px
         screens: {
-          'md': '1440px',
+          'md': '1575px',
         },
       },
       plugins: []
@@ -465,7 +465,7 @@
 
 
   <main class="flex-grow w-full bg-primary_dark-100 dark:bg-primary_dark transition-colors mt-16 flex justify-center">
-    <div class="w-full max-w-4xl px-4 py-8">
+    <div class="w-full max-w-5xl px-4 py-8">
       {% block content %}
       <div class="relative w-full max-w-4xl mx-auto bg-gray-600 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
         <!-- Fondo difuminado dinámico -->
@@ -582,7 +582,7 @@
 <script>
   // Forzar mobile si la pantalla es menor a 1440px
   function forceMobileView() {
-    if (window.innerWidth < 1440) {
+    if (window.innerWidth < 1575) {
       document.body.classList.add('force-mobile');
     } else {
       document.body.classList.remove('force-mobile');
@@ -648,7 +648,7 @@ document.addEventListener('DOMContentLoaded', function() {
       sidebarRight.classList.remove('translate-x-full');
       sidebarLeft.classList.add('-translate-x-full');
     }
-    if (window.innerWidth < 1440) {
+    if (window.innerWidth < 1575) {
       overlay.classList.add('active');
       document.body.style.overflow = 'hidden';
     }
@@ -690,7 +690,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Cierra sidebars al cambiar tamaño a desktop
   window.addEventListener('resize', function() {
-    if (window.innerWidth >= 1440) {
+    if (window.innerWidth >= 1575) {
       overlay.classList.remove('active');
       document.body.style.overflow = '';
       sidebarLeft.classList.remove('-translate-x-full');
