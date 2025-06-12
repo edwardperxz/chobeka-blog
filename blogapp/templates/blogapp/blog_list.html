@@ -190,9 +190,9 @@
       <div class="px-6 pb-6">
         <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="block group">
           {% if blog.content and blog.content|striptags|length > 0 and blog.content|striptags != "&nbsp;" %}
-            <p class="text-gray-600 dark:text-gray-300 mb-6 line-clamp-3">
-              {{ blog.content|striptags|truncatewords:30 }}
-            </p>
+            <div class="prose max-w-none text-gray-600 dark:text-gray-300 mb-6 line-clamp-3">
+              {{ blog.content|safe }}
+            </div>
           {% endif %}
         </a>
 

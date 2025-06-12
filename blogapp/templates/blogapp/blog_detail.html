@@ -27,7 +27,7 @@
         </div>
       {% endif %}
     </div>
-    <p class="text-gray-700 dark:text-gray-300 mb-4">{{ object.content|safe }}</p>
+    <div class="text-gray-700 dark:text-gray-300 mb-4 break-words whitespace-pre-line">{{ object.content|safe }}</div>
     {% if object.image %}
       <!-- Contenedor para la imagen -->
       <div class="relative w-full max-w-4xl mx-auto bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
