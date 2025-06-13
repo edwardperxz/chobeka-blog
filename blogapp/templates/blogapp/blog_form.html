@@ -6,302 +6,395 @@
 {% endblock %}
 
 {% block content %}
-  <h1 class="text-3xl font-bold mb-8 text-gray-900 dark:text-white">
-    {% if form.instance.pk %}
-      Editar Blog
-    {% else %}
-      Crear Nuevo Blogazo
-    {% endif %}
-  </h1>
+<div class="min-h-[calc(100vh-80px)] flex items-center justify-center py-8 px-2">
+  <div class="w-full max-w-4xl text-secondary_dark dark:text-white transition-all duration-300">
+    <div class="flex flex-col items-center mb-8">
+      <h1 class="text-2xl font-extrabold mt-4">
+        {% if form.instance.pk %}
+          Editar Blog
+        {% else %}
+          Crear Nuevo Blogazo
+        {% endif %}
+      </h1>
+    </div>
+    {{ form.media }}
+    <form method="post" enctype="multipart/form-data" class="flex flex-col gap-5" autocomplete="off" id="blog-form">
+      {% csrf_token %}
 
-  {{ form.media }}
-  
-  <form method="post" enctype="multipart/form-data"
-    class="max-w-8xl mx-auto dark:bg-transparent space-y-8 transition-all duration-700 ease-in-out animate-fade-in dark:border-gray-900">
-    {% csrf_token %}
-    <div class="space-y-6">
-
-      {# Campo de título grande #}
+      <!-- Título -->
       <div>
-        <label for="id_title" class="block text-lg font-medium text-gray-900 dark:text-white mb-2">Título<span class="text-red-500">*</span></label>
-        {{ form.title|add_class:"w-full text-lg px-6 py-4 rounded-2xl border border-gray-900 dark:border-gray-600 bg-transparent text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+        <label for="id_title" class="block text-base font-semibold mb-1">Título <span class="text-red-500">*</span></label>
+        {{ form.title|add_class:"bg-blue-50 dark:bg-[#223366] text-blue-900 dark:text-blue-100 px-4 py-3 rounded-xl w-full border border-blue-200 dark:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-base transition" }}
         <div class="flex justify-end mt-1">
           <span class="text-sm text-gray-600 dark:text-gray-400" id="title-counter">0/300</span>
         </div>
+        {% if form.title.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.title.errors|striptags }}</p>
+        {% endif %}
       </div>
 
       {# Campo de tags #}
       <div>
         <div class="flex items-center mb-2 justify-between">
-          <label for="{{ form.tags.id_for_label }}" class="block text-lg font-medium text-gray-900 dark:text-white">Tags</label>
+          <label for="{{ form.tags.id_for_label }}" class="block text-base font-semibold">Tags</label>
           <button type="button" id="add-interest-btn"
-            class="w-10 h-10 p-0 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white flex items-center justify-center transition-all duration-150 transform hover:scale-110 focus:outline-none"
+            class="w-10 h-10 p-0 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-all duration-150 transform hover:scale-110 focus:outline-none"
             title="Agregar Tag">
             <span class="material-icons text-2xl">add</span>
           </button>
         </div>
-        <!-- Hide the textarea but keep it for form submission -->
+        <!-- Ocultar el textarea pero mantenerlo para el envío del formulario -->
         <textarea name="{{ form.tags.name }}" id="{{ form.tags.id_for_label }}" style="display: none;"
-          class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">{{ form.tags.value }}</textarea>
+          class="bg-blue-50 dark:bg-[#223366] text-blue-900 dark:text-blue-100 px-4 py-3 rounded-xl w-full border border-blue-200 dark:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-base transition">{{ form.tags.value }}</textarea>
         <div class="flex flex-wrap gap-2 mt-2 interest-tags"></div>
         <div id="tag-popup"
-          class="hidden mt-2 p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+          class="hidden mt-2 p-4 border border-blue-200 dark:border-blue-700 rounded-xl bg-blue-50 dark:bg-[#223366] shadow-lg">
           <input type="text" id="new-tag" maxlength="50" placeholder="Añade un nuevo tag (50 chars max)"
-            class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            class="bg-white dark:bg-[#18223a] text-blue-900 dark:text-blue-100 px-3 py-2 rounded-lg w-full border border-blue-200 dark:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
           <div class="flex justify-end mt-2 space-x-2">
             <button type="button" id="save-tag-btn"
-              class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm">Guardar</button>
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-base">Guardar</button>
             <button type="button" id="cancel-tag-btn"
-              class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md text-sm">Cancelar</button>
+              class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-blue-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-lg text-base">Cancelar</button>
           </div>
         </div>
+        {% if form.tags.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.tags.errors|striptags }}</p>
+        {% endif %}
       </div>
 
       {# Campo de contenido (CKEditor) #}
       <div>
-        <label for="id_content" class="block text-lg font-medium text-gray-900 dark:text-white mb-2">Cuerpo de texto <span class="text-gray-500 dark:text-gray-400 text-base">(opcional)</span></label>
-        {{ form.content|add_class:"w-full rounded-2xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+        <label for="id_content" class="block text-base font-semibold mb-1">Cuerpo de texto <span class="text-gray-500 dark:text-gray-400 text-base">(opcional)</span></label>
+        {{ form.content|add_class:"w-full rounded-xl border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-[#223366] text-blue-900 dark:text-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400" }}
+        {% if form.content.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.content.errors|striptags }}</p>
+        {% endif %}
       </div>
 
-      {# Otros campos (por ejemplo, imagen) #}
+      <!-- Otros campos -->
       {% for field in form %}
         {% if field.name not in 'title tags content' %}
           <div>
-            <label for="{{ field.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">{{ field.label }}</label>
+            <label for="{{ field.id_for_label }}" class="block text-base font-semibold mb-1">Imágen</label>
             {% if field.name == 'image' %}
-              <div class="flex items-center gap-3">
+              <div class="relative flex items-center justify-center w-full min-h-[120px] bg-gray-900 border border-dashed border-gray-600 rounded-2xl mb-2 group">
                 <input type="file" name="{{ field.name }}" id="{{ field.id_for_label }}"
-                  class="hidden" accept="image/*">
-                <button type="button" id="image-action-btn"
-                  class="w-10 h-10 p-0 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white flex items-center justify-center transition-all duration-150 transform hover:scale-110 focus:outline-none"
-                  title="Agregar o eliminar imagen">
-                  <span id="image-action-icon" class="material-icons text-2xl">
-                    {% if form.instance.image %}
-                      close
-                    {% else %}
-                      add
-                    {% endif %}
+                  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  accept="image/*">
+                <!-- Fondo y mensaje -->
+                <div id="image-upload-bg" class="flex flex-col items-center justify-center w-full pointer-events-none py-10 {% if form.instance.image %}hidden{% endif %}">
+                  <span class="text-gray-200 text-base mb-2">Arrastrar y soltar o subir contenido multimedia</span>
+                  <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16v-8m0 0l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
+                    </svg>
                   </span>
-                </button>
-                <span id="image-file-name" class="text-gray-700 dark:text-gray-300 text-sm">
-                  {% if form.instance.image %}
-                    {{ form.instance.image.name|default_if_none:"" }}
-                  {% endif %}
-                </span>
+                </div>
+                <!-- Vista previa de imagen -->
                 <img
                   id="image-preview"
                   src="{% if form.instance.image %}{{ form.instance.image.url }}{% endif %}"
                   alt="Vista previa"
-                  class="w-14 h-14 object-cover rounded-lg border border-gray-300 dark:border-gray-700 {% if not form.instance.image %}hidden{% endif %}">
-                <input type="hidden" name="remove_image" id="remove-image-flag" value="0">
+                  class="absolute inset-0 w-full h-full object-contain rounded-2xl bg-black bg-opacity-60 {% if not form.instance.image %}hidden{% endif %} z-20">
+                <button type="button" id="remove-image-btn"
+                  class="absolute top-2 right-2 bg-gray-800 bg-opacity-80 hover:bg-red-600 text-white rounded-full p-1 shadow transition-all z-30 {% if not form.instance.image %}hidden{% endif %}">
+                  <span class="material-icons text-base">close</span>
+                </button>
               </div>
+              <span id="image-file-name" class="block text-blue-900 dark:text-blue-100 text-sm mb-2"></span>
+              <input type="hidden" name="remove_image" id="remove-image-flag" value="0">
               <script>
                 document.addEventListener('DOMContentLoaded', function () {
                   const input = document.getElementById('{{ field.id_for_label }}');
-                  const actionBtn = document.getElementById('image-action-btn');
-                  const actionIcon = document.getElementById('image-action-icon');
-                  const fileNameSpan = document.getElementById('image-file-name');
                   const preview = document.getElementById('image-preview');
+                  const removeBtn = document.getElementById('remove-image-btn');
+                  const fileNameSpan = document.getElementById('image-file-name');
                   const removeFlag = document.getElementById('remove-image-flag');
-
-                  function setToAdd() {
-                    actionIcon.textContent = 'add';
-                    actionBtn.title = 'Agregar imagen';
-                    removeFlag.value = "0";
-                  }
-                  function setToRemove() {
-                    actionIcon.textContent = 'close';
-                    actionBtn.title = 'Eliminar imagen';
-                    removeFlag.value = "0";
-                  }
-
-                  // Estado inicial robusto:
-                  if (preview && preview.src && !preview.classList.contains('hidden')) {
-                    setToRemove();
-                  } else {
-                    setToAdd();
-                  }
-
-                  actionBtn.addEventListener('click', function () {
-                    if (actionIcon.textContent === 'add') {
-                      input.click();
-                    } else {
-                      // Eliminar imagen
-                      input.value = '';
-                      fileNameSpan.textContent = '';
-                      preview.src = '';
-                      preview.classList.add('hidden');
-                      setToAdd();
-                      removeFlag.value = "1";
-                    }
-                  });
+                  const bg = document.getElementById('image-upload-bg');
 
                   if (input) {
                     input.addEventListener('change', function () {
                       if (input.files.length) {
                         fileNameSpan.textContent = input.files[0].name;
-                        // Mostrar vista previa
                         const reader = new FileReader();
                         reader.onload = function(e) {
                           preview.src = e.target.result;
                           preview.classList.remove('hidden');
+                          removeBtn.classList.remove('hidden');
+                          if (bg) bg.classList.add('hidden');
                         }
                         reader.readAsDataURL(input.files[0]);
-                        setToRemove();
                         removeFlag.value = "0";
                       } else {
                         fileNameSpan.textContent = '';
                         preview.src = '';
                         preview.classList.add('hidden');
-                        setToAdd();
+                        removeBtn.classList.add('hidden');
+                        if (bg) bg.classList.remove('hidden');
                       }
                     });
+                  }
+                  if (removeBtn) {
+                    removeBtn.addEventListener('click', function (e) {
+                      e.preventDefault();
+                      input.value = '';
+                      fileNameSpan.textContent = '';
+                      preview.src = '';
+                      preview.classList.add('hidden');
+                      removeBtn.classList.add('hidden');
+                      if (bg) bg.classList.remove('hidden');
+                      removeFlag.value = "1";
+                    });
+                  }
+                  // Mostrar nombre si ya hay imagen
+                  if (preview && !preview.classList.contains('hidden') && input && !input.files.length) {
+                    fileNameSpan.textContent = preview.src.split('/').pop();
+                    removeBtn.classList.remove('hidden');
+                    if (bg) bg.classList.add('hidden');
                   }
                 });
               </script>
             {% else %}
-              {{ field|add_class:"bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+              {{ field|add_class:"bg-blue-50 dark:bg-[#223366] text-blue-900 dark:text-blue-100 px-4 py-3 rounded-xl w-full border border-blue-200 dark:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-base transition" }}
             {% endif %}
             {% if field.errors %}
-              <p class="text-red-500 text-sm">{{ field.errors|striptags }}</p>
+              <p class="text-red-500 text-sm mt-1">{{ field.errors|striptags }}</p>
             {% endif %}
           </div>
         {% endif %}
       {% endfor %}
 
-    </div>
-    <div class="flex justify-end gap-4 mt-8">
-      <button type="submit" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold text-lg transition-all duration-300">
-        {% if form.instance.pk %}
-          Actualizar
-        {% else %}
-          Publicar
-        {% endif %}
-      </button>
-    </div>
-  </form>
+      <!-- Botones -->
+      <div class="flex flex-col gap-4 mt-6 md:flex-row md:gap-4 md:justify-end">
+        <!-- Mobile -->
+        <button type="submit"
+                class="w-full md:w-auto order-1 md:order-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl text-lg shadow transition-all">
+          {% if form.instance.pk %}
+            Actualizar
+          {% else %}
+            Publicar
+          {% endif %}
+        </button>
+        <button type="button"
+                id="preview-btn"
+                class="w-full md:w-auto order-2 md:order-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl text-lg shadow transition-all flex items-center justify-center gap-2 text-center">
+          <span class="block md:hidden w-full text-center">Chekear</span>
+          <span class="hidden md:flex items-center gap-2">
+            <span class="material-icons">visibility</span>
+            Chekear
+          </span>
+        </button>
+        <a href="{% url 'blogapp:blog_list' %}"
+           class="w-full md:w-auto order-3 md:order-2 bg-gray-200 hover:bg-gray-300 text-blue-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white font-bold py-3 px-6 rounded-xl text-lg text-center shadow transition-all flex items-center justify-center">
+          Cancelar
+        </a>
+      </div>
+    </form>
 
-  <script>
-    // Contador de título
-    document.addEventListener('DOMContentLoaded', function () {
-      const titleInput = document.getElementById('id_title');
-      const titleCounter = document.getElementById('title-counter');
-      if (titleInput && titleCounter) {
-        function updateCounter() {
-          titleCounter.textContent = `${titleInput.value.length}/300`;
-        }
-        titleInput.addEventListener('input', updateCounter);
-        updateCounter();
+    <!-- Preview Modal -->
+    <div id="preview-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 hidden">
+      <div class="w-full max-w-3xl bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 relative animate-fade-in">
+        <button id="close-preview-modal" class="absolute top-4 right-4 text-gray-700 dark:text-gray-200 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1 z-50" aria-label="Cerrar">
+          <span class="material-icons text-2xl">close</span>
+        </button>
+        <article id="preview-article" class="transition-all duration-700 ease-in-out dark:text-white text-gray-900">
+          <!-- Aquí se muestra el preview -->
+        </article>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Contador de título
+  document.addEventListener('DOMContentLoaded', function () {
+    const titleInput = document.getElementById('id_title');
+    const titleCounter = document.getElementById('title-counter');
+    if (titleInput && titleCounter) {
+      function updateCounter() {
+        titleCounter.textContent = `${titleInput.value.length}/300`;
       }
+      titleInput.addEventListener('input', updateCounter);
+      updateCounter();
+    }
+  });
+  document.addEventListener('DOMContentLoaded', function () {
+    const textarea = document.getElementById('{{ form.tags.id_for_label }}');
+    const addBtn = document.getElementById('add-interest-btn');
+    const popup = document.getElementById('tag-popup');
+    const newtagInput = document.getElementById('new-tag');
+    const saveBtn = document.getElementById('save-tag-btn');
+    const cancelBtn = document.getElementById('cancel-tag-btn');
+    const tagsContainer = document.querySelector('.interest-tags');
+
+    // Initialize tags from textarea
+    updateTagsFromTextarea();
+
+    addBtn.addEventListener('click', function () {
+      popup.classList.remove('hidden');
+      newtagInput.focus();
     });
-    document.addEventListener('DOMContentLoaded', function () {
-      const textarea = document.getElementById('{{ form.tags.id_for_label }}');
-      const addBtn = document.getElementById('add-interest-btn');
-      const popup = document.getElementById('tag-popup');
-      const newtagInput = document.getElementById('new-tag');
-      const saveBtn = document.getElementById('save-tag-btn');
-      const cancelBtn = document.getElementById('cancel-tag-btn');
-      const tagsContainer = document.querySelector('.interest-tags');
 
-      // Initialize tags from textarea
-      updateTagsFromTextarea();
+    cancelBtn.addEventListener('click', function () {
+      popup.classList.add('hidden');
+      newtagInput.value = '';
+    });
 
-      addBtn.addEventListener('click', function () {
-        popup.classList.remove('hidden');
-        newtagInput.focus();
-      });
+    saveBtn.addEventListener('click', function () {
+      let tag = newtagInput.value.trim();
+      if (tag) {
+        // Ensure the tag has a hashtag prefix
+        tag = tag.startsWith('#') ? tag : '#' + tag;
 
-      cancelBtn.addEventListener('click', function () {
+        const tags = parsetags(textarea.value);
+        tags.push(tag);
+        // Store as JSON array
+        textarea.value = JSON.stringify(tags);
+        updateTagsFromTextarea();
         popup.classList.add('hidden');
         newtagInput.value = '';
-      });
-
-      saveBtn.addEventListener('click', function () {
-        let tag = newtagInput.value.trim();
-        if (tag) {
-          // Ensure the tag has a hashtag prefix
-          tag = tag.startsWith('#') ? tag : '#' + tag;
-
-          const tags = parsetags(textarea.value);
-          tags.push(tag);
-          // Store as JSON array
-          textarea.value = JSON.stringify(tags);
-          updateTagsFromTextarea();
-          popup.classList.add('hidden');
-          newtagInput.value = '';
-        }
-      });
-
-      newtagInput.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          saveBtn.click();
-        }
-      });
-
-      function updateTagsFromTextarea() {
-        tagsContainer.innerHTML = '';
-        const tags = parsetags(textarea.value);
-        tags.forEach(tagName => {
-          const tagElement = document.createElement('div');
-          tagElement.className = 'px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-md text-sm flex items-center';
-          tagElement.innerHTML = `
-            <span>${tagName}</span>
-            <button type="button" class="ml-2 text-blue-600 dark:text-blue-300 hover:text-red-500 dark:hover:text-red-400"
-                data-tag="${tagName}">✕</button>
-            `;
-          tagsContainer.appendChild(tagElement);
-        });
-
-        // Add event listeners after tags are created
-        tagsContainer.querySelectorAll('button').forEach(btn => {
-          btn.addEventListener('click', function () {
-            const tagToRemove = this.getAttribute('data-tag');
-            removetag(tagToRemove);
-          });
-        });
       }
-
-      function parsetags(text) {
-        if (!text || text.trim() === '') return [];
-
-        text = text.trim();
-        let tags = [];
-
-        // Try to parse as JSON array
-        if (text.startsWith('[') && text.endsWith(']')) {
-          tags = parseJSON(text);
-        } else {
-          tags = parseTagsFromText(text);
-        }
-
-        // Ensure all tags have a hashtag prefix
-        return tags.map(tag => tag.startsWith('#') ? tag : '#' + tag);
-      }
-
-      function parseJSON(text) {
-        try {
-          return JSON.parse(text);
-        } catch (e) {
-          return parseTagsFromText(text);
-        }
-      }
-
-      function parseTagsFromText(text) {
-        const tags = text.match(/("([^"]*)"|[^,]+)+(?=\s*,|\s*$)/g) || [];
-        return tags.map(tag => tag.trim().replace(/^"|"$/g, '').trim()).filter(Boolean);
-      }
-      function removetag(tag) {
-        const tags = parsetags(textarea.value);
-        const filteredtags = tags.filter(i => i !== tag);
-        // Store as JSON array
-        textarea.value = JSON.stringify(filteredtags);
-        updateTagsFromTextarea();
-      }
-
-      // Ensure the value is stored as a JSON array on page load
-      const initialtags = parsetags(textarea.value);
-      textarea.value = JSON.stringify(initialtags);
     });
-  </script>
+
+    newtagInput.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        saveBtn.click();
+      }
+    });
+
+    function updateTagsFromTextarea() {
+      tagsContainer.innerHTML = '';
+      const tags = parsetags(textarea.value);
+      tags.forEach(tagName => {
+        const tagElement = document.createElement('div');
+        tagElement.className = 'px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full text-sm flex items-center shadow';
+        tagElement.innerHTML = `
+          <span>${tagName}</span>
+          <button type="button" class="ml-2 text-blue-600 dark:text-blue-300 hover:text-red-500 dark:hover:text-red-400 font-bold"
+              data-tag="${tagName}">×</button>
+          `;
+        tagsContainer.appendChild(tagElement);
+      });
+
+      // Add event listeners after tags are created
+      tagsContainer.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', function () {
+          const tagToRemove = this.getAttribute('data-tag');
+          removetag(tagToRemove);
+        });
+      });
+    }
+
+    function parsetags(text) {
+      if (!text || text.trim() === '') return [];
+
+      text = text.trim();
+      let tags = [];
+
+      // Try to parse as JSON array
+      if (text.startsWith('[') && text.endsWith(']')) {
+        tags = parseJSON(text);
+      } else {
+        tags = parseTagsFromText(text);
+      }
+
+      // Ensure all tags have a hashtag prefix
+      return tags.map(tag => tag.startsWith('#') ? tag : '#' + tag);
+    }
+
+    function parseJSON(text) {
+      try {
+        return JSON.parse(text);
+      } catch (e) {
+        return parseTagsFromText(text);
+      }
+    }
+
+    function parseTagsFromText(text) {
+      const tags = text.match(/("([^"]*)"|[^,]+)+(?=\s*,|\s*$)/g) || [];
+      return tags.map(tag => tag.trim().replace(/^"|"$/g, '').trim()).filter(Boolean);
+    }
+    function removetag(tag) {
+      const tags = parsetags(textarea.value);
+      const filteredtags = tags.filter(i => i !== tag);
+      // Store as JSON array
+      textarea.value = JSON.stringify(filteredtags);
+      updateTagsFromTextarea();
+    }
+
+    // Ensure the value is stored as a JSON array on page load
+    const initialtags = parsetags(textarea.value);
+    textarea.value = JSON.stringify(initialtags);
+  });
+
+  // Preview modal
+  document.addEventListener('DOMContentLoaded', function () {
+    const previewBtn = document.getElementById('preview-btn');
+    const previewModal = document.getElementById('preview-modal');
+    const closePreviewBtn = document.getElementById('close-preview-modal');
+    const previewArticle = document.getElementById('preview-article');
+
+    previewBtn.addEventListener('click', function () {
+      // Obtener datos del formulario
+      const title = document.getElementById('id_title').value;
+      const tags = (() => {
+        try {
+          return JSON.parse(document.getElementById('{{ form.tags.id_for_label }}').value);
+        } catch { return []; }
+      })();
+      let content = '';
+      if (window.CKEDITOR && CKEDITOR.instances && CKEDITOR.instances['id_content']) {
+        content = CKEDITOR.instances['id_content'].getData();
+      } else {
+        const contentElem = document.getElementById('id_content');
+        content = contentElem ? contentElem.value : '';
+      }
+      let imageUrl = '';
+      const imageInput = document.getElementById('id_image');
+      const imagePreview = document.getElementById('image-preview');
+      if (imageInput && imageInput.files && imageInput.files[0]) {
+        imageUrl = imagePreview.src;
+      } else if (imagePreview && !imagePreview.classList.contains('hidden')) {
+        imageUrl = imagePreview.src;
+      }
+
+      // Construir el HTML del preview (estructura blog_detail)
+      let tagsHtml = '';
+      if (tags.length) {
+        tagsHtml = `<div class="mb-4">${tags.map(tag => `<span class="bg-slate-100 text-slate-800 text-sm font-medium mr-2 px-2 py-1 rounded dark:bg-slate-800 dark:text-slate-300">${tag}</span>`).join('')}</div>`;
+      }
+      let imageHtml = '';
+      if (imageUrl) {
+        imageHtml = `
+        <div class="relative w-full max-w-4xl mx-auto bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center mb-4">
+          <div class="absolute inset-0 bg-cover bg-center blur-md" style="background-image: url('${imageUrl}');"></div>
+          <img src="${imageUrl}" alt="${title}" class="relative z-10 w-full h-auto max-h-[56.25vw] object-contain md:max-h-[40vw] lg:max-h-[30vw]">
+        </div>`;
+      }
+      previewArticle.innerHTML = `
+        <div>
+          <p class="text-sm text-gray-600 dark:text-gray-500">Tú - Ahora</p>
+          <h1 class="text-3xl font-bold mb-2">${title}</h1>
+          ${tagsHtml}
+        </div>
+        <div class="text-gray-700 dark:text-gray-300 mb-4 break-words whitespace-pre-line">${content}</div>
+        ${imageHtml}
+      `;
+      previewModal.classList.remove('hidden');
+    });
+
+    closePreviewBtn.addEventListener('click', function () {
+      previewModal.classList.add('hidden');
+    });
+
+    // Cerrar modal con Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        previewModal.classList.add('hidden');
+      }
+    });
+  });
+</script>
 {% endblock %}
