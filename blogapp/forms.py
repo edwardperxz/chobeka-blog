@@ -87,6 +87,18 @@ class UserRegisterForm(UserCreationForm):
             )
         return password2
 
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username=username).exists():
+            raise ValidationError(_("Este nombre de usuario ya está en uso."), code='unique')
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise ValidationError(_("Este correo electrónico ya está en uso."), code='unique')
+        return email
+
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
@@ -102,18 +114,48 @@ class ProfileUpdateForm(forms.ModelForm):
     first_name = forms.CharField(max_length=150, required=False)
     last_name = forms.CharField(max_length=150, required=False)
     username = forms.CharField(max_length=20, required=True)
+    email = forms.EmailField(required=True)
 
     class Meta:
         model = UserProfile
         fields = ['profile_photo', 'bio', 'location', 'birth_date', 'interests']
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
+        self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+        if self.user:
+            self.fields['first_name'].initial = self.user.first_name
+            self.fields['last_name'].initial = self.user.last_name
+            self.fields['username'].initial = self.user.username
+            self.fields['email'].initial = self.user.email
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if username and self.user:
+            if User.objects.filter(username=username).exclude(pk=self.user.pk).exists():
+                raise forms.ValidationError("Este nombre de usuario ya está en uso.")
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email and self.user:
+            if User.objects.filter(email=email).exclude(pk=self.user.pk).exists():
+                raise forms.ValidationError("Este correo electrónico ya está en uso.")
+        return email
+
+    def save(self, commit=True, user=None):
+        profile = super().save(commit=False)
+        user = user or self.user
         if user:
-            self.fields['first_name'].initial = user.first_name
-            self.fields['last_name'].initial = user.last_name
-            self.fields['username'].initial = user.username
+            user.first_name = self.cleaned_data.get('first_name')
+            user.last_name = self.cleaned_data.get('last_name')
+            user.username = self.cleaned_data.get('username')
+            user.email = self.cleaned_data.get('email')
+            if commit:
+                user.save()
+        if commit:
+            profile.save()
+        return profile
 
 
 class PasswordUpdateForm(forms.Form):
