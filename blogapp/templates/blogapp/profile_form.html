@@ -4,144 +4,140 @@
 <title>{% block title %}ChobekaBlog | Editar chantin {% endblock %}</title>
 
 {% block content %}
-<div class="container mx-auto px-4 mt-8">
-    <div class="max-w-2xl mx-auto">
-        <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
-            Editar Perfil
-        </h1>
-        <form method="POST" enctype="multipart/form-data"
-              class="space-y-4 transition-all duration-700 ease-in-out animate-fade-in">
-            {% csrf_token %}
-            <div class="space-y-2 transition-all duration-700 ease-in-out">
-
-                {# 1. Foto de perfil con preview #}
-                <div>
-                    <label for="id_profile_photo" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Foto de perfil</label>
-                    <div class="flex items-center gap-4">
-                        <img id="profile-photo-preview"
-                             src="{% if form.instance.profile_photo %}{{ form.instance.profile_photo.url }}{% else %}{% static 'Images/default_profile.png' %}{% endif %}"
-                             alt="Foto de perfil"
-                             class="w-20 h-20 rounded-full object-cover border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-                        <input type="file" name="profile_photo" id="id_profile_photo"
-                               class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               accept="image/*">
-                    </div>
-                    {% if form.profile_photo.help_text %}
-                        <p class="mt-1 text-sm text-blue-800 dark:text-blue-300">{{ form.profile_photo.help_text }}</p>
-                    {% endif %}
-                    {% if form.profile_photo.errors %}
-                        <p class="text-red-500 text-sm">{{ form.profile_photo.errors|striptags }}</p>
-                    {% endif %}
-                </div>
-
-                {# 2. Primer nombre #}
-                <div>
-                    <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Primer nombre</label>
-                    {{ form.first_name|add_class:"bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
-                    {% if form.first_name.errors %}
-                        <p class="text-red-500 text-sm">{{ form.first_name.errors|striptags }}</p>
-                    {% endif %}
-                </div>
-
-                {# 3. Apellido #}
-                <div>
-                    <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Apellido</label>
-                    {{ form.last_name|add_class:"bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
-                    {% if form.last_name.errors %}
-                        <p class="text-red-500 text-sm">{{ form.last_name.errors|striptags }}</p>
-                    {% endif %}
-                </div>
-
-                {# 4. Nombre de usuario #}
-                <div>
-                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Nombre de usuario</label>
-                    {{ form.username|add_class:"bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
-                    {% if form.username.errors %}
-                        <p class="text-red-500 text-sm">{{ form.username.errors|striptags }}</p>
-                    {% endif %}
-                </div>
-
-                {# 5. Correo electrónico #}
-                <div>
-                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Correo electrónico</label>
-                    {{ form.email|add_class:"bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
-                    {% if form.email.errors %}
-                        <p class="text-red-500 text-sm">{{ form.email.errors|striptags }}</p>
-                    {% endif %}
-                </div>
-
-                {# 6. Fecha de nacimiento #}
-                <div>
-                    <label for="{{ form.birth_date.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Fecha de nacimiento</label>
-                    <input type="date" name="birth_date" id="{{ form.birth_date.id_for_label }}"
-                           value="{{ form.birth_date.value|date:'Y-m-d' }}"
-                           class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    {% if form.birth_date.errors %}
-                        <p class="text-red-500 text-sm">{{ form.birth_date.errors|striptags }}</p>
-                    {% endif %}
-                </div>
-
-                {# 7. Biografía #}
-                <div>
-                    <label for="{{ form.bio.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Biografía</label>
-                    {{ form.bio|add_class:"bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
-                    {% if form.bio.errors %}
-                        <p class="text-red-500 text-sm">{{ form.bio.errors|striptags }}</p>
-                    {% endif %}
-                </div>
-
-                {# 8. Provincia (ubicación) #}
-                <div>
-                    <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Provincia</label>
-                    {{ form.location|add_class:"bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
-                    {% if form.location.errors %}
-                        <p class="text-red-500 text-sm">{{ form.location.errors|striptags }}</p>
-                    {% endif %}
-                </div>
-
-                {# 9. Intereses #}
-                <div>
-                    <label for="{{ form.interests.id_for_label }}" class="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Intereses</label>
-                    <!-- Ocultar el textarea pero mantenerlo para el envío del formulario -->
-                    <textarea name="interests" id="{{ form.interests.id_for_label }}"
-                              style="display: none;"
-                              class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">{{ form.interests.value }}</textarea>
-
-                    <div class="flex flex-wrap gap-2 mt-2 interest-tags">
-                        <!-- Los intereses existentes se mostrarán aquí -->
-                    </div>
-
-                    <button type="button" id="add-interest-btn"
-                            class="mt-2 px-4 py-1 bg-green-500 hover:bg-green-600 text-white rounded-md text-sm transition-all">
-                        Agregar Interés
-                    </button>
-
-                    <div id="interest-popup" class="hidden mt-2 p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 shadow-md">
-                        <input type="text" id="new-interest" maxlength="50" placeholder="Agregar un nuevo interés (máx. 50 caracteres)"
-                               class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded-lg w-full border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <div class="flex justify-end mt-2 space-x-2">
-                            <button type="button" id="save-interest-btn"
-                                    class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm">Guardar</button>
-                            <button type="button" id="cancel-interest-btn"
-                                    class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md text-sm">Cancelar</button>
-                        </div>
-                    </div>
-                    {% if form.interests.errors %}
-                        <p class="text-red-500 text-sm">{{ form.interests.errors|striptags }}</p>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="mt-6 flex space-x-4">
-                <button type="submit" class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600 dark:hover:bg-blue-700 rounded transition-all duration-500 ease-in-out">
-                    Guardar Cambios
-                </button>
-                <a href="{% url 'blogapp:profile' user.username %}"
-                   class="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded transition-all duration-500 ease-in-out">
-                    Cancelar
-                </a>
-            </div>
-        </form>
+<div class="min-h-[calc(100vh-80px)] flex items-center justify-center py-8 px-2">
+  <div class="w-full max-w-lg text-secondary_dark dark:text-white">
+    <div class="flex flex-col items-center mb-8">
+      <div class="relative">
+        {% if form.instance.profile_photo %}
+          <img id="profile-photo-preview"
+               src="{{ form.instance.profile_photo.url }}"
+               alt="Foto de perfil"
+               class="w-24 h-24 rounded-full object-cover border-4 border-blue-300 dark:border-primary_dark-300 shadow-lg bg-gray-100 dark:bg-gray-800 transition-all">
+        {% else %}
+          <div id="profile-photo-preview" class="w-24 h-24 flex items-center justify-center rounded-full border-4 border-blue-300 dark:border-primary_dark-300 shadow-lg bg-gray-100 dark:bg-gray-800 transition-all">
+            <!-- Ícono de cuenta SVG -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-blue-300 dark:text-primary_dark-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12c2.7 0 4.5-1.8 4.5-4.5S14.7 3 12 3 7.5 4.8 7.5 7.5 9.3 12 12 12zm0 2c-3 0-9 1.5-9 4.5V21h18v-2.5c0-3-6-4.5-9-4.5z"/>
+            </svg>
+          </div>
+        {% endif %}
+        <label for="id_profile_photo" class="absolute bottom-0 right-0 bg-primary_dark-300 dark:bg-primary_dark-300 hover:bg-primary_dark-600 dark:hover:bg-primary_dark-100 dark:bg-primary_dark-200/80 text-white rounded-full p-2 cursor-pointer shadow-md transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6-6m2 2a2.828 2.828 0 11-4-4 2.828 2.828 0 014 4z"/>
+          </svg>
+          <input type="file" name="profile_photo" id="id_profile_photo" class="hidden" accept="image/*">
+        </label>
+      </div>
+      <h1 class="text-2xl font-extrabold mt-4">Editar Perfil</h1>
     </div>
+    <form method="POST" enctype="multipart/form-data" class="flex flex-col gap-5" autocomplete="off">
+      {% csrf_token %}
+
+      {# 2. Nombre #}
+      <div>
+        <label for="{{ form.first_name.id_for_label }}" class="block text-base font-semibold mb-1">Nombre</label>
+        {{ form.first_name|add_class:"bg-blue-50 dark:bg-[#223366] text-blue-900 dark:text-blue-100 px-4 py-3 rounded-xl w-full border border-blue-200 dark:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-base transition" }}
+        {% if form.first_name.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.first_name.errors|striptags }}</p>
+        {% endif %}
+      </div>
+
+      {# 3. Apellido #}
+      <div>
+        <label for="{{ form.last_name.id_for_label }}" class="block text-base font-semibold mb-1">Apellido</label>
+        {{ form.last_name|add_class:"bg-blue-50 dark:bg-[#223366] text-blue-900 dark:text-blue-100 px-4 py-3 rounded-xl w-full border border-blue-200 dark:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-base transition" }}
+        {% if form.last_name.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.last_name.errors|striptags }}</p>
+        {% endif %}
+      </div>
+
+      {# 4. Nombre de usuario #}
+      <div>
+        <label for="{{ form.username.id_for_label }}" class="block text-base font-semibold mb-1">Nombre de usuario</label>
+        {{ form.username|add_class:"bg-blue-50 dark:bg-[#223366] text-blue-900 dark:text-blue-100 px-4 py-3 rounded-xl w-full border border-blue-200 dark:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-base transition" }}
+        {% if form.username.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.username.errors|striptags }}</p>
+        {% endif %}
+      </div>
+
+      {# 5. Correo electrónico #}
+      <div>
+        <label for="{{ form.email.id_for_label }}" class="block text-base font-semibold mb-1">Correo electrónico</label>
+        {{ form.email|add_class:"bg-blue-50 dark:bg-[#223366] text-blue-900 dark:text-blue-100 px-4 py-3 rounded-xl w-full border border-blue-200 dark:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-base transition" }}
+        {% if form.email.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.email.errors|striptags }}</p>
+        {% endif %}
+      </div>
+
+      {# 6. Fecha de nacimiento #}
+      <div>
+        <label for="{{ form.birth_date.id_for_label }}" class="block text-base font-semibold mb-1">Fecha de nacimiento</label>
+        <input type="date" name="birth_date" id="{{ form.birth_date.id_for_label }}"
+               value="{{ form.birth_date.value|date:'Y-m-d' }}"
+               class="bg-blue-50 dark:bg-[#223366] text-blue-900 dark:text-blue-100 px-4 py-3 rounded-xl w-full border border-blue-200 dark:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-base transition">
+        {% if form.birth_date.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.birth_date.errors|striptags }}</p>
+        {% endif %}
+      </div>
+
+      {# 7. Biografía #}
+      <div>
+        <label for="{{ form.bio.id_for_label }}" class="block text-base font-semibold mb-1">Biografía</label>
+        {{ form.bio|add_class:"bg-blue-50 dark:bg-[#223366] text-blue-900 dark:text-blue-100 px-4 py-3 rounded-xl w-full border border-blue-200 dark:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-base transition" }}
+        {% if form.bio.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.bio.errors|striptags }}</p>
+        {% endif %}
+      </div>
+
+      {# 8. Provincia (ubicación) #}
+      <div>
+        <label for="{{ form.location.id_for_label }}" class="block text-base font-semibold mb-1">Provincia</label>
+        {{ form.location|add_class:"bg-blue-50 dark:bg-[#223366] text-blue-900 dark:text-blue-100 px-4 py-3 rounded-xl w-full border border-blue-200 dark:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-base transition" }}
+        {% if form.location.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.location.errors|striptags }}</p>
+        {% endif %}
+      </div>
+
+      {# 9. Intereses #}
+      <div>
+        <label for="{{ form.interests.id_for_label }}" class="block text-base font-semibold mb-1">Intereses</label>
+        <!-- Ocultar el textarea pero mantenerlo para el envío del formulario -->
+        <textarea name="interests" id="{{ form.interests.id_for_label }}"
+                  style="display: none;"
+                  class="bg-blue-50 dark:bg-[#223366] text-blue-900 dark:text-blue-100 px-4 py-3 rounded-xl w-full border border-blue-200 dark:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-base transition">{{ form.interests.value }}</textarea>
+        <div class="flex flex-wrap gap-2 mt-2 interest-tags"></div>
+        <button type="button" id="add-interest-btn"
+                class="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-base shadow transition-all">
+          + Agregar Interés
+        </button>
+        <div id="interest-popup" class="hidden mt-2 p-4 border border-blue-200 dark:border-blue-700 rounded-xl bg-blue-50 dark:bg-[#223366] shadow-lg">
+          <input type="text" id="new-interest" maxlength="50" placeholder="Nuevo interés (máx. 50 caracteres)"
+                 class="bg-white dark:bg-[#18223a] text-blue-900 dark:text-blue-100 px-3 py-2 rounded-lg w-full border border-blue-200 dark:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <div class="flex justify-end mt-2 space-x-2">
+            <button type="button" id="save-interest-btn"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-base">Guardar</button>
+            <button type="button" id="cancel-interest-btn"
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-blue-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-lg text-base">Cancelar</button>
+          </div>
+        </div>
+        {% if form.interests.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.interests.errors|striptags }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Botones -->
+      <div class="flex flex-col md:flex-row gap-4 mt-6">
+        <button type="submit"
+                class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl text-lg shadow transition-all">
+          Guardar Cambios
+        </button>
+        <a href="{% url 'blogapp:profile' user.username %}"
+           class="w-full md:w-auto bg-gray-200 hover:bg-gray-300 text-blue-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white font-bold py-3 px-6 rounded-xl text-lg text-center shadow transition-all">
+          Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
 </div>
 
 <script>
@@ -154,7 +150,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (e.target.files && e.target.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(ev) {
-                    preview.src = ev.target.result;
+                    if (preview.tagName === 'DIV') {
+                        preview.innerHTML = '';
+                        const img = document.createElement('img');
+                        img.src = ev.target.result;
+                        img.alt = 'Foto de perfil';
+                        img.className = 'w-24 h-24 rounded-full object-cover';
+                        preview.appendChild(img);
+                    } else {
+                        preview.src = ev.target.result;
+                    }
                 };
                 reader.readAsDataURL(e.target.files[0]);
             }
@@ -208,11 +213,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const interests = parseInterests(textarea.value);
         interests.forEach(interest => {
             const tag = document.createElement('div');
-            tag.className = 'px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-md text-sm flex items-center';
+            tag.className = 'px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full text-sm flex items-center shadow';
             tag.innerHTML = `
                 <span>${interest}</span>
-                <button type="button" class="ml-2 text-blue-600 dark:text-blue-300 hover:text-red-500 dark:hover:text-red-400"
-                        data-interest="${interest}">✕</button>
+                <button type="button" class="ml-2 text-blue-600 dark:text-blue-300 hover:text-red-500 dark:hover:text-red-400 font-bold"
+                        data-interest="${interest}" title="Eliminar">✕</button>
             `;
             tagsContainer.appendChild(tag);
         });
