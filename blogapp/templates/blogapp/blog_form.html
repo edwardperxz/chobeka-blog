@@ -76,7 +76,7 @@
       {% for field in form %}
         {% if field.name not in 'title tags content' %}
           <div>
-            <label for="{{ field.id_for_label }}" class="block text-base font-semibold mb-1">Imágen</label>
+            <label for="{{ field.id_for_label }}" class="block text-base font-semibold mb-1">Imagen</label>
             {% if field.name == 'image' %}
               <div class="relative flex items-center justify-center w-full min-h-[120px] bg-gray-900 border border-dashed border-gray-600 rounded-2xl mb-2 group">
                 <input type="file" name="{{ field.name }}" id="{{ field.id_for_label }}"
