@@ -78,7 +78,7 @@
         },
         // breakpoint md a 1440px
         screens: {
-          'md': '1575px',
+          'md': '1024px',
         },
       },
       plugins: []
@@ -217,7 +217,7 @@
       </a>
       <!-- Buscador centrado y largo, solo en blog_list y solo desktop -->
       {% if request.resolver_match.url_name == "blog_list" %}
-  <div class="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl">
+  <div class="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] px-2">
     <form method="get"
       class="flex items-center bg-gray-200 dark:bg-primary_dark-200/80 rounded-full border border-gray-200 dark:border-gray-700 px-2 py-1 gap-1 shadow-none"
       id="filter-form">
@@ -230,33 +230,36 @@
         class="flex-1 bg-transparent border-none focus:ring-0 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-200 text-base px-3 py-2"
       />
       <button type="button" id="toggle-filters"
-        class="flex items-center justify-center w-10 h-10 rounded-full hover:text-white hover:bg-primary_dark-200/80 hover:dark:bg-primary_dark-300 hover:shadow-none transition text-gray-700 dark:text-gray-300 focus:outline-none"
+        class="flex items-center justify-center w-10 h-10 rounded-full text-gray-700 dark:text-gray-300 focus:outline-none transition
+         hover:text-white hover:bg-primary_dark-200/80 hover:dark:bg-primary_dark-300
+         focus:bg-transparent focus:text-gray-700 focus:dark:text-gray-300 active:bg-transparent active:text-gray-700 active:dark:text-gray-300"
         aria-label="Mostrar filtros avanzados">
         <span class="material-icons text-xl">tune</span>
       </button>
       <button type="submit"
-        class="flex items-center justify-center w-10 h-10 rounded-full hover:text-white hover:bg-primary_dark-200/80 hover:dark:bg-primary_dark-300 hover:shadow-none transition text-gray-700 dark:text-gray-300 focus:outline-none ml-1">
+        class="flex items-center justify-center w-10 h-10 rounded-full hover:text-white hover:bg-primary_dark-200/80 hover:dark:bg-primary_dark-300 hover:shadow-none transition text-gray-700 dark:text-gray-300 focus:outline-none ml-1
+              focus:bg-transparent focus:text-gray-700 focus:dark:text-gray-300 active:bg-transparent active:text-gray-700 active:dark:text-gray-300">
         <span class="material-icons text-xl">search</span>
       </button>
 
     <!-- Filtros avanzados ocultos -->
-    <div id="advanced-filters" class="mt-40 bg-gray-200 dark:bg-primary_dark-200/80 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 px-6 py-4 hidden absolute left-0 w-full z-10">
-      <div class="flex flex-row flex-wrap gap-4">
+    <div id="advanced-filters" class="mt-36 bg-gray-200 dark:bg-primary_dark-200 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 px-8 py-4 hidden absolute left-0 w-full max-w-4xl mx-auto z-10">
+      <div class="flex flex-row flex-nowrap gap-4 items-end w-full">
         <!-- Tag -->
-        <div class="flex flex-col min-w-[90px]">
-          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Tag</span>
+        <div class="flex flex-col flex-1 min-w-0">
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate">Tag</span>
           <input type="text" name="tag" form="filter-form" id="tag" value="{{ request.GET.tag }}" placeholder="Tag"
             class="bg-transparent border-b border-gray-300 dark:border-gray-600 focus:ring-0 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 text-sm w-full" />
         </div>
         <!-- Autor -->
-        <div class="flex flex-col min-w-[90px]">
-          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Autor</span>
+        <div class="flex flex-col flex-1 min-w-0">
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate">Autor</span>
           <input type="text" name="author" form="filter-form" id="author" value="{{ request.GET.author }}" placeholder="Usuario"
             class="bg-transparent border-b border-gray-300 dark:border-gray-600 focus:ring-0 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 text-sm w-full" />
         </div>
         <!-- Provincia -->
-        <div class="flex flex-col min-w-[110px]">
-          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Provincia</span>
+        <div class="flex flex-col flex-1 min-w-0">
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate">Provincia</span>
           <select name="province" form="filter-form" id="province"
             class="bg-transparent border-b border-gray-300 dark:border-gray-600 focus:ring-0 text-gray-800 dark:text-white text-sm appearance-none w-full">
             <option value="">Todas</option>
@@ -273,14 +276,14 @@
           </select>
         </div>
         <!-- Desde -->
-        <div class="flex flex-col min-w-[100px]">
-          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Desde</span>
+        <div class="flex flex-col flex-1 min-w-0">
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate">Desde</span>
           <input type="date" name="date_from" form="filter-form" id="date_from" value="{{ request.GET.date_from }}"
             class="bg-transparent border-b border-gray-300 dark:border-gray-600 focus:ring-0 text-gray-800 dark:text-white text-sm w-full" />
         </div>
         <!-- Hasta -->
-        <div class="flex flex-col min-w-[100px]">
-          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Hasta</span>
+        <div class="flex flex-col flex-1 min-w-0">
+          <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate">Hasta</span>
           <input type="date" name="date_to" form="filter-form" id="date_to" value="{{ request.GET.date_to }}"
             class="bg-transparent border-b border-gray-300 dark:border-gray-600 focus:ring-0 text-gray-800 dark:text-white text-sm w-full" />
         </div>
@@ -464,18 +467,22 @@
 </div>
 
 
-  <main class="flex-grow w-full bg-primary_dark-100 dark:bg-primary_dark transition-colors mt-16 flex justify-center">
-    <div class="w-full max-w-5xl px-4 py-8">
-      {% block content %}
-      <div class="relative w-full max-w-4xl mx-auto bg-gray-600 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
-        <!-- Fondo difuminado dinámico -->
-        <div class="absolute inset-0 bg-cover bg-center blur-md" style="background-image: url('{{ object.image.url }}');"></div>
-        <!-- Imagen centrada -->
-        <img src="{{ object.image.url }}" alt="{{ object.title }}" class="relative z-10 w-full h-auto max-h-[56.25vw] object-contain md:max-h-[40vw] lg:max-h-[30vw]">
-      </div>
-      {% endblock %}
+<main class="flex-grow w-full bg-primary_dark-100 dark:bg-primary_dark transition-colors mt-16 flex justify-center">
+  <div class="w-full max-w-7xl py-8
+              md:pl-80 md:pr-80
+              lg:pl-0 lg:pr-0
+              xl:pl-[380px] xl:pr-[380px]
+              2xl:pl-[500px] 2xl:pr-[500px]">
+    {% block content %}
+    <div class="relative w-full max-w-5xl mx-auto bg-gray-600 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
+      <!-- Fondo difuminado dinámico -->
+      <div class="absolute inset-0 bg-cover bg-center blur-md" style="background-image: url('{{ object.image.url }}');"></div>
+      <!-- Imagen centrada -->
+      <img src="{{ object.image.url }}" alt="{{ object.title }}" class="relative z-10 w-full h-auto max-h-[56.25vw] object-contain md:max-h-[40vw] lg:max-h-[30vw]">
     </div>
-  </main>
+    {% endblock %}
+  </div>
+</main>
 
 
 <!-- Toasts -->
