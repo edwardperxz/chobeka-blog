@@ -73,7 +73,7 @@
   </script>
 
   <!-- Blog List -->
-  <div class="grid gap-8 md:grid-cols-1 lg:grid-cols-1">
+  <div class="grid md:grid-cols-1 lg:grid-cols-1">
     {% for blog in object_list %}
     <article class="bg-primary_dark-100 hover:bg-primary_dark-300 dark:bg-primary_dark rounded-xl overflow-hidden hover:shadow-xl hover:dark:bg-secondary_dark transition-colors">
       <!-- Blog Header -->
@@ -190,9 +190,9 @@
       <div class="px-6 pb-6">
         <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="block group">
           {% if blog.content and blog.content|striptags|length > 0 and blog.content|striptags != "&nbsp;" %}
-            <p class="text-gray-600 dark:text-gray-300 mb-6 line-clamp-3">
-              {{ blog.content|striptags|truncatewords:30 }}
-            </p>
+            <div class="prose max-w-none text-gray-600 dark:text-gray-300 mb-6 line-clamp-3">
+              {{ blog.content|safe }}
+            </div>
           {% endif %}
         </a>
 
@@ -255,6 +255,9 @@
         </div>
       </div>
     </article>
+    {% if not forloop.last %}
+      <div class="h-px bg-gray-300 dark:bg-gray-700 w-full m-0"></div>
+    {% endif %}
     {% empty %}
     <div class="col-span-full text-center py-12">
       <div class="mx-auto w-24 h-24 text-gray-800 dark:text-white mb-4">
