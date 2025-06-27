@@ -25,7 +25,7 @@ from django.http import HttpResponse
 def get_location_info(location_code):
     LOCATION_MAP = {
         'BOC': {'flag_url': 'Bocas_del_Toro', 'name': 'Bocas del Toro', 'color': 'lime'},
-        'CHI': {'flag_url': 'Chiriqui', 'name': 'Chiriquí', 'color': 'green'},
+        'CHI': {'flag_url': 'Chiriqui', 'name': 'República Federal de Chiriquí', 'color': 'green'},
         'COC': {'flag_url': 'Cocle', 'name': 'Coclé', 'color': 'amber'},
         'COL': {'flag_url': 'Colon', 'name': 'Colón', 'color': 'indigo'},
         'DAR': {'flag_url': 'Darien', 'name': 'Darién', 'color': 'cyan'},
