@@ -31,6 +31,10 @@ def env_bool(name, default=False):
         return default
     return value.lower() in {'1', 'true', 'yes', 'on'}
 
+
+def env_str(name, default=''):
+    return (os.getenv(name, default) or '').strip()
+
 # Cargar variables de entorno desde .env
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
@@ -46,11 +50,18 @@ DEBUG = env_bool('DEBUG', True)
 
 SITE_ID = 1
 ENABLE_SOCIAL_AUTH = env_bool('ENABLE_SOCIAL_AUTH', False)
-USE_CLOUDINARY_STORAGE = all([
-    os.getenv('CLOUDINARY_CLOUD_NAME'),
-    os.getenv('CLOUDINARY_API_KEY'),
-    os.getenv('CLOUDINARY_API_SECRET'),
+
+CLOUDINARY_CLOUD_NAME = env_str('CLOUDINARY_CLOUD_NAME')
+CLOUDINARY_API_KEY = env_str('CLOUDINARY_API_KEY')
+CLOUDINARY_API_SECRET = env_str('CLOUDINARY_API_SECRET')
+CLOUDINARY_URL = env_str('CLOUDINARY_URL')
+
+HAS_CLOUDINARY_KEYS = all([
+    CLOUDINARY_CLOUD_NAME,
+    CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET,
 ])
+USE_CLOUDINARY_STORAGE = bool(CLOUDINARY_URL or HAS_CLOUDINARY_KEYS)
 
 ALLOWED_HOSTS = [host.strip() for host in os.getenv(
     'ALLOWED_HOSTS',
@@ -218,12 +229,13 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 if USE_CLOUDINARY_STORAGE:
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
-        'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
-        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
-        'SECURE': True,
-    }
+    if HAS_CLOUDINARY_KEYS:
+        CLOUDINARY_STORAGE = {
+            'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
+            'API_KEY': CLOUDINARY_API_KEY,
+            'API_SECRET': CLOUDINARY_API_SECRET,
+            'SECURE': True,
+        }
 
     STORAGES = {
         'default': {

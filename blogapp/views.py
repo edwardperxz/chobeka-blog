@@ -591,7 +591,7 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
                 if not settings.DEBUG and not getattr(settings, 'USE_CLOUDINARY_STORAGE', False):
                     form.add_error(
                         'image',
-                        'No se pudo guardar la imagen en produccion. Verifica CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET en Vercel.'
+                        'No se pudo guardar la imagen en produccion. Verifica CLOUDINARY_URL o las variables CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET en Vercel.'
                     )
                     messages.error(
                         self.request,
@@ -640,7 +640,7 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
                 if not settings.DEBUG and not getattr(settings, 'USE_CLOUDINARY_STORAGE', False):
                     form.add_error(
                         'image',
-                        'No se pudo guardar la imagen en produccion. Verifica CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET en Vercel.'
+                        'No se pudo guardar la imagen en produccion. Verifica CLOUDINARY_URL o las variables CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET en Vercel.'
                     )
                     messages.error(
                         self.request,
