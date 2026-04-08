@@ -1,5 +1,6 @@
 from datetime import datetime
 import secrets
+import logging
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -21,6 +22,9 @@ from random import choice
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.http import HttpResponse
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_location_info(location_code):
@@ -577,7 +581,8 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         try:
             response = super().form_valid(form)
-        except Exception:
+        except Exception as exc:
+            logger.exception('Fallo al subir imagen en BlogCreateView: %s', exc)
             # Si falla la subida (Cloudinary o filesystem), guardar el blog sin imagen para evitar 500.
             if form.cleaned_data.get('image'):
                 form.instance.image = None
@@ -616,7 +621,8 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
         form.instance.last_updated = datetime.now()
         try:
             response = super().form_valid(form)
-        except Exception:
+        except Exception as exc:
+            logger.exception('Fallo al subir imagen en BlogUpdateView: %s', exc)
             if form.cleaned_data.get('image'):
                 original_blog = self.get_object()
                 form.instance.image = original_blog.image
