@@ -52,19 +52,6 @@ USE_CLOUDINARY_STORAGE = all([
     os.getenv('CLOUDINARY_API_SECRET'),
 ])
 
-if not DEBUG:
-    _cloudinary_missing = [
-        name for name in (
-            'CLOUDINARY_CLOUD_NAME',
-            'CLOUDINARY_API_KEY',
-            'CLOUDINARY_API_SECRET',
-        ) if not os.getenv(name)
-    ]
-    print(
-        f"[storage] USE_CLOUDINARY_STORAGE={USE_CLOUDINARY_STORAGE}; "
-        f"missing={','.join(_cloudinary_missing) if _cloudinary_missing else 'none'}"
-    )
-
 ALLOWED_HOSTS = [host.strip() for host in os.getenv(
     'ALLOWED_HOSTS',
     '127.0.0.1,localhost,.vercel.app'
