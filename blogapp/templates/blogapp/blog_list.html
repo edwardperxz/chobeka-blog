@@ -73,9 +73,16 @@
   </script>
 
   <!-- Blog List -->
-  <div class="grid md:grid-cols-1 lg:grid-cols-1">
+  <div class="grid md:grid-cols-1 lg:grid-cols-1 gap-4">
     {% for blog in object_list %}
-    <article class="bg-primary_dark-100 hover:bg-primary_dark-300 dark:bg-primary_dark rounded-xl overflow-hidden hover:shadow-xl hover:dark:bg-secondary_dark transition-colors">
+    <article
+      class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl dark:border-slate-700 dark:bg-slate-900/90 cursor-pointer"
+      data-blog-url="{% url 'blogapp:blog_detail' blog.pk %}"
+      role="link"
+      tabindex="0"
+      aria-label="Abrir blog {{ blog.title }}"
+    >
+      <div class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#4A98D8] to-[#CC1E2C] opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
       <!-- Blog Header -->
       <div class="p-6 flex items-center justify-between flex-wrap gap-y-2">
         <!-- Foto, nombre, fecha, provincia -->
@@ -95,11 +102,11 @@
             {% endif %}
           </a>
           <!-- Nombre -->
-          <a href="{% url 'blogapp:profile' blog.author.username %}" class="ml-2 font-medium text-secondary_dark dark:text-white truncate hover:text-blue-300 dark:hover:text-blue-300 transition group">
+          <a href="{% url 'blogapp:profile' blog.author.username %}" class="ml-2 font-semibold text-slate-800 dark:text-slate-100 truncate hover:text-sky-600 dark:hover:text-sky-300 transition group">
             {{ blog.author.username }}
           </a>
           <!-- Fecha -->
-          <span class="text-xs text-gray-700 dark:text-gray-400">• {{ blog.created_at|date:"d M Y" }}</span>
+          <span class="text-xs text-slate-500 dark:text-slate-400">• {{ blog.created_at|date:"d M Y" }}</span>
           <!-- Provincia (con bandera si existe) -->
           {% for blog_content in blogs_list %}
             {% if blog_content.blog.id == blog.id and blog_content.location_info %}
@@ -165,7 +172,7 @@
 
       <!-- Título -->
       <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="block group px-6 pt-2 -mt-4">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-300 transition-colors break-words">
+        <h2 class="text-[1.65rem] font-extrabold leading-tight text-slate-900 dark:text-white mb-2 group-hover:text-sky-600 dark:group-hover:text-sky-300 transition-colors break-words">
           {{ blog.title }}
         </h2>
       </a>
@@ -190,7 +197,7 @@
       <div class="px-6 pb-6">
         <a href="{% url 'blogapp:blog_detail' blog.pk %}" class="block group">
           {% if blog.content and blog.content|striptags|length > 0 and blog.content|striptags != "&nbsp;" %}
-            <div class="prose max-w-none text-gray-600 dark:text-gray-300 mb-6 line-clamp-3">
+            <div class="prose max-w-none text-slate-600 dark:text-slate-300 mb-6 line-clamp-3">
               {{ blog.content|safe }}
             </div>
           {% endif %}
@@ -211,7 +218,7 @@
         {% endif %}
 
         <!-- Footer: Comentarios y Rating -->
-        <div class="flex items-center justify-between mt-4 flex-wrap gap-y-2">
+        <div class="flex items-center justify-between mt-4 flex-wrap gap-y-2 border-t border-slate-200 pt-4 dark:border-slate-700">
           <!-- Botón comentarios -->
           <a href="{% url 'blogapp:blog_detail' blog.pk %}#comments"
              class="flex items-center px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-blue-100 hover:text-blue-900 dark:hover:bg-blue-300 dark:hover:text-primary_dark transition">
@@ -355,6 +362,25 @@
   if (!localStorage.getItem('entryTutorialCheck')) {
     document.getElementById('guia-popup').classList.remove('hidden');
   }
+
+  // Hacer toda la card clickeable sin interferir con links/botones internos.
+  const interactiveSelector = 'a, button, input, textarea, select, label, [role="menuitem"], [contenteditable="true"]';
+
+  document.querySelectorAll('article[data-blog-url]').forEach(card => {
+    card.addEventListener('click', function(e) {
+      if (e.target.closest(interactiveSelector)) {
+        return;
+      }
+      window.location.href = card.dataset.blogUrl;
+    });
+
+    card.addEventListener('keydown', function(e) {
+      if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest(interactiveSelector)) {
+        e.preventDefault();
+        window.location.href = card.dataset.blogUrl;
+      }
+    });
+  });
 </script>
 
 {% endblock %}
