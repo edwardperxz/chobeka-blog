@@ -21,6 +21,7 @@ from random import choice
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.http import HttpResponse
+from django.conf import settings
 
 
 
@@ -587,6 +588,17 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
         except OSError as exc:
             # En Vercel /var/task es de solo lectura; reintentar sin imagen evita el 500.
             if _is_read_only_storage_error(exc) and form.cleaned_data.get('image'):
+                if not settings.DEBUG and not getattr(settings, 'USE_CLOUDINARY_STORAGE', False):
+                    form.add_error(
+                        'image',
+                        'No se pudo guardar la imagen en produccion. Verifica CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET en Vercel.'
+                    )
+                    messages.error(
+                        self.request,
+                        'No se guardo la imagen. Falta activar Cloudinary en el runtime de produccion.'
+                    )
+                    return self.form_invalid(form)
+
                 form.instance.image = None
                 self.object = form.save()
                 messages.warning(
@@ -625,6 +637,17 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
             response = super().form_valid(form)
         except OSError as exc:
             if _is_read_only_storage_error(exc) and form.cleaned_data.get('image'):
+                if not settings.DEBUG and not getattr(settings, 'USE_CLOUDINARY_STORAGE', False):
+                    form.add_error(
+                        'image',
+                        'No se pudo guardar la imagen en produccion. Verifica CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET en Vercel.'
+                    )
+                    messages.error(
+                        self.request,
+                        'No se guardo la imagen. Falta activar Cloudinary en el runtime de produccion.'
+                    )
+                    return self.form_invalid(form)
+
                 original_blog = self.get_object()
                 form.instance.image = original_blog.image
                 self.object = form.save()
