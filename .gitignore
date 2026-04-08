@@ -184,3 +184,7 @@ tmp/
 
 # Archivos de exportación CSV
 *.csv
+.vercel
+.env*.local
+.env.production
+.env.preview

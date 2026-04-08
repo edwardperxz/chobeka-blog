@@ -44,32 +44,61 @@ class ProfileView(LoginRequiredMixin, DetailView):
     template_name = 'blogapp/profile_user.html'
     context_object_name = 'profile'
 
-    def get_object(self, queryset=None):
-        try:
-            username = self.kwargs.get('username')
-            user = get_user_model().objects.get(username=username)
+    def _get_viewed_user(self):
+        username = (self.kwargs.get('username') or '').strip()
+        if not username:
+            return None
+        user = get_user_model().objects.filter(username__iexact=username).first()
+        if user:
+            return user
 
-            try:
-                return UserProfile.objects.filter(user=user).first()
-            except (OperationalError, ProgrammingError):
-                return None
-        except get_user_model().DoesNotExist:
+        request_user = getattr(self.request, 'user', None)
+        if (
+            request_user
+            and request_user.is_authenticated
+            and (request_user.username or '').strip().lower() == username.lower()
+        ):
+            return request_user
+
+        return None
+
+    def get_object(self, queryset=None):
+        user = self._get_viewed_user()
+        if not user:
+            return None
+
+        try:
+            return UserProfile.objects.filter(user=user).first()
+        except (OperationalError, ProgrammingError):
             return None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        viewed_user = self._get_viewed_user()
+        if not viewed_user:
+            context['profile_user'] = None
+            context['blogs'] = []
+            context['profile'] = None
+            context['interests_list'] = []
+            context['location_info'] = get_location_info(None)
+            context['blogs_count'] = 0
+            context['reviews_count'] = 0
+            context['comments_count'] = 0
+            context['average_rating'] = 0
+            context['average_review_rating'] = 0
+            context['tags_collection'] = []
+            context['tags_count'] = 0
+            return context
+
+        context['profile_user'] = viewed_user
+        profile = self.get_object()
+        context['profile'] = profile
+
+        # Profile info
+        context['interests_list'] = profile.interests if profile and profile.interests else []
+        context['location_info'] = get_location_info(profile.location if profile else None)
+
         try:
-            viewed_user = get_user_model().objects.get(username=self.kwargs.get('username'))
-            profile = self.get_object()
-            context['profile'] = profile
-
-            # Basic user info
-            context['profile_user'] = viewed_user
-
-            # Profile info
-            context['interests_list'] = profile.interests if profile and profile.interests else []
-            context['location_info'] = get_location_info(profile.location if profile else None)
-
             # Blogs by the user
             user_blogs = Blog.objects.filter(author=viewed_user).select_related('author')
             context['blogs'] = user_blogs
@@ -117,17 +146,17 @@ class ProfileView(LoginRequiredMixin, DetailView):
                     all_tags.update(blog_tags)
             context['tags_collection'] = sorted(list(all_tags))
             context['tags_count'] = len(context['tags_collection'])
-
-        except (get_user_model().DoesNotExist, OperationalError, ProgrammingError):
-            context['profile_user'] = None
+        except (OperationalError, ProgrammingError):
             context['blogs'] = []
-            context['interests_list'] = []
-            context['location_info'] = get_location_info(None)
             context['blogs_count'] = 0
+            context['reviews_list'] = []
             context['reviews_count'] = 0
-            context['comments_count'] = 0
+            context['reviewed_blogs'] = []
             context['average_rating'] = 0
             context['average_review_rating'] = 0
+            context['comments_list'] = []
+            context['comments_count'] = 0
+            context['commented_blogs'] = []
             context['tags_collection'] = []
             context['tags_count'] = 0
 
