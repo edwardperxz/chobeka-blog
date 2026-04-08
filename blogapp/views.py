@@ -15,6 +15,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
 from django import forms
 from django.db.models import Avg, Count, Q
+from django.db.utils import OperationalError, ProgrammingError
 from django.contrib.auth.forms import UserCreationForm
 from random import choice
 from django.shortcuts import redirect
@@ -344,32 +345,35 @@ class BlogListView(ListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        queryset = Blog.objects.select_related('author', 'author__profile').prefetch_related('reviews')
-        sort = self.request.GET.get('sort', 'latest')
+        try:
+            queryset = Blog.objects.select_related('author', 'author__profile').prefetch_related('reviews')
+            sort = self.request.GET.get('sort', 'latest')
 
-        if sort == 'most_commented':
-            queryset = queryset.annotate(
-                comment_count=Count('reviews__comments')
-            ).order_by('-comment_count', '-created_at')
-        elif sort == 'oldest':
-            queryset = queryset.order_by('created_at')
-        elif sort == 'best_rated':
-            queryset = queryset.annotate(
-                review_count=Count('reviews'),
-                avg_rating=Avg('reviews__rating')
-            ).order_by('-review_count', '-avg_rating', '-created_at')
-        elif sort == 'random':
-            blog_ids = Blog.objects.values_list('id', flat=True)
-            if blog_ids:
-                random_id = choice(list(blog_ids))
-                self.random_blog_id = random_id
-                queryset = queryset.filter(id=random_id)
+            if sort == 'most_commented':
+                queryset = queryset.annotate(
+                    comment_count=Count('reviews__comments')
+                ).order_by('-comment_count', '-created_at')
+            elif sort == 'oldest':
+                queryset = queryset.order_by('created_at')
+            elif sort == 'best_rated':
+                queryset = queryset.annotate(
+                    review_count=Count('reviews'),
+                    avg_rating=Avg('reviews__rating')
+                ).order_by('-review_count', '-avg_rating', '-created_at')
+            elif sort == 'random':
+                blog_ids = Blog.objects.values_list('id', flat=True)
+                if blog_ids:
+                    random_id = choice(list(blog_ids))
+                    self.random_blog_id = random_id
+                    queryset = queryset.filter(id=random_id)
+                else:
+                    queryset = queryset.none()
             else:
-                queryset = queryset.none()
-        else:  # default: latest
-            queryset = queryset.order_by('-created_at')
+                queryset = queryset.order_by('-created_at')
 
-        return self._apply_filters(queryset)
+            return self._apply_filters(queryset)
+        except (OperationalError, ProgrammingError):
+            return Blog.objects.none()
 
     def _apply_filters(self, queryset):
         """Apply all filters from request parameters to the queryset."""
