@@ -7,8 +7,8 @@
 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-0 mb-8 overflow-hidden">
   <!-- Banner section -->
   <div class="relative h-32 bg-gradient-to-r from-primary_dark-300 to-primary_dark-600">
-    {% if profile_user.profile.profile_photo %}
-    <img src="{{ profile_user.profile.profile_photo.url }}" alt="Banner"
+    {% if profile and profile.profile_photo %}
+    <img src="{{ profile.profile_photo.url }}" alt="Banner"
          class="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm pointer-events-none select-none" />
     {% endif %}
     
@@ -25,7 +25,7 @@
       </span>
       {% endif %}
       
-      {% if profile_user.profile.location and location_info %}
+      {% if profile and profile.location and location_info %}
       <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium
                  bg-{{ location_info.color }}-100
                  text-{{ location_info.color }}-800
@@ -44,8 +44,8 @@
   <div class="relative px-4 md:px-8 pb-8 -mt-16">
     <div class="flex justify-center">
       <div class="relative group">
-        {% if profile_user.profile.profile_photo %}
-        <img src="{{ profile_user.profile.profile_photo.url }}" alt="Foto de Perfil"
+        {% if profile and profile.profile_photo %}
+        <img src="{{ profile.profile_photo.url }}" alt="Foto de Perfil"
              class="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-xl cursor-pointer transition-transform duration-300 group-hover:scale-105 group-hover:ring-4 group-hover:ring-primary_dark-300"
              onclick="openImageModal(this.src)">
         {% else %}
@@ -125,21 +125,21 @@
         Miembro desde {{ profile_user.date_joined|date:"d M, Y" }}
       </p>
       
-      {% if profile_user.profile.bio %}
+      {% if profile and profile.bio %}
       <div class="mb-2">
         <h4 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center">
           <span class="material-icons mr-1">info</span> Biografía
         </h4>
-        <p class="text-gray-600 dark:text-gray-300">{{ profile_user.profile.bio }}</p>
+        <p class="text-gray-600 dark:text-gray-300">{{ profile.bio }}</p>
       </div>
       {% endif %}
       
-      {% if profile_user.profile.birth_date %}
+      {% if profile and profile.birth_date %}
       <div class="mb-2">
         <h4 class="text-md font-medium text-gray-700 dark:text-gray-400 mb-1 flex items-center">
           <span class="material-icons mr-1">cake</span> Fecha de nacimiento
         </h4>
-        <p class="text-gray-600 dark:text-gray-300">{{ profile_user.profile.birth_date|date:"j F" }}</p>
+        <p class="text-gray-600 dark:text-gray-300">{{ profile.birth_date|date:"j F" }}</p>
       </div>
       {% endif %}
       

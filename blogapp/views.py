@@ -52,8 +52,6 @@ class ProfileView(LoginRequiredMixin, DetailView):
             try:
                 return user.profile
             except UserProfile.DoesNotExist:
-                if user == self.request.user:
-                    return UserProfile.objects.create(user=user)
                 return None
         except get_user_model().DoesNotExist:
             return None
@@ -63,6 +61,7 @@ class ProfileView(LoginRequiredMixin, DetailView):
         try:
             viewed_user = get_user_model().objects.get(username=self.kwargs.get('username'))
             profile = self.get_object()
+            context['profile'] = profile
 
             # Basic user info
             context['profile_user'] = viewed_user
