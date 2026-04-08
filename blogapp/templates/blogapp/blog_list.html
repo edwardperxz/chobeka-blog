@@ -1,4 +1,5 @@
 {% extends 'blogapp/base.html' %}
+{% load static %}
 {% block content %}
 
   <!-- Pop-up explicativo (solo primera vez) -->
@@ -9,7 +10,7 @@
          class="hidden md:flex flex-col items-center justify-center w-full max-w-2xl min-h-[400px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-10 text-center animate-fade-in">
       <!-- GIF ilustrativo del sidebar -->
       <div class="w-full flex justify-center mb-6">
-        <img src="static/Images/cp-dance.gif" alt="Guía Sidebar" class="w-[200px] h-auto rounded-lg">
+        <img src="{% static 'Images/cp-dance.gif' %}" alt="Guía Sidebar" class="w-[200px] h-auto rounded-lg">
       </div>
       <!-- Mensaje explicativo -->
       <h2 class="text-3xl font-bold mb-4 text-gray-900 dark:text-white">¡Bienvenido a ChobekaBlog! 😎</h2>
@@ -30,7 +31,7 @@
          class="md:hidden flex flex-col items-center justify-center w-full max-w-xs min-h-[60vh] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-4 text-center animate-fade-in">
       <!-- GIF ilustrativo del sidebar -->
       <div class="w-full flex justify-center mb-4">
-        <img src="static/Images/cp-dance.gif" alt="Guía Sidebar" class="w-[200px] h-auto rounded-lg">
+        <img src="{% static 'Images/cp-dance.gif' %}" alt="Guía Sidebar" class="w-[200px] h-auto rounded-lg">
       </div>
       <!-- Mensaje explicativo -->
       <h2 class="text-2xl font-bold mb-3 text-gray-900 dark:text-white leading-tight">¡Bienvenido a ChobekaBlog! 😎</h2>
