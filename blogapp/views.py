@@ -21,14 +21,6 @@ from random import choice
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-from django.conf import settings
-
-
-
-def _is_read_only_storage_error(exc):
-    return isinstance(exc, OSError) and (
-        getattr(exc, 'errno', None) == 30 or 'Read-only file system' in str(exc)
-    )
 
 
 def get_location_info(location_code):
@@ -585,25 +577,14 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         try:
             response = super().form_valid(form)
-        except OSError as exc:
-            # En Vercel /var/task es de solo lectura; reintentar sin imagen evita el 500.
-            if _is_read_only_storage_error(exc) and form.cleaned_data.get('image'):
-                if not settings.DEBUG and not getattr(settings, 'USE_CLOUDINARY_STORAGE', False):
-                    form.add_error(
-                        'image',
-                        'No se pudo guardar la imagen en produccion. Verifica CLOUDINARY_URL o las variables CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET en Vercel.'
-                    )
-                    messages.error(
-                        self.request,
-                        'No se guardo la imagen. Falta activar Cloudinary en el runtime de produccion.'
-                    )
-                    return self.form_invalid(form)
-
+        except Exception:
+            # Si falla la subida (Cloudinary o filesystem), guardar el blog sin imagen para evitar 500.
+            if form.cleaned_data.get('image'):
                 form.instance.image = None
                 self.object = form.save()
                 messages.warning(
                     self.request,
-                    'El blog se creó, pero la imagen no pudo guardarse en este entorno de despliegue.'
+                    'El blog se creó, pero la imagen no pudo guardarse en este momento.'
                 )
                 messages.success(self.request, '¡El blog ha sido creado exitosamente!')
                 return redirect(self.get_success_url())
@@ -635,25 +616,14 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
         form.instance.last_updated = datetime.now()
         try:
             response = super().form_valid(form)
-        except OSError as exc:
-            if _is_read_only_storage_error(exc) and form.cleaned_data.get('image'):
-                if not settings.DEBUG and not getattr(settings, 'USE_CLOUDINARY_STORAGE', False):
-                    form.add_error(
-                        'image',
-                        'No se pudo guardar la imagen en produccion. Verifica CLOUDINARY_URL o las variables CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET en Vercel.'
-                    )
-                    messages.error(
-                        self.request,
-                        'No se guardo la imagen. Falta activar Cloudinary en el runtime de produccion.'
-                    )
-                    return self.form_invalid(form)
-
+        except Exception:
+            if form.cleaned_data.get('image'):
                 original_blog = self.get_object()
                 form.instance.image = original_blog.image
                 self.object = form.save()
                 messages.warning(
                     self.request,
-                    'El blog se actualizó, pero la nueva imagen no pudo guardarse en este entorno de despliegue.'
+                    'El blog se actualizó, pero la nueva imagen no pudo guardarse en este momento.'
                 )
                 messages.success(self.request, '¡El blog ha sido actualizado exitosamente!')
                 return redirect(self.get_success_url())
