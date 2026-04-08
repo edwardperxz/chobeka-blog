@@ -24,6 +24,12 @@ from django.http import HttpResponse
 
 
 
+def _is_read_only_storage_error(exc):
+    return isinstance(exc, OSError) and (
+        getattr(exc, 'errno', None) == 30 or 'Read-only file system' in str(exc)
+    )
+
+
 def get_location_info(location_code):
     LOCATION_MAP = {
         'BOC': {'flag_url': 'Bocas_del_Toro', 'name': 'Bocas del Toro', 'color': 'lime'},
@@ -131,6 +137,7 @@ class ProfileView(LoginRequiredMixin, DetailView):
                 context['average_review_rating'] = round(avg_review_rating, 1) if avg_review_rating else 0
             else:
                 context['average_review_rating'] = 0
+
 
             # Comments by the user
             user_comments = Comment.objects.filter(commenter=viewed_user)
@@ -575,8 +582,23 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
+        try:
+            response = super().form_valid(form)
+        except OSError as exc:
+            # En Vercel /var/task es de solo lectura; reintentar sin imagen evita el 500.
+            if _is_read_only_storage_error(exc) and form.cleaned_data.get('image'):
+                form.instance.image = None
+                self.object = form.save()
+                messages.warning(
+                    self.request,
+                    'El blog se creó, pero la imagen no pudo guardarse en este entorno de despliegue.'
+                )
+                messages.success(self.request, '¡El blog ha sido creado exitosamente!')
+                return redirect(self.get_success_url())
+            raise
+
         messages.success(self.request, '¡El blog ha sido creado exitosamente!')
-        return super().form_valid(form)
+        return response
 
     def get_success_url(self):
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.object.pk})
@@ -599,8 +621,23 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
         if self.request.POST.get('remove_image') == "1":
             form.instance.remove_image()
         form.instance.last_updated = datetime.now()
+        try:
+            response = super().form_valid(form)
+        except OSError as exc:
+            if _is_read_only_storage_error(exc) and form.cleaned_data.get('image'):
+                original_blog = self.get_object()
+                form.instance.image = original_blog.image
+                self.object = form.save()
+                messages.warning(
+                    self.request,
+                    'El blog se actualizó, pero la nueva imagen no pudo guardarse en este entorno de despliegue.'
+                )
+                messages.success(self.request, '¡El blog ha sido actualizado exitosamente!')
+                return redirect(self.get_success_url())
+            raise
+
         messages.success(self.request, '¡El blog ha sido actualizado exitosamente!')
-        return super().form_valid(form)
+        return response
 
     def get_success_url(self):
         return reverse_lazy('blogapp:blog_detail', kwargs={'pk': self.object.pk})

@@ -46,6 +46,11 @@ DEBUG = env_bool('DEBUG', True)
 
 SITE_ID = 1
 ENABLE_SOCIAL_AUTH = env_bool('ENABLE_SOCIAL_AUTH', False)
+USE_CLOUDINARY_STORAGE = all([
+    os.getenv('CLOUDINARY_CLOUD_NAME'),
+    os.getenv('CLOUDINARY_API_KEY'),
+    os.getenv('CLOUDINARY_API_SECRET'),
+])
 
 ALLOWED_HOSTS = [host.strip() for host in os.getenv(
     'ALLOWED_HOSTS',
@@ -71,6 +76,12 @@ INSTALLED_APPS = [
     'social_django',
     'django_ckeditor_5',
 ]
+
+if USE_CLOUDINARY_STORAGE:
+    INSTALLED_APPS += [
+        'cloudinary',
+        'cloudinary_storage',
+    ]
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -180,7 +191,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
@@ -206,6 +216,32 @@ SOCIALACCOUNT_AUTO_SIGNUP = False
 # https://docs.djangoproject.com/en/5.1/topics/files/#file-upload-handling
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+if USE_CLOUDINARY_STORAGE:
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+        'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+        'SECURE': True,
+    }
+
+    STORAGES = {
+        'default': {
+            'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        },
+    }
+else:
+    STORAGES = {
+        'default': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        },
+    }
 
 CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.getenv(
     'CSRF_TRUSTED_ORIGINS',
@@ -276,8 +312,6 @@ SOCIAL_AUTH_SANITIZE_REDIRECTS = True
 SOCIALACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 # CkEditor configuration
 customColorPalette = [
     {
@@ -307,7 +341,11 @@ customColorPalette = [
 ]
 
 # CKEDITOR_5_CUSTOM_CSS = 'path_to.css'
-CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+CKEDITOR_5_FILE_STORAGE = (
+    'cloudinary_storage.storage.MediaCloudinaryStorage'
+    if USE_CLOUDINARY_STORAGE
+    else 'django.core.files.storage.FileSystemStorage'
+)
 CKEDITOR_5_UPLOAD_PATH = "uploads/ckeditor5/"
 
 CKEDITOR_5_CONFIGS = {
