@@ -17,4 +17,5 @@ def env_flags(request):
     return {
         'debug': settings.DEBUG,
         'pythonanywhere': 'PYTHONANYWHERE_DOMAIN' in os.environ,
+        'enable_social_auth': getattr(settings, 'ENABLE_SOCIAL_AUTH', False),
     }

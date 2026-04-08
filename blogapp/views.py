@@ -1,4 +1,5 @@
 from datetime import datetime
+import secrets
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -152,6 +153,11 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
             # Create a profile if it doesn't exist
             return UserProfile.objects.create(user=self.request.user)
 
+    def dispatch(self, request, *args, **kwargs):
+        if kwargs.get('username') != request.user.username:
+            return redirect('blogapp:profile_settings', username=request.user.username)
+        return super().dispatch(request, *args, **kwargs)
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
@@ -180,6 +186,11 @@ class ProfileSettingsView(LoginRequiredMixin, DetailView):
     template_name = 'blogapp/profile_settings.html'
     context_object_name = 'profile'
 
+    def dispatch(self, request, *args, **kwargs):
+        if kwargs.get('username') != request.user.username:
+            return redirect('blogapp:profile_settings', username=request.user.username)
+        return super().dispatch(request, *args, **kwargs)
+
     def get_object(self, queryset=None):
         try:
             return self.request.user.profile
@@ -187,11 +198,71 @@ class ProfileSettingsView(LoginRequiredMixin, DetailView):
             # Create a profile if it doesn't exist
             return UserProfile.objects.create(user=self.request.user)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-class PasswordUpdateView(LoginRequiredMixin, FormView):
+        password_token = secrets.token_urlsafe(24)
+        email_token = secrets.token_urlsafe(24)
+        delete_token = secrets.token_urlsafe(24)
+
+        self.request.session['profile_settings_password_access_token'] = password_token
+        self.request.session['profile_settings_email_access_token'] = email_token
+        self.request.session['profile_settings_delete_access_token'] = delete_token
+
+        context['password_change_access_url'] = (
+            reverse('blogapp:password_change', kwargs={'username': self.request.user.username})
+            + f'?access={password_token}'
+        )
+        context['email_change_access_url'] = (
+            reverse('blogapp:email_change', kwargs={'username': self.request.user.username})
+            + f'?access={email_token}'
+        )
+        context['delete_profile_access_url'] = (
+            reverse('blogapp:delete_profile', kwargs={'username': self.request.user.username})
+            + f'?access={delete_token}'
+        )
+
+        return context
+
+
+class ProfileSettingsAccessRequiredMixin:
+    access_token_session_key = ''
+    active_form_session_key = ''
+
+    def _settings_redirect(self):
+        return redirect('blogapp:profile_settings', username=self.request.user.username)
+
+    def dispatch(self, request, *args, **kwargs):
+        if kwargs.get('username') != request.user.username:
+            return self._settings_redirect()
+
+        if request.method == 'GET':
+            access_token = request.GET.get('access', '')
+            expected_token = request.session.get(self.access_token_session_key, '')
+
+            if not access_token or access_token != expected_token:
+                return self._settings_redirect()
+
+            request.session.pop(self.access_token_session_key, None)
+            request.session[self.active_form_session_key] = True
+
+        elif request.method == 'POST':
+            if not request.session.get(self.active_form_session_key, False):
+                return self._settings_redirect()
+
+        response = super().dispatch(request, *args, **kwargs)
+        response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+        return response
+
+
+class PasswordUpdateView(LoginRequiredMixin, ProfileSettingsAccessRequiredMixin, FormView):
     form_class = PasswordUpdateForm
     template_name = 'blogapp/profile_update_password.html'
     success_url = reverse_lazy('blogapp:profile')
+    access_token_session_key = 'profile_settings_password_access_token'
+    active_form_session_key = 'profile_settings_password_access_active'
 
     def form_valid(self, form):
         user = self.request.user
@@ -204,10 +275,12 @@ class PasswordUpdateView(LoginRequiredMixin, FormView):
     def get_success_url(self):
         return reverse_lazy('blogapp:profile', kwargs={'username': self.request.user.username})
 
-class EmailUpdateView(LoginRequiredMixin, FormView):
+class EmailUpdateView(LoginRequiredMixin, ProfileSettingsAccessRequiredMixin, FormView):
     form_class = EmailUpdateForm
     template_name = 'blogapp/profile_update_email.html'
     success_url = reverse_lazy('blogapp:profile')
+    access_token_session_key = 'profile_settings_email_access_token'
+    active_form_session_key = 'profile_settings_email_access_active'
 
     def form_valid(self, form):
         user = self.request.user
@@ -220,10 +293,12 @@ class EmailUpdateView(LoginRequiredMixin, FormView):
     def get_success_url(self):
         return reverse_lazy('blogapp:profile', kwargs={'username': self.request.user.username})
 
-class ProfileDeleteView(LoginRequiredMixin, FormView):
+class ProfileDeleteView(LoginRequiredMixin, ProfileSettingsAccessRequiredMixin, FormView):
     form_class = ProfileDeletionForm
     template_name = 'blogapp/profile_confirm_delete.html'
     success_url = reverse_lazy('blogapp:blog_list')
+    access_token_session_key = 'profile_settings_delete_access_token'
+    active_form_session_key = 'profile_settings_delete_access_active'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

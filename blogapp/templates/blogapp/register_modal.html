@@ -1,7 +1,9 @@
 {% extends "blogapp/base.html" %}
 {% load static %}
 {% block title %}ChobekaBlog | Register{% endblock %}
+{% if enable_social_auth %}
 {% load socialaccount %}
+{% endif %}
 {% block body_class %}register-modal-nav-logo{% endblock %}
 {% block content %}
 
@@ -105,6 +107,7 @@
       </button>
     </form>
 
+    {% if enable_social_auth %}
     <div class="flex items-center w-full my-6">
       <div class="flex-1 border-t border-[#ef4444]"></div>
       <span class="mx-3 text-zinc-300 text-base">o</span>
@@ -123,6 +126,7 @@
         <span class="flex-1 text-center font-medium text-white">Facebook</span>
       </a>
     </div>
+    {% endif %}
 
     <div class="w-full text-center mt-8">
       <p class="text-gray-300 text-base dark:text-zinc-300">¿Ya tienes una cuenta?
@@ -216,6 +220,7 @@
       </button>
     </form>
 
+    {% if enable_social_auth %}
     <div class="flex items-center w-full my-4">
       <div class="flex-1 border-t border-[#ef4444]"></div>
       <span class="mx-3 text-gray-700 text-sm dark:text-zinc-400">o</span>
@@ -234,6 +239,7 @@
         <span class="flex-1 text-center font-medium text-white">Facebook</span>
       </a>
     </div>
+    {% endif %}
 
     <div class="w-full text-center mt-6">
       <p class="text-gray-700 text-sm dark:text-zinc-400">¿Ya tienes una cuenta?

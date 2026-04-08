@@ -6,3 +6,6 @@ django-widget-tweaks
 django-allauth
 social-auth-app-django
 django-ckeditor-5
+dj-database-url
+psycopg2-binary
+whitenoise

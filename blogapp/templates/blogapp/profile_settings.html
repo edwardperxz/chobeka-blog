@@ -33,15 +33,15 @@
         </div>
         <div class="px-4 sm:px-6 py-6">
           <div class="space-y-2">
-            <a href="{% url 'blogapp:password_change' user.username %}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+            <a href="{{ password_change_access_url }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
               <span class="material-icons text-red-500">key</span>
               <span class="text-gray-700 dark:text-gray-300">Cambiar Contraseña</span>
             </a>
-            <a href="{% url 'blogapp:email_change' user.username %}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+            <a href="{{ email_change_access_url }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
               <span class="material-icons text-gray-500 dark:text-gray-400">email</span>
               <span class="text-gray-700 dark:text-gray-300">Cambiar Email</span>
             </a>
-            <a href="{% url 'blogapp:delete_profile' user.username %}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition">
+            <a href="{{ delete_profile_access_url }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition">
               <span class="material-icons text-red-500 dark:text-red-400">delete</span>
               <span class="text-red-600 dark:text-red-400">Eliminar cuenta</span>
             </a>

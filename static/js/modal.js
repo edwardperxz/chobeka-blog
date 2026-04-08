@@ -1,24 +1,26 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('deleteConfirmModal');
+function closeCurrentModal(trigger) {
+    const parentModal = trigger ? trigger.closest('#confirmModal, #deleteConfirmModal, [role="dialog"]') : null;
+    const fallbackModal = document.getElementById('confirmModal') || document.getElementById('deleteConfirmModal');
+    const modal = parentModal || fallbackModal;
+
     if (modal) {
-        modal.classList.remove('hidden');
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+        return;
     }
 
-    const closeBtn = document.getElementById('closeModal');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (modal) modal.classList.add('hidden');
-        });
+    window.location.href = '/';
+}
+
+document.addEventListener('click', function(e) {
+    const trigger = e.target.closest('#closeModal, #cancelButton');
+    if (!trigger) {
+        return;
     }
 
-    const cancelBtn = document.getElementById('cancelButton');
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (modal) modal.classList.add('hidden');
-        });
-    }
+    e.preventDefault();
+    closeCurrentModal(trigger);
 });
 
 /**
