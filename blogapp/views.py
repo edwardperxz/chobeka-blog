@@ -50,8 +50,8 @@ class ProfileView(LoginRequiredMixin, DetailView):
             user = get_user_model().objects.get(username=username)
 
             try:
-                return user.profile
-            except UserProfile.DoesNotExist:
+                return UserProfile.objects.filter(user=user).first()
+            except (OperationalError, ProgrammingError):
                 return None
         except get_user_model().DoesNotExist:
             return None
@@ -118,7 +118,7 @@ class ProfileView(LoginRequiredMixin, DetailView):
             context['tags_collection'] = sorted(list(all_tags))
             context['tags_count'] = len(context['tags_collection'])
 
-        except get_user_model().DoesNotExist:
+        except (get_user_model().DoesNotExist, OperationalError, ProgrammingError):
             context['profile_user'] = None
             context['blogs'] = []
             context['interests_list'] = []
